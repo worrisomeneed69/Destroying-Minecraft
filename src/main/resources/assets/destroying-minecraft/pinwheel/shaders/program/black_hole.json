@@ -1,0 +1,22 @@
+{
+  "vertex": "veil:blit_screen",
+  "fragment": "destroying-minecraft:black_hole",
+  "textures": {
+    "RandNoise": {
+      "type": "location",
+      "location": "destroying-minecraft:textures/shaders/rand_noise.png"
+    },
+    "Normals": {
+      "type": "framebuffer",
+      "name": "veil:dynamic_main",
+      "sampler": 2
+    },
+    "DepthComponent": {
+      "type": "framebuffer",
+      "name": "veil:dynamic_main:depth"
+    }
+  },
+  "definitions": [
+    "MOTION_BLUR"
+  ]
+}

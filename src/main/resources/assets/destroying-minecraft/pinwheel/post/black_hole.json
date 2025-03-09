@@ -1,0 +1,25 @@
+{
+    "stages": [
+        {
+            "type": "veil:blit",
+            "shader": "destroying-minecraft:black_hole",
+            "in": "minecraft:main",
+            "out": "veil:post"
+        }
+    ],
+    "framebuffers": {
+    },
+    "textures": {
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
