@@ -4,6 +4,11 @@
             "type": "veil:blit",
             "shader": "destroying-minecraft:black_hole",
             "in": "minecraft:main",
+            "out": "destroying-minecraft:black_hole"
+        },
+        {
+            "type": "veil:copy",
+            "in": "destroying-minecraft:black_hole",
             "out": "veil:post"
         }
     ],

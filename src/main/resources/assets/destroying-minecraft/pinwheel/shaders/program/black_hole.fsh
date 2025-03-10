@@ -15,7 +15,7 @@ uniform float GameTime;
 
 
 const float BH_SIZE = 0.11;
-const float DISK_RADIUS = BH_SIZE + 2.5;
+const float DISK_RADIUS = BH_SIZE + 10;
 const int ITERATIONS = 200;
 
 // Thank you Sonic Ether: https://www.shadertoy.com/view/lstSRS
@@ -83,12 +83,12 @@ float rand(vec2 coord) {
     return fract(sin(dot(coord, vec2(12.9898, 78.223))) * 43758.5453) * 2.0 - 1.0;
 }
 
-void warpSpace(inout vec3 rayPos, inout vec3 rayDir, vec3 BH_POS, inout float force, in float stepDist, inout float dstToCentre) {
-    vec3 dirToCentre = normalize(BH_POS - rayPos);
-    dstToCentre = length(BH_POS - rayPos);
+void warpSpace(inout vec3 rayPos, inout vec3 rayDir, vec3 BH_POS, in float stepDist) {
+    vec3 dirToCenter = normalize(BH_POS - rayPos);
+    float dstToCenter = distance(BH_POS, rayPos);
 
-    force = 1 / (pow(dstToCentre, 2.0));
-    rayDir = normalize(mix(rayDir, dirToCentre, force * stepDist * 0.1));
+    float force = 1 / (pow(dstToCenter, 2.0));
+    rayDir = normalize(mix(rayDir, dirToCenter, force * 0.02));
 }
 
 //Thank you https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83 for the noise functions
@@ -130,14 +130,22 @@ float fbm(vec3 x) {
     return v;
 }
 
+//Attenuation formula https://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula
+float attenuation(float value, float a, float b){
+    return 1 / (1 + a*abs(value) + b*abs(value)*abs(value));
+}
+
 void raymarchAccretionDisk(vec3 rayPos, float diskDist, vec3 BH_POS, inout vec4 color) {
     float radius = distance(rayPos, BH_POS);
     vec3 diskPos = rayPos - BH_POS;
-    float angle = atan2(diskPos.x, diskPos.z) + GameTime * 2000;
+    float angle = atan2(diskPos.x, diskPos.z) + GameTime * 500;
+    float attenuate = attenuation(radius / 15, 0, 20);
 
     float cloud = clamp(fbm(vec3(radius * 5, angle, diskPos.y * 3)), 0.0, 1.0);
-    color += vec4(cloud * (1.0 - (radius * radius)/(DISK_RADIUS * DISK_RADIUS) ) * 0.1);
-    color.rgb *= texture(RandNoise, vec2(radius, angle) * 10).rgb;
+    color.rgb += vec3(cloud * attenuate);
+    color.rgb *= texture(RandNoise, vec2(radius, angle) * 200).rgb;
+    color.a = attenuate;
+//    color.a += 1.0;
 }
 
 in vec2 texCoord;
@@ -156,50 +164,46 @@ void main() {
     float farPlane = 8.0;
     vec3 ro = VeilCamera.CameraPosition + rand(texCoord + GameTime) * 0.01;
     vec3 rayDir = viewDirFromUv(texCoord);
-    vec3 ogRayDir = rayDir;
+    float stepDist = farPlane / float(ITERATIONS);
     float dist = 0.0;
 
 
     bool hit = false;
     vec4 BHcolor = vec4(0.0);
-    float force = 0.0;
-    float dstToCentre = 0.0;
+    vec3 rayPos = ro;
     if(depth >= 1.0) {
+        color = vec4(0.0, 0.0, 0.0, 1.0);
         for(int i = 0; i <= ITERATIONS; i++) {
-            vec3 rayPos = ro + rayDir * dist;
+            rayPos += rayDir * stepDist;
 
 
             float diskDist = mapDisk(rayPos, BH_POS);
-            float stepDist = farPlane / float(ITERATIONS);
             dist += stepDist;
 
             //Warp Space
-//            warpSpace(rayPos, rayDir, BH_POS, force, stepDist, dstToCentre);
+            warpSpace(rayPos, rayDir, BH_POS, stepDist);
 
 
             //Hit Accretion Disk
-            if(diskDist <= 0.001) {
+            if (diskDist <= 0.0001) {
                 hit = true;
                 raymarchAccretionDisk(rayPos, diskDist, BH_POS, BHcolor);
-                if(BHcolor.a >= 1.0){
+                if (BHcolor.a >= 1.0) {
                     break;
                 }
-            } else if (dist >= wordDepth || dist > 100){
+            } else if (dist >= wordDepth || dist > 100) {
                 hit = false;
                 break;
             }
-//else if(dstToCentre <= BH_SIZE + 0.05){
-//                hit = true;
-//                BHcolor = vec4(0.0);
-//                break;
-//            }
         }
 
-        if(hit){
+        if(hit) {
+            BHcolor.rgb *= 10;
             fragColor = vec4(blend(color, BHcolor), 1.0);
         } else {
             fragColor = color;
         }
+
     } else {
         fragColor = color;
     }
