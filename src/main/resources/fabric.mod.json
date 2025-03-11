@@ -18,6 +18,9 @@
 		"main": [
 			"com.sp.DestroyingMinecraft"
 		],
+		"client": [
+			"com.sp.DestroyingMinecraftClient"
+		],
 		"fabric-datagen": [
 			"com.sp.DestroyingMinecraftDataGenerator"
 		]

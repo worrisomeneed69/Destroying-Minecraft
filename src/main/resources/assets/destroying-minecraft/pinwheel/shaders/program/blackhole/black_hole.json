@@ -1,6 +1,6 @@
 {
   "vertex": "veil:blit_screen",
-  "fragment": "destroying-minecraft:black_hole",
+  "fragment": "destroying-minecraft:blackhole/black_hole",
   "textures": {
     "RandNoise": {
       "type": "location",
@@ -14,9 +14,10 @@
     "DepthComponent": {
       "type": "framebuffer",
       "name": "veil:dynamic_main:depth"
+    },
+    "HandDepth": {
+      "type": "framebuffer",
+      "name": "veil:first_person:depth"
     }
-  },
-  "definitions": [
-    "MOTION_BLUR"
-  ]
+  }
 }

@@ -2,19 +2,32 @@
     "stages": [
         {
             "type": "veil:blit",
-            "shader": "destroying-minecraft:black_hole",
-            "in": "minecraft:main",
-            "out": "destroying-minecraft:black_hole"
+            "shader": "destroying-minecraft:blackhole/black_hole",
+            "out": "destroying-minecraft:black_hole_final"
         },
         {
             "type": "veil:copy",
-            "in": "destroying-minecraft:black_hole",
+            "in": "destroying-minecraft:black_hole_final",
+            "out": "destroying-minecraft:black_hole"
+        },
+        {
+            "type": "veil:blit",
+            "shader": "destroying-minecraft:blackhole/mix",
+            "in": "minecraft:main",
             "out": "veil:post"
         }
     ],
     "framebuffers": {
     },
     "textures": {
+        "PrevSampler": {
+            "type": "framebuffer",
+            "name": "destroying-minecraft:black_hole"
+        },
+        "BHSampler": {
+            "type": "framebuffer",
+            "name": "destroying-minecraft:black_hole_final"
+        }
     }
 }
 

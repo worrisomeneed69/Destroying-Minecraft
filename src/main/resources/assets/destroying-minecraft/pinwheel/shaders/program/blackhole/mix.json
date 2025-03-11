@@ -1,0 +1,22 @@
+{
+  "vertex": "veil:blit_screen",
+  "fragment": "destroying-minecraft:blackhole/mix",
+  "textures": {
+    "PrevSampler": {
+      "type": "framebuffer",
+      "name": "destroying-minecraft:black_hole"
+    },
+    "BHSampler": {
+      "type": "framebuffer",
+      "name": "destroying-minecraft:black_hole_final"
+    },
+    "DepthComponent": {
+      "type": "framebuffer",
+      "name": "veil:dynamic_main:depth"
+    },
+    "HandDepth": {
+      "type": "framebuffer",
+      "name": "veil:first_person:depth"
+    }
+  }
+}
