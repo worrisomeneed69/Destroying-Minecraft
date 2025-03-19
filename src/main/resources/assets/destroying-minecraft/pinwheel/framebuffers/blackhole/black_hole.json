@@ -2,5 +2,7 @@
   "depth": false,
   "format": "RGBA16",
   "autoClear": false,
-  "linear": true
+  "filter": {
+    "blur": true
+  }
 }

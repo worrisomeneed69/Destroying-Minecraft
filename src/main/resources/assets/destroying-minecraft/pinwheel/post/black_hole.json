@@ -3,12 +3,37 @@
         {
             "type": "veil:blit",
             "shader": "destroying-minecraft:blackhole/black_hole",
-            "out": "destroying-minecraft:black_hole_final"
+            "in": "minecraft:main",
+            "out": "destroying-minecraft:blackhole/black_hole_final"
         },
         {
             "type": "veil:copy",
-            "in": "destroying-minecraft:black_hole_final",
-            "out": "destroying-minecraft:black_hole"
+            "in": "destroying-minecraft:blackhole/black_hole_final",
+            "out": "destroying-minecraft:blackhole/black_hole"
+        },
+        {
+            "type": "veil:blit",
+            "shader": "destroying-minecraft:blackhole/mipmaptree",
+            "in": "destroying-minecraft:blackhole/black_hole_final",
+            "out": "destroying-minecraft:blackhole/mipmaptree"
+        },
+        {
+            "type": "veil:blit",
+            "shader": "destroying-minecraft:blackhole/blur/horizontal",
+            "in": "destroying-minecraft:blackhole/mipmaptree",
+            "out": "swap"
+        },
+        {
+            "type": "veil:blit",
+            "shader": "destroying-minecraft:blackhole/blur/vertical",
+            "in": "swap",
+            "out": "destroying-minecraft:blackhole/black_hole_blur"
+        },
+        {
+            "type": "veil:blit",
+            "shader": "destroying-minecraft:blackhole/bloom",
+            "in": "destroying-minecraft:blackhole/black_hole_blur",
+            "out": "destroying-minecraft:blackhole/black_hole_bloom"
         },
         {
             "type": "veil:blit",
@@ -22,11 +47,19 @@
     "textures": {
         "PrevSampler": {
             "type": "framebuffer",
-            "name": "destroying-minecraft:black_hole"
+            "name": "destroying-minecraft:blackhole/black_hole"
         },
         "BHSampler": {
             "type": "framebuffer",
-            "name": "destroying-minecraft:black_hole_final"
+            "name": "destroying-minecraft:blackhole/black_hole_final"
+        },
+        "MipMapSampler": {
+            "type": "framebuffer",
+            "name": "destroying-minecraft:blackhole/black_hole_bloom"
+        },
+        "BHBloomSampler": {
+            "type": "framebuffer",
+            "name": "destroying-minecraft:blackhole/black_hole_bloom"
         }
     }
 }

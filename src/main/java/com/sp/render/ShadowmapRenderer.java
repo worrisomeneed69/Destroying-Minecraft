@@ -1,0 +1,171 @@
+package com.sp.render;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.systems.VertexSorter;
+import com.sp.DestroyingMinecraft;
+import com.sp.mixin.WorldRendererAccessor;
+import foundry.veil.api.client.render.CameraMatrices;
+import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
+import foundry.veil.api.client.render.VeilRenderSystem;
+import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
+import foundry.veil.api.client.render.shader.program.MutableUniformAccess;
+import foundry.veil.api.client.render.shader.program.ShaderProgram;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.*;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3d;
+
+/**
+ * Taken from my backrooms mod
+ */
+public class ShadowMapRenderer {
+    private static boolean renderingShadowMap;
+    private static Camera currentCamera;
+
+
+    public static void renderShadowMap(Camera camera){
+        currentCamera = camera;
+        MinecraftClient client = MinecraftClient.getInstance();
+        WorldRenderer worldRenderer = client.worldRenderer;
+        WorldRendererAccessor accessor = (WorldRendererAccessor) worldRenderer;
+        Vec3d cameraPos = camera.getPos();
+        MatrixStack shadowModelView = createShadowModelView(cameraPos.x, cameraPos.y, cameraPos.z, true);
+        Matrix4f shadowProjMat = createProjMat();
+        Matrix4f backupProjMat = RenderSystem.getProjectionMatrix();
+
+        int width = client.getFramebuffer().viewportWidth;
+        int height = client.getFramebuffer().viewportHeight;
+        Frustum frustum;
+
+        AdvancedFbo shadowMap = VeilRenderSystem.renderer().getFramebufferManager().getFramebuffer(Identifier.of(DestroyingMinecraft.MOD_ID, "shadowmap"));
+        if(shadowMap != null) {
+            setRenderingShadowMap(true);
+            PerspectiveRenderer.render(shadowMap, shadowModelView.peek().getPositionMatrix(), shadowProjMat, new Vector3d(cameraPos.x, cameraPos.y, cameraPos.z), new Quaternionf(), 20, client.getRenderTickCounter(), true);
+            setRenderingShadowMap(false);
+//            RenderSystem.setProjectionMatrix(shadowProjMat, VertexSorter.BY_Z);
+//
+//            shadowMap.bind(true);
+//            setRenderingShadowMap(true);
+//
+//            boolean chunkCulling = client.chunkCullingEnabled;
+//            client.chunkCullingEnabled = false;
+//            Frustum backupFrustum = accessor.getFrustum();
+//
+//            frustum = new Frustum(shadowModelView.peek().getPositionMatrix(), shadowProjMat);
+//            frustum.setPosition(cameraPos.x, cameraPos.y, cameraPos.z);
+//            accessor.setFrustum(frustum);
+////            worldRenderer.setupFrustum();
+//            accessor.invokeSetupTerrain(camera, frustum, false, false);
+//            accessor.invokeRenderLayer(RenderLayer.getCutout(), cameraPos.x, cameraPos.y, cameraPos.z, shadowModelView.peek().getPositionMatrix(), shadowProjMat);
+//            accessor.invokeRenderLayer(RenderLayer.getCutoutMipped(), cameraPos.x, cameraPos.y, cameraPos.z, shadowModelView.peek().getPositionMatrix(), shadowProjMat);
+//            accessor.invokeRenderLayer(RenderLayer.getSolid(), cameraPos.x, cameraPos.y, cameraPos.z, shadowModelView.peek().getPositionMatrix(), shadowProjMat);
+//
+//            if(client.world != null) {
+//                VertexConsumerProvider.Immediate immediate = accessor.getBufferBuilders().getEntityVertexConsumers();
+//
+//                for(Entity entity : client.world.getEntities()){
+//                    if(accessor.getEntityRenderDispatcher().shouldRender(entity, accessor.getFrustum(), cameraPos.x, cameraPos.y, cameraPos.z) || entity.isSpectator()){
+//                        accessor.invokeRenderEntity(entity, cameraPos.x, cameraPos.y, cameraPos.z, tickDelta, shadowModelView, immediate);
+//                    }
+//                }
+//
+//                immediate.draw();
+//
+//            }
+//
+//            setRenderingShadowMap(false);
+//            AdvancedFbo.unbind();
+//
+//            accessor.setFrustum(backupFrustum);
+//            RenderSystem.applyModelViewMatrix();
+////            client.chunkCullingEnabled = chunkCulling;
+//            RenderSystem.viewport(0, 0, width, height);
+//
+//            RenderSystem.setProjectionMatrix(backupProjMat, VertexSorter.BY_DISTANCE);
+
+
+
+        }
+    }
+
+
+    /**
+     The "do interval" bit was taken from the Iris Shadow Matrices class in order to keep the Shadows from flashing
+     <a href="https://github.com/IrisShaders/Iris/blob/3fc94e8f41535feebce0bcb4235eff4a809f5eea/common/src/main/java/net/irisshaders/iris/shadows/ShadowMatrices.java">HERE</a>
+     */
+    public static MatrixStack createShadowModelView(double CameraX, double CameraY, double CameraZ, boolean doInterval){
+        MatrixStack shadowModelView = new MatrixStack();
+
+        shadowModelView.peek().getNormalMatrix().identity();
+        shadowModelView.peek().getPositionMatrix().identity();
+
+        shadowModelView.peek().getPositionMatrix().translate(0.0f, 0.0f, -100.0f);
+        rotateShadowModelView(shadowModelView.peek().getPositionMatrix());
+
+        if(doInterval) {
+            float offsetX = (float) CameraX % 2.0f;
+            float offsetY = (float) CameraY % 2.0f;
+            float offsetZ = (float) CameraZ % 2.0f;
+
+            float halfIntervalSize = 1.0f;
+
+            offsetX -= halfIntervalSize;
+            offsetY -= halfIntervalSize;
+            offsetZ -= halfIntervalSize;
+            shadowModelView.peek().getPositionMatrix().translate(offsetX, offsetY, offsetZ);
+        }
+        return shadowModelView;
+    }
+
+    //Global Light Rotation
+    public static void rotateShadowModelView(Matrix4f shadowModelView){
+        shadowModelView.rotate(RotationAxis.POSITIVE_X.rotationDegrees(20.0f));
+        shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
+
+    }
+
+    public static Matrix4f createProjMat(){
+        return orthographicMatrix(160, 0.01f, 256.0f);
+    }
+
+
+    /**
+     Also taken from Iris lol. Turns out their orthographic Matrix is better
+     <a href="https://github.com/IrisShaders/Iris/blob/3fc94e8f41535feebce0bcb4235eff4a809f5eea/common/src/main/java/net/irisshaders/iris/shadows/ShadowMatrices.java">HERE</a>
+     */
+    public static Matrix4f orthographicMatrix(float halfPlaneLength, float nearPlane, float farPlane) {
+        return new Matrix4f(
+                1.0f / halfPlaneLength, 0f, 0f, 0f,
+                0f, 1.0f / halfPlaneLength, 0f, 0f,
+                0f, 0f, 2.0f / (nearPlane - farPlane), 0f,
+                0f, 0f, -(farPlane + nearPlane) / (farPlane - nearPlane), 1f
+        );
+    }
+
+    public static boolean isRenderingShadowMap() {
+        return renderingShadowMap;
+    }
+
+    public static void setRenderingShadowMap(boolean l) {
+        renderingShadowMap = l;
+    }
+
+    public static void setShadowUniforms(ShaderProgram access, World world) {
+        Matrix4f viewMat = ShadowMapRenderer.createShadowModelView(currentCamera.getPos().x, currentCamera.getPos().y, currentCamera.getPos().z, true).peek().getPositionMatrix();
+
+        access.setMatrix("shadowViewMatrix", viewMat);
+        access.setMatrix("IShadowViewMatrix", viewMat.invert());
+        access.setMatrix("shadowProjMat", ShadowMapRenderer.createProjMat());
+        access.setInt("working", 1);
+    }
+
+
+
+}

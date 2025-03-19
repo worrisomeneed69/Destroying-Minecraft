@@ -1,0 +1,8 @@
+{
+  "depth": false,
+  "format": "RGBA16",
+  "autoClear": true,
+  "filter": {
+    "blur": true
+  }
+}

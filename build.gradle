@@ -15,6 +15,11 @@ repositories {
 		name = 'BlameJared Maven (CrT / Bookshelf)'
 		url = 'https://maven.blamejared.com'
 	}
+
+	maven {
+		name = "Modrinth"
+		url = "https://api.modrinth.com/maven"
+	}
 }
 
 fabricApi {
@@ -35,6 +40,8 @@ dependencies {
 	modImplementation("foundry.veil:veil-fabric-${project.minecraft_version}:${project.veil_version}") {
 		exclude group: "maven.modrinth"
 	}
+
+	modCompileOnly "maven.modrinth:sodium:mc1.21.1-${sodium_version}-fabric"
 	
 }
 

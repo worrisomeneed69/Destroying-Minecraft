@@ -4,11 +4,11 @@
   "textures": {
     "PrevSampler": {
       "type": "framebuffer",
-      "name": "destroying-minecraft:black_hole"
+      "name": "destroying-minecraft:blackhole/black_hole"
     },
-    "BHSampler": {
+    "BHBloomSampler": {
       "type": "framebuffer",
-      "name": "destroying-minecraft:black_hole_final"
+      "name": "destroying-minecraft:blackhole/black_hole_bloom"
     },
     "DepthComponent": {
       "type": "framebuffer",
