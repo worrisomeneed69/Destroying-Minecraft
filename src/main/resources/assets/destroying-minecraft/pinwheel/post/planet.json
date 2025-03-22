@@ -1,0 +1,38 @@
+{
+    "stages": [
+        {
+            "type": "veil:blit",
+            "shader": "destroying-minecraft:planet/planet",
+            "in": "minecraft:main",
+            "out": "veil:post"
+        }
+    ],
+    "framebuffers": {
+    },
+    "textures": {
+        "ShadowMap": {
+            "type": "framebuffer",
+            "name": "destroying-minecraft:shadowmap:depth"
+        },
+        "NormalSampler": {
+            "type": "framebuffer",
+            "name": "veil:dynamic_main",
+            "sampler": 2
+        },
+        "HandDepth": {
+            "type": "framebuffer",
+            "name": "veil:first_person:depth"
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+

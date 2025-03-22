@@ -179,6 +179,8 @@ void main() {
     if(depth >= 1.0){
         //Don't use normal depth here because of ghosting
         vec3 worldSpacePos = screenToWorldSpace(texCoord, 1.0).xyz;
+
+
         vec3 playerSpacePos = worldSpacePos - prevCameraPos;
         vec3 prevViewPos = (prevViewMat * vec4(playerSpacePos, 1.0)).xyz;
         vec4 homogenousPos = prevProjMat * vec4(prevViewPos, 1.0);
@@ -203,7 +205,7 @@ void main() {
 
 
             float diskDist = mapDisk(rayPos, BH_POS);
-            dist += stepDist;
+//            dist += stepDist;
 
             //Warp Space
             warpSpace(rayPos, rayDir, BH_POS, stepDist);

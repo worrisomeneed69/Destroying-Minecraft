@@ -17,8 +17,6 @@ out vec4 vertexColor;
 out vec2 texCoord0;
 out vec4 viewPos;
 
-const vec4 plane = vec4(0,-1,0,9);
-
 vec3 distort(in vec3 shadowPosition) {
     const float bias0 = 0.95;
     const float bias1 = 1.0 - bias0;
@@ -37,8 +35,6 @@ void main() {
 
     viewPos = orthoMatrix * viewRix * vec4(pos, 1.0);
     gl_Position = ProjMat * ModelViewMat * vec4(pos, 1.0);
-
-    gl_ClipDistance[0] = dot(vec4(Position, 1.0), plane);
 
     vertexColor = Color;
     texCoord0 = UV0;

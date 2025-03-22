@@ -8,7 +8,6 @@ import net.caffeinemc.mods.sodium.client.gl.shader.*;
 import net.caffeinemc.mods.sodium.client.render.chunk.ShaderChunkRenderer;
 import net.caffeinemc.mods.sodium.client.render.chunk.shader.*;
 import net.caffeinemc.mods.sodium.client.render.chunk.terrain.TerrainRenderPass;
-import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -48,13 +47,13 @@ public abstract class SodiumShadowMapShaderMixin {
         ShaderConstants constants = options.constants();
 
         GlShader vertShader = ShaderLoader.loadShader(ShaderType.VERTEX,
-                Identifier.of(DestroyingMinecraft.MOD_ID, path + ".vsh"), constants);
+                DestroyingMinecraft.idOf(path + ".vsh"), constants);
 
         GlShader fragShader = ShaderLoader.loadShader(ShaderType.FRAGMENT,
-                Identifier.of(DestroyingMinecraft.MOD_ID, path + ".fsh"), constants);
+                DestroyingMinecraft.idOf(path + ".fsh"), constants);
 
         try {
-            return GlProgram.builder(Identifier.of(DestroyingMinecraft.MOD_ID, "chunk_shader"))
+            return GlProgram.builder(DestroyingMinecraft.idOf("chunk_shader"))
                     .attachShader(vertShader)
                     .attachShader(fragShader)
                     .bindAttribute("a_Position", ChunkShaderBindingPoints.ATTRIBUTE_POSITION)

@@ -1,0 +1,133 @@
+package com.sp.render.blackhole;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.sp.DestroyingMinecraft;
+import foundry.veil.api.client.render.VeilRenderSystem;
+import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
+import foundry.veil.api.client.render.shader.program.ShaderProgram;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.VertexBuffer;
+import net.minecraft.client.render.*;
+import net.minecraft.util.Identifier;
+import org.joml.Vector3f;
+
+import java.util.Objects;
+
+import static foundry.veil.impl.client.render.dynamicbuffer.DynamicBufferManger.MAIN_WRAPPER;
+
+public class BlockInstanceRenderer {
+    VertexBuffer vertexBuffer;
+    private static final Identifier shaderPath = DestroyingMinecraft.idOf("blackholeterrain/blackholeterrain");
+    private static final Identifier dirtTexture = Identifier.ofVanilla("textures/block/dirt.png");
+    private static final Identifier stoneTexture = Identifier.ofVanilla("textures/block/stone.png");
+    private static final Identifier gravelTexture = Identifier.ofVanilla("textures/block/gravel.png");
+    private static final Identifier deepslateTexture = Identifier.ofVanilla("textures/block/deepslate.png");
+
+    public static final VertexFormat POSITION_TEXTURE_NORMAL = VertexFormat.builder()
+            .add("Position", VertexFormatElement.POSITION)
+            .add("UV0", VertexFormatElement.UV_0)
+            .add("Normal", VertexFormatElement.NORMAL)
+            .build();
+
+
+
+
+    public BlockInstanceRenderer() {
+        this.vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS, POSITION_TEXTURE_NORMAL);
+
+        this.createCube(bufferBuilder, 0, 0, 0, 1, 1, 1);
+
+        this.vertexBuffer.bind();
+        this.vertexBuffer.upload(bufferBuilder.end());
+        VertexBuffer.unbind();
+    }
+
+    public void render() {
+        AdvancedFbo fbo = VeilRenderSystem.renderer().getFramebufferManager().getFramebuffer(MAIN_WRAPPER);
+        if(fbo != null) {
+            fbo.bind(false);
+        }
+
+        ShaderProgram shader = VeilRenderSystem.setShader(shaderPath);
+        if(shader == null){
+            return;
+        }
+
+        Vector3f position = new Vector3f(0,70,0);
+
+        RenderSystem.setShaderTexture(0, dirtTexture);
+        RenderSystem.setShaderTexture(1, stoneTexture);
+        RenderSystem.setShaderTexture(2, gravelTexture);
+        RenderSystem.setShaderTexture(3, deepslateTexture);
+        shader.setSampler("Sampler0", RenderSystem.getShaderTexture(0));
+        shader.setSampler("Sampler1", RenderSystem.getShaderTexture(1));
+        shader.setSampler("Sampler2", RenderSystem.getShaderTexture(2));
+        shader.setSampler("Sampler3", RenderSystem.getShaderTexture(3));
+
+        shader.setVector("offset", position);
+
+        shader.bindSamplers(0);
+        shader.setDefaultUniforms(VertexFormat.DrawMode.QUADS);
+
+
+        this.vertexBuffer.bind();
+        shader.bind();
+
+        VeilRenderSystem.drawInstanced(this.vertexBuffer, 500);
+
+        ShaderProgram.unbind();
+        VertexBuffer.unbind();
+
+
+        if(fbo != null) {
+            AdvancedFbo.unbind();
+        }
+    }
+
+
+    private void createCube(BufferBuilder bufferBuilder, float pMinX, float pMinY, float pMinZ, float pMaxX, float pMaxY, float pMaxZ) {
+
+        //NORTH
+        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMinZ)).texture(1.0f, 1.0f).normal(0,0,-1);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMinZ)).texture(0.0f, 1.0f).normal(0,0,-1);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMinZ)).texture(0.0f, 0.0f).normal(0,0,-1);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMinZ)).texture(1.0f, 0.0f).normal(0,0,-1);
+
+        //DOWN
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMinZ)).texture(0.0f, 1.0f).normal(0,-1,0);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMaxZ)).texture(0.0f, 0.0f).normal(0,-1,0);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMaxZ)).texture(1.0f, 0.0f).normal(0,-1,0);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMinZ)).texture(1.0f, 1.0f).normal(0,-1,0);
+
+        //UP
+        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMaxZ)).texture(0.0f, 1.0f).normal(0,1,0);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMaxZ)).texture(0.0f, 0.0f).normal(0,1,0);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMinZ)).texture(1.0f, 0.0f).normal(0,1,0);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMinZ)).texture(1.0f, 1.0f).normal(0,1,0);
+
+        //SOUTH
+        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMaxZ)).texture(0.0f, 1.0f).normal(0,0,1);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMaxZ)).texture(0.0f, 0.0f).normal(0,0,1);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMaxZ)).texture(1.0f, 0.0f).normal(0,0,1);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMaxZ)).texture(1.0f, 1.0f).normal(0,0,1);
+
+        //EAST
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMaxZ)).texture(0.0f, 1.0f).normal(1,0,0);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMaxZ)).texture(0.0f, 0.0f).normal(1,0,0);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMinZ)).texture(1.0f, 0.0f).normal(1,0,0);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMinZ)).texture(1.0f, 1.0f).normal(1,0,0);
+
+        //WEST
+        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMinZ)).texture(0.0f, 1.0f).normal(-1,0,0);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMinZ)).texture(0.0f, 0.0f).normal(-1,0,0);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMaxZ)).texture(1.0f, 0.0f).normal(-1,0,0);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMaxZ)).texture(1.0f, 1.0f).normal(-1,0,0);
+    }
+
+    public void free(){
+        this.vertexBuffer.close();
+    }
+
+}

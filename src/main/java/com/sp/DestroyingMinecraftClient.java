@@ -2,22 +2,27 @@ package com.sp;
 
 import com.sp.render.PrevUniforms;
 import com.sp.render.ShadowMapRenderer;
+import com.sp.render.blackhole.BlockInstanceRenderer;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
 import foundry.veil.platform.VeilEventPlatform;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
-
+//-120 72 146
 public class DestroyingMinecraftClient implements ClientModInitializer {
-	private static final Identifier BLACK_HOLE_POST = Identifier.of(DestroyingMinecraft.MOD_ID, "black_hole");
-	private static final Identifier SHADOWS_POST = Identifier.of(DestroyingMinecraft.MOD_ID, "shadows");
-	private static final Identifier SHADOWS_SHADER = Identifier.of(DestroyingMinecraft.MOD_ID, "shadows/shadows");
-	private static final Identifier BLACK_HOLE_SHADER = Identifier.of(DestroyingMinecraft.MOD_ID, "blackhole/black_hole");
+	public static DestroyingMinecraftClient INSTANCE;
+	public BlockInstanceRenderer blockInstanceRenderer;
+	private static final Identifier BLACK_HOLE_POST = DestroyingMinecraft.idOf("black_hole");
+	private static final Identifier SHADOWS_POST = DestroyingMinecraft.idOf("shadows");
+	private static final Identifier SHADOWS_SHADER = DestroyingMinecraft.idOf("shadows/shadows");
+	private static final Identifier BLACK_HOLE_SHADER = DestroyingMinecraft.idOf("blackhole/black_hole");
 
 	@Override
 	public void onInitializeClient() {
+		INSTANCE = this;
 
 		VeilEventPlatform.INSTANCE.onVeilRenderLevelStage(((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, renderTick, deltaTracker, camera, frustum) -> {
 			MinecraftClient client = MinecraftClient.getInstance();
@@ -28,6 +33,13 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 					if (camera != null) {
 						ShadowMapRenderer.renderShadowMap(camera);
 					}
+				}
+
+				if (stage == VeilRenderLevelStageEvent.Stage.AFTER_SKY){
+					if(this.blockInstanceRenderer == null){
+						this.blockInstanceRenderer = new BlockInstanceRenderer();
+					}
+					blockInstanceRenderer.render();
 				}
 			}
 		}));
@@ -55,6 +67,11 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 				}
 			}
 
+		});
+
+		ClientPlayConnectionEvents.DISCONNECT.register((clientPlayNetworkHandler, minecraftClient) -> {
+			this.blockInstanceRenderer.free();
+			this.blockInstanceRenderer = null;
 		});
 	}
 }

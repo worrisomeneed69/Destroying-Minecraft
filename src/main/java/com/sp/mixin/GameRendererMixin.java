@@ -13,10 +13,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = GameRenderer.class)
 public abstract class GameRendererMixin {
     @Unique
-    private static final Identifier shadowSolid = Identifier.of(DestroyingMinecraft.MOD_ID, "shadowmap/rendertype_solid");
+    private static final Identifier shadowSolid = DestroyingMinecraft.idOf("shadowmap/rendertype_solid");
 
     @Unique
-    private static final Identifier shadowEntity = Identifier.of(DestroyingMinecraft.MOD_ID, "shadowmap/rendertype_entity");
+    private static final Identifier shadowEntity = DestroyingMinecraft.idOf("shadowmap/rendertype_entity");
 
 
     @Inject(method = {

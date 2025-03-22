@@ -1,20 +1,14 @@
 package com.sp.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.systems.VertexSorter;
 import com.sp.DestroyingMinecraft;
 import com.sp.mixin.WorldRendererAccessor;
-import foundry.veil.api.client.render.CameraMatrices;
-import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
-import foundry.veil.api.client.render.shader.program.MutableUniformAccess;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -44,7 +38,7 @@ public class ShadowMapRenderer {
         int height = client.getFramebuffer().viewportHeight;
         Frustum frustum;
 
-        AdvancedFbo shadowMap = VeilRenderSystem.renderer().getFramebufferManager().getFramebuffer(Identifier.of(DestroyingMinecraft.MOD_ID, "shadowmap"));
+        AdvancedFbo shadowMap = VeilRenderSystem.renderer().getFramebufferManager().getFramebuffer(DestroyingMinecraft.idOf("shadowmap"));
         if(shadowMap != null) {
             setRenderingShadowMap(true);
             PerspectiveRenderer.render(shadowMap, shadowModelView.peek().getPositionMatrix(), shadowProjMat, new Vector3d(cameraPos.x, cameraPos.y, cameraPos.z), new Quaternionf(), 20, client.getRenderTickCounter(), true);
