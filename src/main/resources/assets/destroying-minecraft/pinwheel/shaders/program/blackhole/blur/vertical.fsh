@@ -36,14 +36,16 @@ const float WEIGHTS[11] = float[11](
     0.0020726777103066527
 );
 
+const vec2 multiplier = vec2(0.0, 0.5);
+
 void main() {
     if(texCoord.y < 0.53) {
         //half the offset for better results on lower mipmaps
-        vec4 color = texture(DiffuseSampler, texCoord + vec2(OFFSETS[5]/ScreenSize) * vec2(0.0, 0.5)) * WEIGHTS[5];
-        float count = 0.0;
+        vec4 color = texture(DiffuseSampler, texCoord + vec2(OFFSETS[5]/ScreenSize) * multiplier) * WEIGHTS[5];
+        float count = 1.0;
         for(int i = 0; i < 5; i++){
-            color += texture(DiffuseSampler, texCoord + vec2(OFFSETS[i+6]/ScreenSize) * vec2(0.0, 0.5)) * WEIGHTS[i+6];
-            color += texture(DiffuseSampler, texCoord + vec2(OFFSETS[i]/ScreenSize) * vec2(0.0, 0.5)) * WEIGHTS[i];
+            color += texture(DiffuseSampler, texCoord + vec2(OFFSETS[i+6]/ScreenSize) * multiplier) * WEIGHTS[i+6];
+            color += texture(DiffuseSampler, texCoord + vec2(OFFSETS[i]/ScreenSize) * multiplier) * WEIGHTS[i];
             count += 1;
         }
 

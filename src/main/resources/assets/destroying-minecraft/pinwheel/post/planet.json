@@ -10,18 +10,25 @@
     "framebuffers": {
     },
     "textures": {
-        "ShadowMap": {
-            "type": "framebuffer",
-            "name": "destroying-minecraft:shadowmap:depth"
+        "PlanetColor": {
+            "type": "location",
+            "location": "destroying-minecraft:textures/shaders/planet/planet_color.png"
         },
-        "NormalSampler": {
-            "type": "framebuffer",
-            "name": "veil:dynamic_main",
-            "sampler": 2
+        "PebbleDepth": {
+            "type": "location",
+            "location": "destroying-minecraft:textures/shaders/planet/shadertoy_depth.png"
         },
-        "HandDepth": {
-            "type": "framebuffer",
-            "name": "veil:first_person:depth"
+        "PlanetCracks": {
+            "type": "location",
+            "location": "destroying-minecraft:textures/shaders/planet/crack1.png"
+        },
+        "PlanetSmallCracks": {
+            "type": "location",
+            "location": "destroying-minecraft:textures/shaders/planet/crack2.png"
+        },
+        "NoiseTexture": {
+            "type": "location",
+            "location": "destroying-minecraft:textures/shaders/planet/noise_texture.png"
         }
     }
 }

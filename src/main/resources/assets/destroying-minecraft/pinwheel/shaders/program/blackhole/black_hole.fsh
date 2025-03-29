@@ -1,4 +1,5 @@
 #veil:buffer veil:camera VeilCamera
+#include destroying-minecraft:ray_march
 #include veil:space_helper
 #include veil:blend
 
@@ -26,54 +27,6 @@ const int ITERATIONS = 150;
 const vec3 InDiskColor = vec3(1, 0.9647058823529412, 0.9450980392156862) * 0.5;
 const vec3 OutDiskColor = vec3(0.1607843137254902, 0.11764705882352941, 0.09411764705882353) * 5;
 
-// Thank you Sonic Ether: https://www.shadertoy.com/view/lstSRS
-const float pi = 3.14159265;
-float atan2(float y, float x){
-    if (x > 0.0) {
-        return atan(y / x);
-    }
-    else if (x == 0.0) {
-        if (y > 0.0) {
-            return pi / 2.0;
-        }
-        else if (y < 0.0) {
-            return -(pi / 2.0);
-        }
-        else {
-            return 0.0;
-        }
-    }
-    else { //(x < 0.0)
-        if (y >= 0.0) {
-            return atan(y / x) + pi;
-        }
-        else {
-            return atan(y / x) - pi;
-        }
-    }
-}
-
-//https://iquilezles.org/articles/distfunctions/
-float opSubtraction( float d1, float d2 ) {
-    return max(-d1,d2);
-}
-
-float sdCylinder(vec3 p, float h, float r ) {
-    vec2 d = abs(vec2(length(p.xz),p.y)) - vec2(r,h);
-    return min(max(d.x,d.y),0.0) + length(max(d,0.0));
-}
-
-float sdRoundedCylinder( vec3 p, float ra, float rb, float h ){
-    vec2 d = vec2( length(p.xz)-2.0*ra+rb, abs(p.y) - h );
-    return min(max(d.x,d.y),0.0) + length(max(d,0.0)) - rb;
-}
-
-mat2 rot2D(float angle) {
-    float rad = (angle * 3.151592)/180.0;
-    float s = sin(rad);
-    float c = cos(rad);
-    return mat2(c, -s, s, c);
-}
 
 float mapDisk(vec3 rayPos, vec3 spherePos) {
     vec3 rotatedRayPos = rayPos - spherePos;
@@ -105,45 +58,6 @@ void warpSpace(inout vec3 rayPos, inout vec3 rayDir, vec3 BH_POS, in float stepD
     rayDir = normalize(mix(rayDir, dirToCenter, force * 3.0 / float(ITERATIONS)));
 }
 
-//Thank you https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83 for the noise functions
-float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
-vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
-vec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}
-
-float noise(vec3 p){
-    vec3 a = floor(p);
-    vec3 d = p - a;
-    d = d * d * (3.0 - 2.0 * d);
-
-    vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);
-    vec4 k1 = perm(b.xyxy);
-    vec4 k2 = perm(k1.xyxy + b.zzww);
-
-    vec4 c = k2 + a.zzzz;
-    vec4 k3 = perm(c);
-    vec4 k4 = perm(c + 1.0);
-
-    vec4 o1 = fract(k3 * (1.0 / 41.0));
-    vec4 o2 = fract(k4 * (1.0 / 41.0));
-
-    vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);
-    vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);
-
-    return o4.y * d.y + o4.x * (1.0 - d.y);
-}
-
-float fbm(vec3 x) {
-    float v = 0.0;
-    float a = 0.5;
-    vec3 shift = vec3(100);
-    for (int i = 0; i < 8; ++i) {
-        v += a * noise(x);
-        x = x * 2.0 + shift;
-        a *= 0.5;
-    }
-    return v;
-}
-
 //Attenuation formula https://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula
 float attenuation(float value, float a, float b){
     return 1 / (1 + a*abs(value) + b*abs(value)*abs(value));
@@ -156,7 +70,7 @@ void raymarchAccretionDisk(vec3 rayPos, float diskDist, vec3 BH_POS, inout vec4 
     float attenuate = attenuation(radius / 2.5, 0, 4) * (1.0 - diskDist);
 //    attenuate *= attenuate;
 
-    float cloud = clamp(fbm(vec3(radius * 15, angle * 5, diskPos.y * attenuate * attenuate)), 0.0, 1.0);
+    float cloud = clamp(fbm(vec3(radius * 15, angle * 5, diskPos.y * attenuate * attenuate), 8), 0.0, 1.0);
     color.rgb += vec3(cloud * attenuate) * mix(OutDiskColor, InDiskColor, attenuate * attenuate);
 //    color.rgb *= texture(RandNoise, vec2(radius, angle) * 2).r;
     color.rgb *= attenuate * attenuate;
@@ -182,6 +96,7 @@ void main() {
 
 
         vec3 playerSpacePos = worldSpacePos - prevCameraPos;
+        playerSpacePos += (VeilCamera.CameraPosition - prevCameraPos);
         vec3 prevViewPos = (prevViewMat * vec4(playerSpacePos, 1.0)).xyz;
         vec4 homogenousPos = prevProjMat * vec4(prevViewPos, 1.0);
         vec3 ndcPos = homogenousPos.xyz / homogenousPos.w;
@@ -227,6 +142,8 @@ void main() {
         } else {
             fragColor = color;
         }
+
+//        fragColor = vec4(playerSpacePos, 1.0);
 
         if(prevTexcoord.x >= 0 && prevTexcoord.x <= 1.0 && prevTexcoord.y >= 0 && prevTexcoord.y <= 1.0) {
             fragColor = mix(fragColor, texture(PrevSampler, prevTexcoord), 0.8);

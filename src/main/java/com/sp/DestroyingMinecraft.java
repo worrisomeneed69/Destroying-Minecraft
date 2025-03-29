@@ -1,5 +1,6 @@
 package com.sp;
 
+import com.sp.item.ModItems;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.util.Identifier;
@@ -15,7 +16,7 @@ public class DestroyingMinecraft implements ModInitializer {
 	@Override
 	public void onInitialize() {
 
-
+		ModItems.registerModItems();
 		LOGGER.info("Hello Fabric world!");
 	}
 

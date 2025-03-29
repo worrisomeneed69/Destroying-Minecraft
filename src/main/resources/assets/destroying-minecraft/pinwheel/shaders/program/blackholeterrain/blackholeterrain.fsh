@@ -22,7 +22,7 @@ void main() {
 		color = texture(Sampler1, texCoord);
 	} else if(textureType == 2) {
 		color = texture(Sampler2, texCoord);
-	} else {
+	} else if(textureType == 3) {
 		color = texture(Sampler3, texCoord);
 	}
 

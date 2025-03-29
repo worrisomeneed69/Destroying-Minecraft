@@ -1,5 +1,6 @@
 package com.sp;
 
+import com.sp.render.CameraShake;
 import com.sp.render.PrevUniforms;
 import com.sp.render.ShadowMapRenderer;
 import com.sp.render.blackhole.BlockInstanceRenderer;
@@ -7,6 +8,7 @@ import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
 import foundry.veil.platform.VeilEventPlatform;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
@@ -39,7 +41,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 					if(this.blockInstanceRenderer == null){
 						this.blockInstanceRenderer = new BlockInstanceRenderer();
 					}
-					blockInstanceRenderer.render();
+//					blockInstanceRenderer.render();
 				}
 			}
 		}));
@@ -55,6 +57,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 						shaderProgram.setMatrix("prevProjMat", PrevUniforms.getPrevProjMat());
 						shaderProgram.setMatrix("prevViewMat", PrevUniforms.getPrevModelViewMat());
 						shaderProgram.setVector("prevCameraPos", PrevUniforms.getPrevCameraPos());
+
 					}
 
 					PrevUniforms.update();
@@ -72,6 +75,12 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 		ClientPlayConnectionEvents.DISCONNECT.register((clientPlayNetworkHandler, minecraftClient) -> {
 			this.blockInstanceRenderer.free();
 			this.blockInstanceRenderer = null;
+		});
+
+		ClientTickEvents.END_CLIENT_TICK.register(minecraftClient -> {
+			for(CameraShake cameraShake : CameraShake.getAllInstances()){
+				cameraShake.individualTick();
+			}
 		});
 	}
 }

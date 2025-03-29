@@ -13,6 +13,7 @@ public class PrevUniforms {
 
     public static void update(){
         CameraMatrices matrices = VeilRenderSystem.renderer().getCameraMatrices();
+
         prevProjMat = new Matrix4f(matrices.getProjectionMatrix());
         prevModelViewMat = new Matrix4f(matrices.getViewMatrix());
         prevCameraPos = new Vector3f(matrices.getCameraPosition());

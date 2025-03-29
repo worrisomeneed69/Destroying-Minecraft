@@ -45,7 +45,7 @@ mat2 rot2D(float angle) {
 }
 
 void main() {
-    float distToBlackHole = fract(GameTime * (hash(gl_InstanceID * 5345) + 0.5) * 10);
+    float distToBlackHole = fract(GameTime * (hash(gl_InstanceID * 5345) + 0.4) * 10);
     vec3 pos = Position;
 
 

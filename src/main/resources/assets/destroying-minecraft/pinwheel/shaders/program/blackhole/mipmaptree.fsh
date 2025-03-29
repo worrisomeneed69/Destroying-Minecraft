@@ -9,9 +9,9 @@ const int samples[10] = int[10](
     1,
     2,
     6,
-    12,
-    24,
-    32,
+    8,
+    16,
+    16,
     32,
     32,
     1,
@@ -23,7 +23,7 @@ vec3 BloomLod(float scale, vec2 offset, int samples){
     vec3 color = vec3(0.0);
     vec2 uv = ((texCoord - offset) * scale);
     if(uv.x > 1.0 || uv.y > 1.0 || uv.x < 0.0 || uv.y < 0.0){
-        return vec3(0.0, 0.0, 0.0);
+        return vec3(0.0);
     }
 
     float divide = 0.0;
