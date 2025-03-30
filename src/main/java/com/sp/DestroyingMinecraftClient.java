@@ -13,7 +13,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
-//-120 72 146
+
 public class DestroyingMinecraftClient implements ClientModInitializer {
 	public static DestroyingMinecraftClient INSTANCE;
 	public BlockInstanceRenderer blockInstanceRenderer;

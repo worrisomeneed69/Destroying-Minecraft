@@ -1,5 +1,6 @@
 #veil:buffer veil:camera VeilCamera
 #include destroying-minecraft:ray_march
+#include destroying-minecraft:noise
 #include veil:space_helper
 #include veil:blend
 
@@ -44,10 +45,6 @@ float mapDisk(vec3 rayPos, vec3 spherePos) {
 
 float mapSphere(vec3 rayPos, vec3 spherePos) {
     return length(rayPos - spherePos) - BH_SIZE;
-}
-
-float rand(vec2 coord) {
-    return fract(sin(dot(coord, vec2(12.9898, 78.223))) * 43758.5453) * 2.0 - 1.0;
 }
 
 void warpSpace(inout vec3 rayPos, inout vec3 rayDir, vec3 BH_POS, in float stepDist) {

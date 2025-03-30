@@ -42,7 +42,7 @@ public class CameraShake {
 
 
         for(CameraShake cameraShake : getAllInstances()){
-            if(cameraShake.getTrauma() <= 0.0f){
+            if(cameraShake.getTrauma() <= 0.0f || cameraShake.progress >= cameraShake.duration){
                 allInstances.remove(cameraShake);
                 continue;
             }
