@@ -16,6 +16,7 @@
     "WorldRendererMixin",
     "camerashake.CameraMixin",
     "camerashake.CameraRollMixin",
-    "sodiumcompat.SodiumShadowMapShaderMixin"
+    "sodiumcompat.SodiumShadowMapShaderMixin",
+    "supernova.SunMixin"
   ]
 }

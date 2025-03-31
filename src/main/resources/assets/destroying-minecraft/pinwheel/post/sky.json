@@ -1,0 +1,67 @@
+{
+    "stages": [
+        {
+            "type": "veil:blit",
+            "shader": "destroying-minecraft:sky/sky",
+            "in": "minecraft:main",
+            "out": "destroying-minecraft:sky/sky"
+        },
+        {
+            "type": "veil:blit",
+            "shader": "destroying-minecraft:blackhole/mipmaptree",
+            "in": "destroying-minecraft:sky/sky",
+            "out": "destroying-minecraft:sky/sky_mipmaptree"
+        },
+        {
+            "type": "veil:blit",
+            "shader": "destroying-minecraft:blackhole/blur/horizontal",
+            "in": "destroying-minecraft:sky/sky_mipmaptree",
+            "out": "swap"
+        },
+        {
+            "type": "veil:blit",
+            "shader": "destroying-minecraft:blackhole/blur/vertical",
+            "in": "swap",
+            "out": "destroying-minecraft:sky/sky_blur"
+        },
+        {
+            "type": "veil:blit",
+            "shader": "destroying-minecraft:blackhole/bloom",
+            "in": "destroying-minecraft:sky/sky_blur",
+            "out": "destroying-minecraft:sky/sky_bloom"
+        },
+        {
+            "type": "veil:blit",
+            "shader": "destroying-minecraft:sky/mix",
+            "in": "minecraft:main",
+            "out": "veil:post"
+        }
+    ],
+    "framebuffers": {
+        "swap": {
+            "depth": false,
+            "format": "R11F_G11F_B10F",
+            "autoClear": true,
+            "filter": {
+                "blur": true
+            }
+        }
+    },
+    "textures": {
+        "FinalSampler": {
+            "type": "framebuffer",
+            "name": "destroying-minecraft:sky/sky"
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+

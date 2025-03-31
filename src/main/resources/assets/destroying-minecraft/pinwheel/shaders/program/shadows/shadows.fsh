@@ -3,7 +3,7 @@
 
 #define SHADOW_SAMPLES 3
 
-#define SHADOW_STRENGTH 0.5
+#define SHADOW_STRENGTH 0.4
 
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DiffuseDepthSampler;
@@ -86,7 +86,7 @@ void main() {
 
     float lightDir = dot(worldNormal, BH_DIR);
 
-    float shadowSum = 0.2;
+    float shadowSum = SHADOW_STRENGTH;
 
     if(lightDir > -0.02){
         mat2 randRotation = randRotMat(texCoord);
@@ -106,7 +106,7 @@ void main() {
 
     vec3 ambientLight = (blockLight + 0.2*skyLight) * clamp(dot(worldNormal, worldNormal), 0.0, 1.0);
 
-    vec3 outputColor = albedoColor * (blockLight + skyLight * max(shadowSum, 0.2));
+    vec3 outputColor = albedoColor * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH));
 
     if(handDepth < 1.0){
         outputColor = color.rgb;

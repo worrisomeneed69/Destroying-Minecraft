@@ -2,9 +2,5 @@
   "vertex": "veil:blit_screen",
   "fragment": "destroying-minecraft:blackhole/mipmaptree",
   "textures": {
-    "BHSampler": {
-      "type": "framebuffer",
-      "name": "destroying-minecraft:blackhole/black_hole_final"
-    }
   }
 }

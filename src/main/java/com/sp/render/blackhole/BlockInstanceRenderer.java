@@ -5,13 +5,11 @@ import com.sp.DestroyingMinecraft;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.*;
 import net.minecraft.util.Identifier;
 import org.joml.Vector3f;
 
-import java.util.Objects;
 
 import static foundry.veil.impl.client.render.dynamicbuffer.DynamicBufferManger.MAIN_WRAPPER;
 

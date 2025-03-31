@@ -57,7 +57,7 @@
             "type": "framebuffer",
             "name": "destroying-minecraft:blackhole/black_hole"
         },
-        "BHSampler": {
+        "FinalSampler": {
             "type": "framebuffer",
             "name": "destroying-minecraft:blackhole/black_hole_final"
         },

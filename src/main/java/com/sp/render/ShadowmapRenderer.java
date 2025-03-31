@@ -22,17 +22,19 @@ import org.joml.Vector3d;
 public class ShadowMapRenderer {
     private static boolean renderingShadowMap;
     private static Camera currentCamera;
+    private static MinecraftClient client;
 
 
     public static void renderShadowMap(Camera camera){
         currentCamera = camera;
-        MinecraftClient client = MinecraftClient.getInstance();
+        client = MinecraftClient.getInstance();
         WorldRenderer worldRenderer = client.worldRenderer;
         WorldRendererAccessor accessor = (WorldRendererAccessor) worldRenderer;
         Vec3d cameraPos = camera.getPos();
         MatrixStack shadowModelView = createShadowModelView(cameraPos.x, cameraPos.y, cameraPos.z, true);
         Matrix4f shadowProjMat = createProjMat();
         Matrix4f backupProjMat = RenderSystem.getProjectionMatrix();
+
 
         int width = client.getFramebuffer().viewportWidth;
         int height = client.getFramebuffer().viewportHeight;
@@ -120,8 +122,13 @@ public class ShadowMapRenderer {
 
     //Global Light Rotation
     public static void rotateShadowModelView(Matrix4f shadowModelView){
-        shadowModelView.rotate(RotationAxis.POSITIVE_X.rotationDegrees(20.0f));
-        shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
+//        shadowModelView.rotate(RotationAxis.POSITIVE_X.rotationDegrees(20.0f));
+//        shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
+
+        if(client.world != null) {
+            shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
+            shadowModelView.rotate(RotationAxis.POSITIVE_Z.rotationDegrees(-(client.world.getSkyAngle(client.getRenderTickCounter().getTickDelta(false)) * 360.0F) - 90.0f));
+        }
 
     }
 
