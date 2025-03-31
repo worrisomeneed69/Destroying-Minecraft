@@ -53,41 +53,46 @@ float fbm2(vec3 x, int iterations) {
     return v;
 }
 
+float mapDebrisField(vec3 coneRayPos, vec3 p, float radius, float repetition, float sizeDifference, float chunkNoise){
+    vec3 chunkPos = p;
+    float chunkSphere = sdSphere(coneRayPos, radius);
+    chunkPos = mod(chunkPos, repetition) - repetition/2;
+
+    vec3 id = vec3(floor(abs(p.x) / repetition), floor(abs(p.y) / repetition), floor(abs(p.z) / repetition));
+    float fid = id.x*41.6 + id.y*38.7 + id.z*60.2;
+
+    float offset = rand(vec2(fid, fid));
+    float offsetPosition = rand(vec2(fid * 174.42456, -fid * 47.5354));
+    float chunks = sdSphere(chunkPos + offsetPosition * 20, 1 + offset * sizeDifference) * noise(chunkPos * 0.01);
+    return opSmoothIntersection(chunkSphere, chunks - chunkNoise * sizeDifference, 40);
+}
+
 float map(in vec3 p, int iterations) {
     vec3 rayPos = p - PLANET_POS;
     vec3 coneRayPos = rayPos - (vec3(0.5, -1, 1) * 800);
-//    vec3 chunkPos = p;
     coneRayPos.xy *= rot2D(145);
     coneRayPos.yz *= rot2D(-55);
 
-    float chunkNoise = fbm2(coneRayPos * 0.01, iterations);
-    float cone = sdCappedCone(coneRayPos, 1033.333333, 66.6667, 806.6667) - chunkNoise * 200;
+    float chunkNoise = fbm2(p * 0.03, iterations);
+    float cone = sdCappedCone(coneRayPos, 1033.333333, 66.6667, 1206.6667) + chunkNoise * 200;
 
     float sphere = sdSphere(rayPos, 2000);
 
-//    float repetition = 200;
-//    chunkPos = mod(chunkPos, repetition) - repetition/2;
-//
-//    vec3 id = vec3(floor(abs(p.x) / repetition), floor(abs(p.y) / repetition), floor(abs(p.z) / repetition));
-//    float fid = id.x*41.6 + id.y*38.7 + id.z*60.2;
-//
-//    float offset = rand(vec2(fid * 1.42456, fid * 47.5354));
-//    float chunk1 = sdSphere(chunkPos + offset * 50, 30 + offset * 20);
-//    float chunk2 = ;
-//    float chunk3 = ;
-
-    float dist = opSubtraction(cone, sphere);
+    float debrisField3 = sdCappedCone(coneRayPos - vec3(200, 1300, 300), 200, 50, 200) + chunkNoise * 30;
+    float dist = min(opSubtraction(cone, sphere), debrisField3);
 
 
     vec3 sphereNormal = getPlanetNormal(p);
-    float center = clamp(dot(sphereNormal, normalize(vec3(1,-1,1))) * 0.2, 0.0, 1.0);
-    float cracks = getSphereTexture(p, sphereNormal, PlanetSmallCracks).r * center;
+    float crackDir = clamp(dot(sphereNormal, normalize(vec3(1,-1,1))) * 0.6, 0.0, 1.0);
+    float cracks = getSphereTexture(p, sphereNormal, PlanetSmallCracks).r * crackDir;
     float displacement = getSphereTexture(p, sphereNormal, PebbleDepth).r - cracks;
-//    float displacement = sin(p.x * 0.1) * sin(p.y * 0.1) * sin(p.z * 0.1);
 
+    float debrisField1 = mapDebrisField(coneRayPos, p, 1500, 500, 30, chunkNoise);
+//    float debrisField2 = mapDebrisField(coneRayPos, p, 1200, 400, 20, chunkNoise);
+//
+//    float finalDebrisField = min(debrisField1, debrisField2);
 
-    return dist + displacement * 20;
-//    return chunk1 + displacement * 00;
+    return min(debrisField1, dist + displacement * 20);
 }
 
 float lqMap(in vec3 p) {
@@ -98,14 +103,13 @@ float lqMap(in vec3 p) {
 
     float cone = sdCappedCone(coneRayPos, 1033.333333, 66.6667, 806.6667);
     float sphere = sdSphere(rayPos, 2000);
+    float debrisSphere = sdSphere(coneRayPos, 1500);
 
-    float dist = opSubtraction(cone, sphere);
-
-    return dist;
+    return min(opSubtraction(cone, sphere), debrisSphere);
 }
 
 vec3 getRaymarchNormal(in vec3 point){
-    vec2 e = vec2(0.01, 0.0);
+    vec2 e = vec2(0.1, 0.0);
     float d = map(point, FBM_ITERATIONS);
     return normalize(vec3(map(point + e.xyy, FBM_ITERATIONS), map(point + e.yxy, FBM_ITERATIONS), map(point + e.yyx, FBM_ITERATIONS)) - d);
 }
@@ -121,7 +125,7 @@ void rayMarch(in out vec3 rayPos, in vec3 rayOrigin, in vec3 rayDir, in float wo
 
         float d = lqMap(rayPos);
         if(d < 20){
-           d = map(rayPos, fbmIterations);
+            d = map(rayPos, fbmIterations);
         }
         steps += 1.0;
 
@@ -140,7 +144,6 @@ void rayMarch(in out vec3 rayPos, in vec3 rayOrigin, in vec3 rayDir, in float wo
 }
 
 void main() {
-//    vec3 LIGHT_DIR = normalize(vec3(1));
     vec4 mainTexture = texture(DiffuseSampler, texCoord);
     float depth = texture(DiffuseDepthSampler, texCoord).r;
 
@@ -154,7 +157,7 @@ void main() {
         bool hit;
         float shadow;
         float steps;
-        rayMarch(rayPos, rayOrigin, rayDir, worldDepth, hit, shadow, 8, 3000, 150, FBM_ITERATIONS, steps);
+        rayMarch(rayPos, rayOrigin, rayDir, worldDepth, hit, shadow, 8, 2000, 150, FBM_ITERATIONS, steps);
 
         vec3 planetNormal = vec3(0.0);
         if(hit) {
@@ -164,10 +167,11 @@ void main() {
         //SHADOWS
         bool shadowHit;
         float steps2;
+        vec3 shadowRayPos;
 
         //No point in calculating shadows if the surface is facing away
         if(dot(planetNormal, LIGHT_DIR) > -0.1){
-            rayMarch(rayPos, rayPos + planetNormal * 20, LIGHT_DIR, worldDepth, shadowHit, shadow, 1, 1000, 50, SHADOW_FBM_ITERATIONS, steps2);
+            rayMarch(shadowRayPos, rayPos + planetNormal * 20, LIGHT_DIR, worldDepth, shadowHit, shadow, 1, 1000, 50, SHADOW_FBM_ITERATIONS, steps2);
         }
 
 
