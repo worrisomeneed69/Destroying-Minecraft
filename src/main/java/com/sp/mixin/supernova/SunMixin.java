@@ -17,12 +17,9 @@ public class SunMixin implements SunMatrix {
     @Unique MatrixStack sunViewMat;
 
     //@ModifyConstant(method = "renderSky", constant = @Constant(floatValue = 30.0F))
-    private float changeSunSize(float k) {
-        return SupernovaRenderer.getSunSize();
-    }
-
-//    @Redirect(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/BufferRenderer;drawWithGlobalProgram(Lnet/minecraft/client/render/BuiltBuffer;)V", ordinal = 1))
-//    private void don
+//    private float changeSunSize(float k) {
+//        return SupernovaRenderer.getSupernovaTimer();
+//    }
 
 
     @Inject(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack$Entry;getPositionMatrix()Lorg/joml/Matrix4f;", ordinal = 2))

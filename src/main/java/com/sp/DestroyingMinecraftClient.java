@@ -5,6 +5,7 @@ import com.sp.render.CameraShake;
 import com.sp.render.PrevUniforms;
 import com.sp.render.ShadowMapRenderer;
 import com.sp.render.blackhole.BlockInstanceRenderer;
+import com.sp.render.supernova.SupernovaRenderer;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
 import foundry.veil.platform.VeilEventPlatform;
@@ -29,6 +30,9 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 	private static final Identifier SKY_POST = DestroyingMinecraft.idOf("sky");
 	private static final Identifier SKY_SHADER = DestroyingMinecraft.idOf("sky/sky");
+
+	private static final Identifier SUPERNOVA_POST = DestroyingMinecraft.idOf("supernova");
+	private static final Identifier SUPERNOVA_SHADER = DestroyingMinecraft.idOf("supernova/supernova");
 
 	@Override
 	public void onInitializeClient() {
@@ -83,7 +87,21 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 						Matrix4f matrix4f = new Matrix4f();
 						matrix4f.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
-						matrix4f.rotate(RotationAxis.POSITIVE_X.rotationDegrees((clientWorld.getSkyAngle(client.getRenderTickCounter().getTickDelta(false)) * 360.0F) - 90.0f));
+						matrix4f.rotate(RotationAxis.POSITIVE_X.rotationDegrees((clientWorld.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
+
+						shaderProgram.setMatrix("sunMat", matrix4f);
+
+						float tickDelta = client.getRenderTickCounter().getTickDelta(true);
+
+						shaderProgram.setFloat("supernovaTimer", SupernovaRenderer.getSupernovaTimer(tickDelta));
+						shaderProgram.setFloat("flash", SupernovaRenderer.getFlash(tickDelta));
+					}
+				} else if(SUPERNOVA_POST.equals(name)){
+					ShaderProgram shaderProgram = context.getShader(SUPERNOVA_SHADER);
+					if (shaderProgram != null) {
+						Matrix4f matrix4f = new Matrix4f();
+						matrix4f.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
+						matrix4f.rotate(RotationAxis.POSITIVE_X.rotationDegrees((clientWorld.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
 
 						shaderProgram.setMatrix("sunMat", matrix4f);
 					}
@@ -97,10 +115,13 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 			this.blockInstanceRenderer = null;
 		});
 
+		//Update rendering
 		ClientTickEvents.END_CLIENT_TICK.register(minecraftClient -> {
 			for(CameraShake cameraShake : CameraShake.getAllInstances()){
 				cameraShake.individualTick();
 			}
+
+			SupernovaRenderer.updateSupernovaTimer();
 		});
 	}
 }

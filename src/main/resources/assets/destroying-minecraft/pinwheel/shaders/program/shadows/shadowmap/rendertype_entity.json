@@ -1,0 +1,4 @@
+{
+  "vertex": "destroying-minecraft:shadows/shadowmap/entity",
+  "fragment": "destroying-minecraft:shadows/shadowmap/rendertype_entity"
+}

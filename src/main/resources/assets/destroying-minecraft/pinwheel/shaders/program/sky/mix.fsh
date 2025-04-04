@@ -5,6 +5,8 @@ uniform sampler2D HandDepth;
 uniform sampler2D DepthComponent;
 uniform sampler2D MipMapSampler;
 
+uniform float GameTime;
+
 in vec2 texCoord;
 out vec4 fragColor;
 
@@ -59,14 +61,12 @@ void main() {
     vec4 finalColor;
 
     if(depth >= 1.0){
-        finalColor = blackHole;
-    } else {
-        finalColor = color;
+        color.rgb = vec3(0.0);
     }
 
 //    finalColor.rgb = simpleReinhardToneMapping(blackHole.rgb);
 
-    fragColor = finalColor;
+    fragColor = color + blackHole;
 //    fragColor = vec4(getLuminance());
 
 

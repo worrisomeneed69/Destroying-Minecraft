@@ -61,13 +61,5 @@ public class WorldRendererMixin implements CullingDataCache {
         savedLastCameraYaw = tmp;
     }
 
-//    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;renderLayer(Lnet/minecraft/client/render/RenderLayer;DDDLorg/joml/Matrix4f;Lorg/joml/Matrix4f;)V", ordinal = 0, shift = At.Shift.AFTER))
-//    private void renderBHTerrain(RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci){
-//        if(DestroyingMinecraftClient.INSTANCE.blockInstanceRenderer == null){
-//            DestroyingMinecraftClient.INSTANCE.blockInstanceRenderer = new BlockInstanceRenderer();
-//        }
-//        DestroyingMinecraftClient.INSTANCE.blockInstanceRenderer.render();
-//    }
-
 
 }

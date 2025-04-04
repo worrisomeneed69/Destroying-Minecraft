@@ -15,7 +15,7 @@ import static foundry.veil.impl.client.render.dynamicbuffer.DynamicBufferManger.
 
 public class BlockInstanceRenderer {
     VertexBuffer vertexBuffer;
-    private static final Identifier shaderPath = DestroyingMinecraft.idOf("blackholeterrain/blackholeterrain");
+    private static final Identifier shaderPath = DestroyingMinecraft.idOf("blackhole/blackholeterrain/blackholeterrain");
     private static final Identifier dirtTexture = Identifier.ofVanilla("textures/block/dirt.png");
     private static final Identifier stoneTexture = Identifier.ofVanilla("textures/block/stone.png");
     private static final Identifier gravelTexture = Identifier.ofVanilla("textures/block/gravel.png");

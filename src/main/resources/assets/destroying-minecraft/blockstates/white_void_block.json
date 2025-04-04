@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "destroying-minecraft:block/white_void_block"
+    }
+  }
+}

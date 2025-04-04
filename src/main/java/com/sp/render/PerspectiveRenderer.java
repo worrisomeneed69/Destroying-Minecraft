@@ -134,7 +134,7 @@ public class PerspectiveRenderer {
 
             for(Entity entity : minecraft.world.getEntities()){
                 if(accessor1.getEntityRenderDispatcher().shouldRender(entity, levelRendererAccessor.getCullingFrustum(), cameraPosition.x(), cameraPosition.y(), cameraPosition.z()) && !entity.isSpectator()){
-                    accessor1.invokeRenderEntity(entity, cameraPosition.x(), cameraPosition.y(), cameraPosition.z(), minecraft.getRenderTickCounter().getTickDelta(false), poseStack, immediate);
+                    accessor1.invokeRenderEntity(entity, cameraPosition.x(), cameraPosition.y(), cameraPosition.z(), minecraft.getRenderTickCounter().getTickDelta(true), poseStack, immediate);
                 }
             }
 

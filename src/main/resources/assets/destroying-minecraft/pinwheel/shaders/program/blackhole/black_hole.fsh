@@ -21,7 +21,7 @@ uniform vec3 prevCameraPos;
 
 
 
-const float BH_SIZE = 0.11;
+const float BH_SIZE = 0.15;
 const float DISK_RADIUS = BH_SIZE + 3.5;
 const int ITERATIONS = 150;
 
@@ -80,7 +80,7 @@ out vec4 fragColor;
 
 void main() {
     vec3 cameraPos = VeilCamera.CameraPosition;
-    vec3 BH_POS = cameraPos + vec3(0, 1.25, -4.2);
+    vec3 BH_POS = cameraPos + vec3(0, 1, -3.2);
 //    vec3 BH_POS = vec3(-96, 80, 156);
 
 //    vec4 color = texture(DiffuseSampler, texCoord) * ColorModulator;
@@ -101,7 +101,7 @@ void main() {
 
 
         float farPlane = 8.0;
-        vec3 ro = (VeilCamera.CameraPosition) + rand(texCoord + GameTime) * 0.01;
+        vec3 ro = (VeilCamera.CameraPosition) + rand(texCoord + GameTime) * 0.03;
 
         vec3 rayDir = viewDirFromUv(texCoord);
         float stepDist = farPlane / float(ITERATIONS);
@@ -143,7 +143,7 @@ void main() {
 //        fragColor = vec4(playerSpacePos, 1.0);
 
         if(prevTexcoord.x >= 0 && prevTexcoord.x <= 1.0 && prevTexcoord.y >= 0 && prevTexcoord.y <= 1.0) {
-            fragColor = mix(fragColor, texture(PrevSampler, prevTexcoord), 0.8);
+            fragColor = mix(fragColor, texture(PrevSampler, prevTexcoord), 0.9);
         }
     } else {
         fragColor = texture(DiffuseSampler, texCoord);
