@@ -1,41 +1,44 @@
 package com.sp.render.supernova;
 
+import com.sp.util.ShaderTimer;
+import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.client.util.Easing;
 
 public class SupernovaRenderer {
-    private static float sunSize;
-    private static float lastSupernovaTimer = 0.0f;
-    private static float supernovaTimer = 0.0f;
-    private static float lastFlash = 0.998f;
-    private static float flash = 0.998f;
+    private static final ShaderTimer implodeTimer = new ShaderTimer();
+    private static final ShaderTimer flashTimer = new ShaderTimer();
+    private static final ShaderTimer explosionTimer = new ShaderTimer();
     private static int progress = 0;
-    private static int duration = 100;
+    private static final int duration = 100;
 
     public static void updateSupernovaTimer() {
         progress++;
         if(progress < duration){
-            supernovaTimer = Easing.EASE_IN_EXPO.ease((float) progress /duration);
-            flash = 0.998f;
+            implodeTimer.setTimer(Easing.EASE_IN_CUBIC.ease((float) progress /duration));
+
         } else {
-            supernovaTimer = 1.0F;
-            flash = (float) (progress - duration) / (duration);
+            implodeTimer.maxTimer();
+            flashTimer.setTimer(Easing.EASE_IN_OUT_CUBIC.ease((float) (progress - duration) / (duration*1.5f)));
+            explosionTimer.setTimer((float) (progress - duration) / (duration*3f));
+
         }
 
-        lastSupernovaTimer = supernovaTimer;
-        lastFlash = flash;
-    }
-
-    public static float getSupernovaTimer(float tickDelta) {
-        return lastSupernovaTimer + (supernovaTimer - lastSupernovaTimer) * tickDelta;
-    }
-
-    public static float getFlash(float tickDelta) {
-        return lastFlash + (flash - lastFlash) * tickDelta;
+        implodeTimer.setLastTimer();
+        flashTimer.setLastTimer();
+        explosionTimer.setLastTimer();
     }
 
     public static void resetSupernovaTimer(){
-        supernovaTimer = 0.0f;
+        implodeTimer.reset();
+        flashTimer.reset();
+        explosionTimer.reset();
         progress = 0;
+    }
+
+    public static void setSupernovaUniforms(ShaderProgram shaderProgram, float tickDelta){
+        shaderProgram.setFloat("supernovaTimer", implodeTimer.getTimer(tickDelta));
+        shaderProgram.setFloat("flashTimer", flashTimer.getTimer(tickDelta));
+        shaderProgram.setFloat("explosionTimer", explosionTimer.getTimer(tickDelta));
     }
 
 }

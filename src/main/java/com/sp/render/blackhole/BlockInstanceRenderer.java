@@ -44,14 +44,12 @@ public class BlockInstanceRenderer {
 
     public void render() {
         AdvancedFbo fbo = VeilRenderSystem.renderer().getFramebufferManager().getFramebuffer(MAIN_WRAPPER);
-        if(fbo != null) {
-            fbo.bind(false);
-        }
+        if(fbo == null) return;
 
         ShaderProgram shader = VeilRenderSystem.setShader(shaderPath);
-        if(shader == null){
-            return;
-        }
+        if(shader == null) return;
+
+        fbo.bind(false);
 
         Vector3f position = new Vector3f(0,70,0);
 
@@ -79,9 +77,7 @@ public class BlockInstanceRenderer {
         VertexBuffer.unbind();
 
 
-        if(fbo != null) {
-            AdvancedFbo.unbind();
-        }
+        AdvancedFbo.unbind();
     }
 
 

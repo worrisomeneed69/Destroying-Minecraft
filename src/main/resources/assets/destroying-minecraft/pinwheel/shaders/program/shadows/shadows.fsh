@@ -21,6 +21,9 @@ uniform vec2 ScreenSize;
 uniform mat4 shadowViewMatrix;
 uniform mat4 IShadowViewMatrix;
 uniform mat4 shadowProjMat;
+uniform float supernovaTimer;
+uniform float flashTimer;
+uniform float explosionTimer;
 
 in vec2 texCoord;
 out vec4 fragColor;
@@ -104,9 +107,14 @@ void main() {
         shadowSum /= pow(2.0 * SHADOW_SAMPLES + 1.0, 2.0);
     }
 
-    vec3 ambientLight = (blockLight + 0.2*skyLight) * clamp(dot(worldNormal, worldNormal), 0.0, 1.0);
+//    vec3 ambientLight = (blockLight + 0.2*skyLight) * clamp(dot(worldNormal, worldNormal), 0.0, 1.0);
+    vec3 outputColor;
+    if (flashTimer > 0.0) {
+        outputColor = albedoColor * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)) + vec3(1) * (1.0-min(flashTimer, 1.0));
+    } else {
+        outputColor = albedoColor * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)*(1.0 - supernovaTimer));
+    }
 
-    vec3 outputColor = albedoColor * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH));
 
     if(handDepth < 1.0){
         outputColor = color.rgb;

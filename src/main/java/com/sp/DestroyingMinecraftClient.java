@@ -61,6 +61,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 		VeilEventPlatform.INSTANCE.preVeilPostProcessing((name, pipeline, context) -> {
 			MinecraftClient client = MinecraftClient.getInstance();
 			World clientWorld = client.world;
+			float tickDelta = client.getRenderTickCounter().getTickDelta(true);
 
 			if(clientWorld != null) {
 				if (BLACK_HOLE_POST.equals(name)) {
@@ -80,6 +81,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 					ShaderProgram shaderProgram = context.getShader(SHADOWS_SHADER);
 					if (shaderProgram != null) {
 						ShadowMapRenderer.setShadowUniforms(shaderProgram, clientWorld);
+						SupernovaRenderer.setSupernovaUniforms(shaderProgram, tickDelta);
 					}
 				} else if (SKY_POST.equals(name)) {
 					ShaderProgram shaderProgram = context.getShader(SKY_SHADER);
@@ -88,13 +90,9 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 						Matrix4f matrix4f = new Matrix4f();
 						matrix4f.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
 						matrix4f.rotate(RotationAxis.POSITIVE_X.rotationDegrees((clientWorld.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
-
 						shaderProgram.setMatrix("sunMat", matrix4f);
 
-						float tickDelta = client.getRenderTickCounter().getTickDelta(true);
-
-						shaderProgram.setFloat("supernovaTimer", SupernovaRenderer.getSupernovaTimer(tickDelta));
-						shaderProgram.setFloat("flash", SupernovaRenderer.getFlash(tickDelta));
+						SupernovaRenderer.setSupernovaUniforms(shaderProgram, tickDelta);
 					}
 				} else if(SUPERNOVA_POST.equals(name)){
 					ShaderProgram shaderProgram = context.getShader(SUPERNOVA_SHADER);
