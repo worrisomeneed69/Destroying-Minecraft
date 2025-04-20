@@ -48,6 +48,10 @@
         }
     },
     "textures": {
+        "CloudsTexture": {
+            "type": "location",
+            "location": "destroying-minecraft:textures/shaders/clouds2.png"
+        },
         "FinalSampler": {
             "type": "framebuffer",
             "name": "destroying-minecraft:sky/sky"

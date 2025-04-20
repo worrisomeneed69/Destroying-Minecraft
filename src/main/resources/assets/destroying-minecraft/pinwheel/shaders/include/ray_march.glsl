@@ -17,8 +17,19 @@ float opSmoothIntersection( float d1, float d2, float k ) {
     return mix( d2, d1, h ) + k*h*(1.0-h);
 }
 
+
+float opSmoothUnion( float d1, float d2, float k ) {
+    float h = clamp( 0.5 + 0.5*(d2-d1)/k, 0.0, 1.0 );
+    return mix( d2, d1, h ) - k*h*(1.0-h);
+}
+
 float sdSphere(vec3 p, float s){
     return length(p)-s;
+}
+
+float sdBox( vec3 p, vec3 b ) {
+    vec3 q = abs(p) - b;
+    return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
 }
 
 float sdCappedCone( vec3 p, float h, float r1, float r2 ) {
@@ -39,6 +50,11 @@ float sdCylinder(vec3 p, float h, float r ) {
 float sdRoundedCylinder( vec3 p, float ra, float rb, float h ){
     vec2 d = vec2( length(p.xz)-2.0*ra+rb, abs(p.y) - h );
     return min(max(d.x,d.y),0.0) + length(max(d,0.0)) - rb;
+}
+
+float sdTorus( vec3 p, vec2 t ) {
+    vec2 q = vec2(length(p.xz)-t.x,p.y);
+    return length(q)-t.y;
 }
 
 mat2 rot2D(float angle) {

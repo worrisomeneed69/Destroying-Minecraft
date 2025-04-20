@@ -39,7 +39,7 @@ const float WEIGHTS[11] = float[11](
 const vec2 multiplier = vec2(0.5, 0.0);
 
 void main() {
-    if(texCoord.y < 0.53) {
+    if(texCoord.x < 0.53) {
         //half the offset for better results on lower mipmaps
         vec4 color = texture(DiffuseSampler, texCoord + vec2(OFFSETS[5]/ScreenSize) * multiplier) * WEIGHTS[5];
         float count = 1.0;

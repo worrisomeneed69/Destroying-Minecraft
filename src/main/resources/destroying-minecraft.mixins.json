@@ -8,9 +8,9 @@
     "defaultRequire": 1
   },
   "client": [
+    "DisableEntityShadowsMixin",
     "GameRendererMixin",
     "NoDirectionalBrightnessMixin",
-    "TextureManagerMixin",
     "VeilLevelPerspectiveRendererMixin",
     "WorldRendererAccessor",
     "WorldRendererMixin",

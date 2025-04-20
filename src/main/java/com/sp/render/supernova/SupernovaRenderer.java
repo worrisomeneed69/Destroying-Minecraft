@@ -10,25 +10,37 @@ public class SupernovaRenderer {
     private static final ShaderTimer explosionTimer = new ShaderTimer();
     private static int progress = 0;
     private static final int duration = 100;
+    private static boolean enable;
 
     public static void updateSupernovaTimer() {
-        progress++;
-        if(progress < duration){
-            implodeTimer.setTimer(Easing.EASE_IN_CUBIC.ease((float) progress /duration));
+        if(enable) {
+            progress++;
+            if (progress < duration) {
+                implodeTimer.setTimer(Easing.EASE_IN_CUBIC.ease((float) progress / duration));
 
+            } else {
+                implodeTimer.maxTimer();
+                flashTimer.setTimer(Easing.EASE_IN_OUT_CUBIC.ease((float) (progress - duration) / (duration * 1.5f)));
+                explosionTimer.setTimer((float) (progress - duration) / (duration * 3f));
+
+            }
+
+            implodeTimer.setLastTimer();
+            flashTimer.setLastTimer();
+            explosionTimer.setLastTimer();
         } else {
-            implodeTimer.maxTimer();
-            flashTimer.setTimer(Easing.EASE_IN_OUT_CUBIC.ease((float) (progress - duration) / (duration*1.5f)));
-            explosionTimer.setTimer((float) (progress - duration) / (duration*3f));
-
+            implodeTimer.reset();
+            flashTimer.reset();
+            explosionTimer.reset();
+            progress = 0;
         }
-
-        implodeTimer.setLastTimer();
-        flashTimer.setLastTimer();
-        explosionTimer.setLastTimer();
     }
 
-    public static void resetSupernovaTimer(){
+    public static void toggleSupernova(boolean on){
+        enable = on;
+    }
+
+    public static void resetSupernovaTimer() {
         implodeTimer.reset();
         flashTimer.reset();
         explosionTimer.reset();

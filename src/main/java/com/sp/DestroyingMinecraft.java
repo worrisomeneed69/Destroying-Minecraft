@@ -4,6 +4,7 @@ import com.sp.block.ModBlocks;
 import com.sp.command.SupernovaCommand;
 import com.sp.item.ModItemGroups;
 import com.sp.item.ModItems;
+import com.sp.networking.InitializePackets;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -23,6 +24,7 @@ public class DestroyingMinecraft implements ModInitializer {
 		ModItems.registerModItems();
 		ModBlocks.init();
 		ModItemGroups.registerItemGroups();
+		InitializePackets.registerServerNetworking();
 
 		CommandRegistrationCallback.EVENT.register(SupernovaCommand::register);
 
@@ -31,5 +33,9 @@ public class DestroyingMinecraft implements ModInitializer {
 
 	public static Identifier idOf(String path){
 		return Identifier.of(MOD_ID, path);
+	}
+
+	public static void sendSupernovaPacket(){
+
 	}
 }

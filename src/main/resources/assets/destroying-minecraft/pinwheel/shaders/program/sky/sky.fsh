@@ -1,4 +1,5 @@
 #include veil:space_helper
+#include veil:blend
 #include destroying-minecraft:ray_march
 #include destroying-minecraft:noise
 #veil:buffer veil:camera VeilCamera
@@ -7,6 +8,7 @@
 
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DiffuseDepthSampler;
+uniform sampler2D CloudsTexture;
 
 uniform float GameTime;
 uniform mat4 sunMat;
@@ -41,18 +43,6 @@ const vec3 color1 = vec3(0.4627450980392157, 0.06274509803921569, 0.117647058823
 const vec3 color2 = vec3(0.7607843137254902, 0.8666666666666667, 0.8941176470588236);
 const vec3 color3 = vec3(0.07450980392156863, 0.21568627450980393, 0.4117647058823529);
 const vec3 color4 = vec3(0.788235294117647, 0.21568627450980393, 0.2980392156862745);
-
-float fbm2(vec3 x, int iterations) {
-    float v = 0.0;
-    float a = 0.5;
-    vec3 shift = vec3(100);
-    for (int i = 0; i < iterations; ++i) {
-        v += a * noise(x);
-        x = x * 2.0 + shift;
-        a *= 0.5;
-    }
-    return v;
-}
 
 //Attenuation formula https://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula
 float attenuation(float value, float a, float b){
@@ -159,8 +149,49 @@ vec3 rayMarchSupernova(){
     return color;
 }
 
+float noise3D(vec3 p){
+    float z = p.z*5.0;
+    vec2 z1 = (floor(z) * OFFSET + p.xz)/5.0;
+    vec2 z2 = ((floor(z) + 1.0) * OFFSET + p.xz)/5.0;
+    float n1 = texture(CloudsTexture, z1).r;
+    float n2 = texture(CloudsTexture, z2).r;
+    float ratio = fract(z);
+    return mix(n1, n2, ratio);
+}
+
+vec3 getClouds(vec4 color, float depth){
+    vec3 cameraPos = VeilCamera.CameraPosition;
+    vec3 rd = viewDirFromUv(texCoord);
+
+    vec4 clouds = vec4(0.0);
+    if(rd.y > 0) {
+        vec2 uv = (rd.xz / rd.y);
+        vec2 xz = (rd.xz * (200 - cameraPos.y))/rd.y;
+//        vec3 rayOrigin = vec3(uv.x, 100 + cameraPos.y, uv.y) + cameraPos;
+        vec3 rayOrigin = vec3(xz.x, 0, xz.y) + cameraPos;
+
+        float dist = 0.0;
+        for(int i = 0; i < 50; i++){
+            vec3 rayPos = rayOrigin + rd * dist;
+            dist += 1;
+
+//            clouds += 0.01 * fbm(vec3(fbm(rayPos, 1)), 5);
+            clouds += 0.05 * max(fbm(rayPos*0.1, 3) * fbm(rayPos*0.03, 1), 0.0);
+
+            if(clouds.r >= 1.0){
+                break;
+            }
+
+        }
+//        clouds = texture(CloudsTexture, uv);
+    }
+
+
+    return blend(color, clouds);
+}
+
 void main() {
-    vec3 color = vec3(0.0);
+    vec3 color = vec3(1.0);
     float depth = texture(DiffuseDepthSampler, texCoord).r;
 
     vec3 sunDir = getLightAngle();
@@ -180,9 +211,13 @@ void main() {
         } else {
             fragColor = vec4(color, 1.0);
         }
+
+        fragColor.rgb = getClouds(fragColor, depth);
     } else {
         fragColor = vec4(0.0);
     }
 
-//    fragColor = vec4(rayMarchSupernova(), 1.0);
+
+
+//    fragColor = vec4(1.0);
 }

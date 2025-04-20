@@ -1,6 +1,7 @@
 package com.sp;
 
 import com.sp.mixininterfaces.SunMatrix;
+import com.sp.networking.InitializePackets;
 import com.sp.render.CameraShake;
 import com.sp.render.PrevUniforms;
 import com.sp.render.ShadowMapRenderer;
@@ -20,7 +21,7 @@ import net.minecraft.world.World;
 import org.joml.Matrix4f;
 
 public class DestroyingMinecraftClient implements ClientModInitializer {
-	public static DestroyingMinecraftClient INSTANCE;
+//	public static DestroyingMinecraftClient INSTANCE;
 	public BlockInstanceRenderer blockInstanceRenderer;
 	private static final Identifier BLACK_HOLE_POST = DestroyingMinecraft.idOf("black_hole");
 	private static final Identifier BLACK_HOLE_SHADER = DestroyingMinecraft.idOf("blackhole/black_hole");
@@ -36,7 +37,8 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-		INSTANCE = this;
+//		INSTANCE = this;
+		InitializePackets.registerClientNetworking();
 
 		VeilEventPlatform.INSTANCE.onVeilRenderLevelStage(((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, renderTick, deltaTracker, camera, frustum) -> {
 			MinecraftClient client = MinecraftClient.getInstance();
@@ -118,7 +120,9 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 			for(CameraShake cameraShake : CameraShake.getAllInstances()){
 				cameraShake.individualTick();
 			}
+		});
 
+		ClientTickEvents.END_WORLD_TICK.register(clientWorld -> {
 			SupernovaRenderer.updateSupernovaTimer();
 		});
 	}

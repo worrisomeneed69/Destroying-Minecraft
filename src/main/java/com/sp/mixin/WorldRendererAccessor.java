@@ -18,9 +18,6 @@ public interface WorldRendererAccessor {
     @Invoker("setupTerrain")
     void invokeSetupTerrain(Camera camera, Frustum frustum, boolean hasForcedFrustum, boolean spectator);
 
-//    @Invoker("updateChunks")
-//    void updateChunks(Camera camera);
-
     @Invoker("renderEntity")
     void invokeRenderEntity(Entity entity, double cameraX, double cameraY, double cameraZ, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers);
 

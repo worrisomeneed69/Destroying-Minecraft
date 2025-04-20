@@ -5,6 +5,8 @@ uniform vec2 ScreenSize;
 in vec2 texCoord;
 out vec4 fragColor;
 
+const float padding = 0.025;
+
 const int samples[10] = int[10](
     1,
     2,
@@ -41,13 +43,12 @@ vec3 BloomLod(float scale, vec2 offset, int samples){
 
 void main() {
     vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
-    float scale = 2.0;
-    float offset = 0;
-    for(int i = 0; i < 6; i++) {
-        color.rgb += BloomLod(scale, vec2(offset, 0.0), samples[i]);
-        offset = (1.0 - (1.0/ scale));
-        scale *= 2.0;
-    }
+    color.rgb += BloomLod(2,  vec2(0.0           , 0.0          )  , samples[0]);
+    color.rgb += BloomLod(4,  vec2(0.0           , 0.5 + padding)  , samples[1]);
+    color.rgb += BloomLod(8,  vec2(0.25 + padding, 0.5 + padding)  , samples[2]);
+    color.rgb += BloomLod(16, vec2(0.4  + padding, 0.5 + padding)  , samples[3]);
+    color.rgb += BloomLod(32, vec2(0.0           , 0.775 + padding), samples[4]);
+    color.rgb += BloomLod(64, vec2(0.04          , 0.775 + padding), samples[5]);
 
 
     float Brightness = 0.3 * dot(color.rgb, vec3(0.2126, 0.7152, 0.0722));
