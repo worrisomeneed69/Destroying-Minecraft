@@ -1,8 +1,0 @@
-{
-  "depth": false,
-  "format": "R11F_G11F_B10F",
-  "autoClear": true,
-  "filter": {
-    "blur": true
-  }
-}

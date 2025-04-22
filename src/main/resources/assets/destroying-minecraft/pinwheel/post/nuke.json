@@ -4,13 +4,9 @@
             "type": "veil:blit",
             "shader": "destroying-minecraft:nuke/nuke",
             "in": "minecraft:main",
-            "out": "veil:post"
+            "out": "destroying-minecraft:bloom/bloom_start"
         }
-    ],
-    "framebuffers": {
-    },
-    "textures": {
-    }
+    ]
 }
 
 

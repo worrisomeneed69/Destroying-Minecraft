@@ -1,12 +1,12 @@
 package com.sp;
 
-import com.sp.mixininterfaces.SunMatrix;
 import com.sp.networking.InitializePackets;
 import com.sp.render.CameraShake;
 import com.sp.render.PrevUniforms;
 import com.sp.render.ShadowMapRenderer;
 import com.sp.render.blackhole.BlockInstanceRenderer;
 import com.sp.render.supernova.SupernovaRenderer;
+import com.sp.util.BetterUniforms;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
 import foundry.veil.platform.VeilEventPlatform;
@@ -14,7 +14,6 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.World;
@@ -70,9 +69,9 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 					ShaderProgram shaderProgram = context.getShader(BLACK_HOLE_SHADER);
 					if (shaderProgram != null) {
 						if (PrevUniforms.isInitialized()) {
-							shaderProgram.setMatrix("prevProjMat", PrevUniforms.getPrevProjMat());
-							shaderProgram.setMatrix("prevViewMat", PrevUniforms.getPrevModelViewMat());
-							shaderProgram.setVector("prevCameraPos", PrevUniforms.getPrevCameraPos());
+							BetterUniforms.setMatrix(shaderProgram, "prevProjMat", PrevUniforms.getPrevProjMat());
+							BetterUniforms.setMatrix(shaderProgram, "prevViewMat", PrevUniforms.getPrevModelViewMat());
+							BetterUniforms.setVector(shaderProgram, "prevCameraPos", PrevUniforms.getPrevCameraPos());
 
 						}
 
@@ -92,7 +91,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 						Matrix4f matrix4f = new Matrix4f();
 						matrix4f.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
 						matrix4f.rotate(RotationAxis.POSITIVE_X.rotationDegrees((clientWorld.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
-						shaderProgram.setMatrix("sunMat", matrix4f);
+						BetterUniforms.setMatrix(shaderProgram, "sunMat", matrix4f);
 
 						SupernovaRenderer.setSupernovaUniforms(shaderProgram, tickDelta);
 					}
@@ -103,7 +102,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 						matrix4f.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
 						matrix4f.rotate(RotationAxis.POSITIVE_X.rotationDegrees((clientWorld.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
 
-						shaderProgram.setMatrix("sunMat", matrix4f);
+						BetterUniforms.setMatrix(shaderProgram, "sunMat", matrix4f);
 					}
 				}
 			}

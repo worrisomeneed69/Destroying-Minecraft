@@ -3,6 +3,8 @@ package com.sp.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.DestroyingMinecraft;
 import com.sp.mixin.WorldRendererAccessor;
+import com.sp.util.BetterUniforms;
+import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
@@ -43,7 +45,7 @@ public class ShadowMapRenderer {
         AdvancedFbo shadowMap = VeilRenderSystem.renderer().getFramebufferManager().getFramebuffer(DestroyingMinecraft.idOf("shadowmap"));
         if(shadowMap != null) {
             setRenderingShadowMap(true);
-            PerspectiveRenderer.render(shadowMap, shadowModelView.peek().getPositionMatrix(), shadowProjMat, new Vector3d(cameraPos.x, cameraPos.y, cameraPos.z), new Quaternionf(), 20, client.getRenderTickCounter(), true);
+            VeilLevelPerspectiveRenderer.render(shadowMap, shadowModelView.peek().getPositionMatrix(), shadowProjMat, new Vector3d(cameraPos.x, cameraPos.y, cameraPos.z), new Quaternionf(), 20, client.getRenderTickCounter(), true);
             setRenderingShadowMap(false);
 //            RenderSystem.setProjectionMatrix(shadowProjMat, VertexSorter.BY_Z);
 //
@@ -161,10 +163,9 @@ public class ShadowMapRenderer {
     public static void setShadowUniforms(ShaderProgram access, World world) {
         Matrix4f viewMat = ShadowMapRenderer.createShadowModelView(currentCamera.getPos().x, currentCamera.getPos().y, currentCamera.getPos().z, true).peek().getPositionMatrix();
 
-        access.setMatrix("shadowViewMatrix", viewMat);
-        access.setMatrix("IShadowViewMatrix", viewMat.invert());
-        access.setMatrix("shadowProjMat", ShadowMapRenderer.createProjMat());
-        access.setInt("working", 1);
+        BetterUniforms.setMatrix(access, "shadowViewMatrix", viewMat);
+        BetterUniforms.setMatrix(access, "IShadowViewMatrix", viewMat.invert());
+        BetterUniforms.setMatrix(access, "shadowProjMat", ShadowMapRenderer.createProjMat());
     }
 
 

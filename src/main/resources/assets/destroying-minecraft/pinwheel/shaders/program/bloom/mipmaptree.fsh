@@ -56,7 +56,7 @@ void main() {
 
     fragColor = vec4(color.rgb * Brightness, 1.0);
 
-//    fragColor = textureLod(DiffuseSampler, texCoord, 2);
+//    fragColor = texture(DiffuseSampler, texCoord);
 
 
 }

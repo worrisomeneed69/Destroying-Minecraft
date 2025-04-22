@@ -1,6 +1,6 @@
 uniform sampler2D DiffuseSampler;
 uniform sampler2D BHBloomSampler;
-uniform sampler2D FinalSampler;
+uniform sampler2D StartSampler;
 
 uniform vec2 ScreenSize;
 
@@ -22,7 +22,7 @@ vec3 BloomLod(float scale, vec2 offset){
 }
 
 void main() {
-    vec4 color = texture(FinalSampler, texCoord);
+    vec4 color = texture(StartSampler, texCoord);
 
     vec4 highlights = vec4(0.0);
     float scale = 2.0;

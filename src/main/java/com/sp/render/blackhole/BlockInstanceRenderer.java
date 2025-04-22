@@ -2,6 +2,7 @@ package com.sp.render.blackhole;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.DestroyingMinecraft;
+import com.sp.util.BetterUniforms;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
@@ -62,7 +63,7 @@ public class BlockInstanceRenderer {
         shader.setSampler("Sampler2", RenderSystem.getShaderTexture(2));
         shader.setSampler("Sampler3", RenderSystem.getShaderTexture(3));
 
-        shader.setVector("offset", position);
+        BetterUniforms.setVector(shader, "offset", position);
 
         shader.bindSamplers(0);
         shader.setDefaultUniforms(VertexFormat.DrawMode.QUADS);

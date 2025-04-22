@@ -29,6 +29,11 @@
 		"destroying-minecraft.mixins.json"
 	],
 	"accessWidener": "destroying-minecraft.accesswidener",
+	"custom": {
+		"loom:injected_interfaces": {
+			"foundry/veil/api/client/render/shader/program/ShaderProgram": ["com/sp/mixin/BetterUniformsMixin"]
+		}
+	},
 	"depends": {
 		"fabricloader": ">=0.16.10",
 		"minecraft": "~1.21.1",

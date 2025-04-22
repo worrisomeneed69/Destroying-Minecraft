@@ -2,7 +2,7 @@
 uniform sampler2D DiffuseSampler;
 uniform sampler2D HandDepth;
 uniform sampler2D DepthComponent;
-uniform sampler2D BHBloomSampler;
+uniform sampler2D FinalSampler;
 uniform sampler2D MipMapSampler;
 
 in vec2 texCoord;
@@ -55,8 +55,7 @@ void main() {
     vec4 color = texture(DiffuseSampler, texCoord);
     float depth = texture(DepthComponent, texCoord).r;
     float handDepth = texture(HandDepth, texCoord).r;
-    vec4 blackHole = texture(BHBloomSampler, texCoord);
-    vec4 finalColor;
+    vec4 blackHole = texture(FinalSampler, texCoord);
 
 //    if(depth >= 1.0 && handDepth >= 1.0){
 //        finalColor = blackHole;

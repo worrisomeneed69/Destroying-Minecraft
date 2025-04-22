@@ -12,125 +12,108 @@ uniform float GameTime;
 in vec2 texCoord;
 out vec4 fragColor;
 
-//const vec3 LIGHT_DIR = vec3(1, 1, 1);
-const vec3 NUKE_POS = vec3(-124, 72, 157);
-const float CONTRAST = -10;
+//vec3(-124, 72, 157);
+const vec3 NUKE_POS = vec3(-797, 63, 654);
+//const float CONTRAST = -1;
+const float ZOOM = 0.1;
+const int ITERATIONS = 5;
+const float ABSORPTION = 0.5;
+const float SEETH = 500;
 
-float contrast(float color){
-    return CONTRAST * (color - 0.5) + 0.5;
+const vec3 fireColor1 = vec3(0.807843137254902, 0.44313725490196076, 0.09019607843137255); //Darkest
+const vec3 fireColor2 = vec3(0.9725490196078431, 0.5607843137254902, 0.13333333333333333);
+const vec3 fireColor3 = vec3(0.984313725490196, 0.9568627450980393, 0.5176470588235295); //Lightest
+
+float contrast(float color, float cont){
+    return cont * (color - 0.5) + 0.5;
 }
 
 float map(vec3 p){
     vec3 nukePos = p - NUKE_POS;
-//    float cylinder = sdCylinder(nukePos - vec3(0, 40, 0), 40, 10);
-//    float torus = sdTorus(nukePos - vec3(0, 80,0), vec2(30, 20));
-//    float sphere = sdSphere(nukePos - vec3(0,2,0), 2);
-    float cube = sdBox(nukePos - vec3(0,2,0), vec3(2));
+    float cylinder = sdCylinder(nukePos - vec3(0, 40, 0), 40, 10);
+    float torus = sdTorus(nukePos - vec3(0, 80,0), vec2(30, 20));
+    float cone = sdCappedCone(nukePos - vec3(0, 3, 0), 3, 80, 1);
+//    float cube = sdBox(nukePos - vec3(0,2,0), vec3(2));
+    float distortion = (fbm(nukePos + (GameTime*1000), 7) - fbm(nukePos*0.2 + (GameTime*100), 2)*2)*3;
 
 
 
-//    return opSmoothUnion(torus, cylinder, 0);
-//    return cube - fbm(nukePos + (GameTime*1000), 7) - fbm(nukePos + (GameTime*1000), 1);
-    return cube;
+    return opSmoothUnion(torus, opSmoothUnion(cylinder, cone, 20), 0) - distortion;
+//    return cone - distortion;
 }
 
+float lqMap(vec3 p){
+    vec3 nukePos = p - NUKE_POS;
+    float cylinder = sdCylinder(nukePos - vec3(0, 40, 0), 44, 12);
+    float torus = sdTorus(nukePos - vec3(0, 80,0), vec2(34, 24));
 
-vec3 getRaymarchNormal(vec3 point){
-    vec2 e = vec2(0.01, 0.0);
-    float d = map(point);
-    return normalize(vec3(map(point + e.xyy), map(point + e.yxy), map(point + e.yyx)) - d);
+
+    return opSmoothUnion(torus, cylinder, 0);
 }
 
-float rayMarchShadow(in vec3 rayPos, vec3 LIGHT_DIR){
-    vec3 shadowRayPos = rayPos;
-    vec3 step = LIGHT_DIR * 0.05;
+vec3 rayMarchCloud(inout vec3 color, in vec3 viewPos, in vec3 rayOrigin, in vec3 rayDir){
+    vec3 step = rayDir * 0.05;
 
-    float shadow = 0.0;
-    for(int i = 0; i < 50; i++){
-        shadowRayPos += step;
-        float d = max(-map(shadowRayPos), 0.0);
-
-        float noise = clamp(contrast(fbm(shadowRayPos*1, 9)), 0.0, 1.0);
-
-        shadow += clamp(1 * d * noise, 0.0, 1.0);
-
-        if(shadow >= 1.0){
-            break;
-        } else if(map(shadowRayPos) > 0.9){
-            break;
-        }
-    }
-
-    return shadow;
-}
-
-float rayMarchCloud(vec3 rayPos, vec3 rd, vec3 viewPos, vec3 LIGHT_DIR) {
-    vec3 step = rd * 0.05;
-    vec3 ogRayPos = rayPos;
-
-    float cloud = 0.0;
-    float shadow = 1.0;
-    for(int i = 0; i < 50; i++){
+    vec3 rayPos = rayOrigin;
+    float accumulation = 0.0;
+    for(int i = 0; i < 100; i++){
         rayPos += step;
 
-        if(map(rayPos) > 0.9){
+        float noise = fbm4d(vec4(rayPos*ZOOM, GameTime * SEETH), ITERATIONS);
+
+        float d = map(rayPos);
+        if(noise > 0.0){
+            accumulation += noise * 0.05 + max(-d*0.1, 0.0);
+        }
+
+
+
+        if(d > 1.2 || accumulation >= 1.0){
             break;
         }
 
-        float d = max(-map(rayPos), 0.0);
-
-        float noise = clamp(contrast(fbm(rayPos*1, 9)), 0.0, 1.0);
-        float density = (10 * d * noise);
-
-        shadow -= rayMarchShadow(rayPos, LIGHT_DIR);
-
-        cloud += clamp(density, 0.0, 1.0) * exp(length(ogRayPos - rayPos) * 0.1);
-
-        if(cloud >= 1.0){
+        else if(length(rayOrigin - rayPos) > 10){
             break;
         }
     }
+    float dist = length(rayOrigin - rayPos);
 
-    return shadow;
-//    return cloud * (shadow);
+    float fireNoise = contrast(fbm4d(vec4(rayPos*0.1, GameTime * 100), ITERATIONS), -15);
+    vec3 fire = fireColor1 * max((1.0 - exp(-dist * 0.5)) * fireNoise, 0.0)*5;
+    return vec3(accumulation * (1.0 - exp(-dist * 0.1))) + fire;
 }
 
-vec3 rayMarchNuke(vec3 color, vec3 viewPos, out vec3 normal, out bool hit, vec3 LIGHT_DIR){
-    vec3 rayOrigin = (VeilCamera.CameraPosition + VeilCamera.CameraBobOffset) + rand(texCoord + GameTime) * 0.01;
+void rayMarchNuke(inout vec3 color, in vec3 viewPos, inout vec3 normal, inout bool hit){
+    vec3 rayOrigin = VeilCamera.CameraPosition + VeilCamera.CameraBobOffset;
     vec3 rayDir = viewDirFromUv(texCoord);
 
     float dist = 0.0;
     vec3 rayPos = rayOrigin;
-    for(int i = 0; i < 100; i++){
+    for(int i = 0; i < 50; i++){
         rayPos = rayOrigin + rayDir * dist;
 
+//        float d = lqMap(rayPos);
+//        if(d < 1){
+//            d = map(rayPos);
+//        }
         float d = map(rayPos);
         dist += d;
 
-        if(d <= 0.01){
+        if(d <= 0.001){
             hit = true;
-            normal = getRaymarchNormal(rayOrigin + rayDir * dist);
             break;
         }
 
-        if(d > 100 || length(viewPos) < dist){
+        else if(dist > length(viewPos) || dist > 300){
             break;
         }
     }
 
     if(hit){
-        return vec3(rayMarchCloud(rayPos, rayDir, viewPos, LIGHT_DIR));
-//        return blend(vec4(color, 1.0), vec4(rayMarchCloud(rayPos, rayDir, viewPos, LIGHT_DIR)));
-//        return vec3(0.3);
+        color = rayMarchCloud(color, viewPos, rayPos, rayDir);
+//        color = vec3(1);
     }
 
-    return color;
-}
-
-void lighting(inout vec3 color, in vec3 normal){
-//    vec3 lightDir = vec3(sin(GameTime * 1000),0,cos(GameTime * 1000));
-    vec3 lightDir = vec3(1.0);
-    color = color * (dot(normal, lightDir) * 0.5 + 0.5);
 }
 
 void main() {
@@ -144,11 +127,7 @@ void main() {
 
     vec3 LIGHT_DIR = vec3(sin(GameTime * 1000), 1, cos(GameTime * 1000));
 //    vec3 LIGHT_DIR = vec3(1);
-    color = rayMarchNuke(color, viewPos, normal, hit, LIGHT_DIR);
-
-//    if(hit){
-//        lighting(color, normal);
-//    }
+    rayMarchNuke(color, viewPos, normal, hit);
 
     fragColor = vec4(color, 1.0);
 }

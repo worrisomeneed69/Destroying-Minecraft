@@ -191,7 +191,7 @@ vec3 getClouds(vec4 color, float depth){
 }
 
 void main() {
-    vec3 color = vec3(1.0);
+    vec3 color = texture(DiffuseSampler, texCoord).rgb;
     float depth = texture(DiffuseDepthSampler, texCoord).r;
 
     vec3 sunDir = getLightAngle();
@@ -212,9 +212,9 @@ void main() {
             fragColor = vec4(color, 1.0);
         }
 
-        fragColor.rgb = getClouds(fragColor, depth);
+//        fragColor.rgb = getClouds(fragColor, depth);
     } else {
-        fragColor = vec4(0.0);
+        fragColor = vec4(color, 1.0);
     }
 
 

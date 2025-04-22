@@ -1,5 +1,6 @@
 package com.sp.render.supernova;
 
+import com.sp.util.BetterUniforms;
 import com.sp.util.ShaderTimer;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.client.util.Easing;
@@ -16,23 +17,22 @@ public class SupernovaRenderer {
         if(enable) {
             progress++;
             if (progress < duration) {
+                //Sun implosion
                 implodeTimer.setTimer(Easing.EASE_IN_CUBIC.ease((float) progress / duration));
-
             } else {
+                //Flash, then fade to supernova
                 implodeTimer.maxTimer();
                 flashTimer.setTimer(Easing.EASE_IN_OUT_CUBIC.ease((float) (progress - duration) / (duration * 1.5f)));
                 explosionTimer.setTimer((float) (progress - duration) / (duration * 3f));
 
             }
 
-            implodeTimer.setLastTimer();
-            flashTimer.setLastTimer();
-            explosionTimer.setLastTimer();
+            //prevTimer = timer;
+            implodeTimer.setPrevTimer();
+            flashTimer.setPrevTimer();
+            explosionTimer.setPrevTimer();
         } else {
-            implodeTimer.reset();
-            flashTimer.reset();
-            explosionTimer.reset();
-            progress = 0;
+            resetSupernovaTimer();
         }
     }
 
@@ -48,9 +48,9 @@ public class SupernovaRenderer {
     }
 
     public static void setSupernovaUniforms(ShaderProgram shaderProgram, float tickDelta){
-        shaderProgram.setFloat("supernovaTimer", implodeTimer.getTimer(tickDelta));
-        shaderProgram.setFloat("flashTimer", flashTimer.getTimer(tickDelta));
-        shaderProgram.setFloat("explosionTimer", explosionTimer.getTimer(tickDelta));
+        BetterUniforms.setFloat(shaderProgram, "supernovaTimer", implodeTimer.getTimer(tickDelta));
+        BetterUniforms.setFloat(shaderProgram, "flashTimer", flashTimer.getTimer(tickDelta));
+        BetterUniforms.setFloat(shaderProgram, "explosionTimer", explosionTimer.getTimer(tickDelta));
     }
 
 }

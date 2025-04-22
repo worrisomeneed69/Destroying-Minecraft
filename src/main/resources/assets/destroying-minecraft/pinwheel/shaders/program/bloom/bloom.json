@@ -1,6 +1,6 @@
 {
   "vertex": "veil:blit_screen",
-  "fragment": "destroying-minecraft:blackhole/bloom",
+  "fragment": "destroying-minecraft:bloom/bloom",
   "textures": {
   }
 }
