@@ -68,6 +68,13 @@ void main() {
     float depth = texture(DiffuseDepthSampler, texCoord).r;
     float handDepth = texture(HandDepth, texCoord).r;
 
+
+    vec3 flash = flashTimer > 0 ? vec3(0.6) * (1.0-min(flashTimer, 1.0)) : vec3(0.0);
+    if(depth >= 1.0) {
+        fragColor = color + vec4(flash, 0.0);
+        return;
+    }
+
     vec3 viewPos = screenToViewSpace(texCoord, depth).rgb;
 
 
@@ -110,7 +117,7 @@ void main() {
 //    vec3 ambientLight = (blockLight + 0.2*skyLight) * clamp(dot(worldNormal, worldNormal), 0.0, 1.0);
     vec3 outputColor;
     if (flashTimer > 0.0) {
-        outputColor = albedoColor * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)) + vec3(1) * (1.0-min(flashTimer, 1.0));
+        outputColor = albedoColor * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)) + flash;
     } else {
         outputColor = albedoColor * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)*(1.0 - supernovaTimer));
     }

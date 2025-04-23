@@ -8,22 +8,24 @@ import foundry.veil.api.client.util.Easing;
 
 public class NukeRenderer extends ExplosionRenderer {
     private static final ShaderTimer smokeRiseTimer = new ShaderTimer();
+    private static final ShaderTimer flashTimer = new ShaderTimer();
 
-    NukeRenderer(int duration) {
-        super(duration);
+    public NukeRenderer(int duration) {
+        super(duration, "nuke", "nuke/nuke");
     }
 
     @Override
     public void updateTimer() {
         if(this.enable) {
             this.progress++;
-            if (this.progress < this.duration) {
-                //Sun implosion
-                smokeRiseTimer.setTimer(Easing.EASE_IN_CUBIC.ease((float) this.progress / this.duration));
+            if (this.progress <= this.duration) {
+                smokeRiseTimer.setTimer(Easing.EASE_OUT_SINE.ease((float) this.progress / this.duration));
+                flashTimer.setTimer(Easing.EASE_OUT_SINE.ease(Math.min((float) this.progress / this.duration*1.25f, 1.0f)));
             }
 
             //prevTimer = timer;
             smokeRiseTimer.setPrevTimer();
+            flashTimer.setPrevTimer();
         } else {
             this.resetExplosionTimer();
         }
@@ -32,11 +34,15 @@ public class NukeRenderer extends ExplosionRenderer {
     @Override
     public void resetExplosionTimer() {
         smokeRiseTimer.reset();
+        flashTimer.reset();
         super.resetExplosionTimer();
     }
 
     @Override
     public void setUniforms(ShaderProgram shaderProgram, float tickDelta) {
-        BetterUniforms.setFloat(shaderProgram, "smokeRiseTimer", smokeRiseTimer.getTimer(tickDelta));
+//        if(this.enable) {
+            BetterUniforms.setFloat(shaderProgram, "smokeRiseTimer", smokeRiseTimer.getTimer(tickDelta));
+            BetterUniforms.setFloat(shaderProgram, "flashTimer", flashTimer.getTimer(tickDelta));
+//        }
     }
 }

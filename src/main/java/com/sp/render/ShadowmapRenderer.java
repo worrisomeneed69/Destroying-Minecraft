@@ -30,66 +30,15 @@ public class ShadowMapRenderer {
     public static void renderShadowMap(Camera camera){
         currentCamera = camera;
         client = MinecraftClient.getInstance();
-        WorldRenderer worldRenderer = client.worldRenderer;
-        WorldRendererAccessor accessor = (WorldRendererAccessor) worldRenderer;
         Vec3d cameraPos = camera.getPos();
         MatrixStack shadowModelView = createShadowModelView(cameraPos.x, cameraPos.y, cameraPos.z, true);
         Matrix4f shadowProjMat = createProjMat();
-        Matrix4f backupProjMat = RenderSystem.getProjectionMatrix();
-
-
-        int width = client.getFramebuffer().viewportWidth;
-        int height = client.getFramebuffer().viewportHeight;
-        Frustum frustum;
 
         AdvancedFbo shadowMap = VeilRenderSystem.renderer().getFramebufferManager().getFramebuffer(DestroyingMinecraft.idOf("shadowmap"));
         if(shadowMap != null) {
             setRenderingShadowMap(true);
             VeilLevelPerspectiveRenderer.render(shadowMap, shadowModelView.peek().getPositionMatrix(), shadowProjMat, new Vector3d(cameraPos.x, cameraPos.y, cameraPos.z), new Quaternionf(), 20, client.getRenderTickCounter(), true);
             setRenderingShadowMap(false);
-//            RenderSystem.setProjectionMatrix(shadowProjMat, VertexSorter.BY_Z);
-//
-//            shadowMap.bind(true);
-//            setRenderingShadowMap(true);
-//
-//            boolean chunkCulling = client.chunkCullingEnabled;
-//            client.chunkCullingEnabled = false;
-//            Frustum backupFrustum = accessor.getFrustum();
-//
-//            frustum = new Frustum(shadowModelView.peek().getPositionMatrix(), shadowProjMat);
-//            frustum.setPosition(cameraPos.x, cameraPos.y, cameraPos.z);
-//            accessor.setFrustum(frustum);
-////            worldRenderer.setupFrustum();
-//            accessor.invokeSetupTerrain(camera, frustum, false, false);
-//            accessor.invokeRenderLayer(RenderLayer.getCutout(), cameraPos.x, cameraPos.y, cameraPos.z, shadowModelView.peek().getPositionMatrix(), shadowProjMat);
-//            accessor.invokeRenderLayer(RenderLayer.getCutoutMipped(), cameraPos.x, cameraPos.y, cameraPos.z, shadowModelView.peek().getPositionMatrix(), shadowProjMat);
-//            accessor.invokeRenderLayer(RenderLayer.getSolid(), cameraPos.x, cameraPos.y, cameraPos.z, shadowModelView.peek().getPositionMatrix(), shadowProjMat);
-//
-//            if(client.world != null) {
-//                VertexConsumerProvider.Immediate immediate = accessor.getBufferBuilders().getEntityVertexConsumers();
-//
-//                for(Entity entity : client.world.getEntities()){
-//                    if(accessor.getEntityRenderDispatcher().shouldRender(entity, accessor.getFrustum(), cameraPos.x, cameraPos.y, cameraPos.z) || entity.isSpectator()){
-//                        accessor.invokeRenderEntity(entity, cameraPos.x, cameraPos.y, cameraPos.z, tickDelta, shadowModelView, immediate);
-//                    }
-//                }
-//
-//                immediate.draw();
-//
-//            }
-//
-//            setRenderingShadowMap(false);
-//            AdvancedFbo.unbind();
-//
-//            accessor.setFrustum(backupFrustum);
-//            RenderSystem.applyModelViewMatrix();
-////            client.chunkCullingEnabled = chunkCulling;
-//            RenderSystem.viewport(0, 0, width, height);
-//
-//            RenderSystem.setProjectionMatrix(backupProjMat, VertexSorter.BY_DISTANCE);
-
-
-
         }
     }
 
@@ -124,13 +73,19 @@ public class ShadowMapRenderer {
 
     //Global Light Rotation
     public static void rotateShadowModelView(Matrix4f shadowModelView){
+        //Black Hole
 //        shadowModelView.rotate(RotationAxis.POSITIVE_X.rotationDegrees(20.0f));
 //        shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
 
-        if(client.world != null) {
-            shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
-            shadowModelView.rotate(RotationAxis.POSITIVE_Z.rotationDegrees(-(client.world.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
-        }
+        //Supernova
+//        if(client.world != null) {
+//            shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
+//            shadowModelView.rotate(RotationAxis.POSITIVE_Z.rotationDegrees(-(client.world.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
+//        }
+
+        //Nuke
+        shadowModelView.rotate(RotationAxis.POSITIVE_X.rotationDegrees(20.0f));
+        shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(0.0f));
 
     }
 

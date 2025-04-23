@@ -8,21 +8,20 @@ uniform sampler2D DiffuseSampler;
 uniform sampler2D DiffuseDepthSampler;
 
 uniform float GameTime;
+uniform float smokeRiseTimer;
 
 in vec2 texCoord;
 out vec4 fragColor;
 
 //vec3(-124, 72, 157);
-const vec3 NUKE_POS = vec3(-797, 63, 654);
+const vec3 NUKE_POS = vec3(-1007, 70, 1056);
 //const float CONTRAST = -1;
 const float ZOOM = 0.1;
 const int ITERATIONS = 5;
 const float ABSORPTION = 0.5;
 const float SEETH = 500;
 
-const vec3 fireColor1 = vec3(0.807843137254902, 0.44313725490196076, 0.09019607843137255); //Darkest
-const vec3 fireColor2 = vec3(0.9725490196078431, 0.5607843137254902, 0.13333333333333333);
-const vec3 fireColor3 = vec3(0.984313725490196, 0.9568627450980393, 0.5176470588235295); //Lightest
+const vec3 fireColor = vec3(0.807843137254902, 0.44313725490196076, 0.09019607843137255);
 
 float contrast(float color, float cont){
     return cont * (color - 0.5) + 0.5;
@@ -30,9 +29,9 @@ float contrast(float color, float cont){
 
 float map(vec3 p){
     vec3 nukePos = p - NUKE_POS;
-    float cylinder = sdCylinder(nukePos - vec3(0, 40, 0), 40, 10);
-    float torus = sdTorus(nukePos - vec3(0, 80,0), vec2(30, 20));
-    float cone = sdCappedCone(nukePos - vec3(0, 3, 0), 3, 80, 1);
+    float cylinder = sdCylinder(nukePos - vec3(0, 40*smokeRiseTimer, 0), 40*smokeRiseTimer, 10);
+    float torus = sdTorus(nukePos - vec3(0, 80*smokeRiseTimer,0), vec2(30*smokeRiseTimer, 20));
+    float cone = sdCappedCone(nukePos - vec3(0, 3, 0), 3, 80*smokeRiseTimer, 1);
 //    float cube = sdBox(nukePos - vec3(0,2,0), vec3(2));
     float distortion = (fbm(nukePos + (GameTime*1000), 7) - fbm(nukePos*0.2 + (GameTime*100), 2)*2)*3;
 
@@ -59,7 +58,7 @@ vec3 rayMarchCloud(inout vec3 color, in vec3 viewPos, in vec3 rayOrigin, in vec3
     for(int i = 0; i < 100; i++){
         rayPos += step;
 
-        float noise = fbm4d(vec4(rayPos*ZOOM, GameTime * SEETH), ITERATIONS);
+        float noise = fbm4d(vec4((rayPos + vec3(0,40,0)*sin(GameTime*0))*ZOOM, GameTime * SEETH), ITERATIONS);
 
         float d = map(rayPos);
         if(noise > 0.0){
@@ -78,8 +77,8 @@ vec3 rayMarchCloud(inout vec3 color, in vec3 viewPos, in vec3 rayOrigin, in vec3
     }
     float dist = length(rayOrigin - rayPos);
 
-    float fireNoise = contrast(fbm4d(vec4(rayPos*0.1, GameTime * 100), ITERATIONS), -15);
-    vec3 fire = fireColor1 * max((1.0 - exp(-dist * 0.5)) * fireNoise, 0.0)*5;
+    float fireNoise = contrast(fbm4d(vec4((rayPos + vec3(0,40,0)*smokeRiseTimer)*0.1, GameTime * 100), ITERATIONS), -15);
+    vec3 fire = fireColor * max((1.0 - exp(-dist * 0.5)) * fireNoise, 0.0)*(4 + 50*(1.0 - smokeRiseTimer));
     return vec3(accumulation * (1.0 - exp(-dist * 0.1))) + fire;
 }
 
@@ -117,9 +116,14 @@ void rayMarchNuke(inout vec3 color, in vec3 viewPos, inout vec3 normal, inout bo
 }
 
 void main() {
-    vec3 nukePos = vec3(-124, 72, 157);
     vec3 color = texture(DiffuseSampler, texCoord).rgb;
     float depth = texture(DiffuseDepthSampler, texCoord).r;
+//    if(depth >= 1.0){
+//        discard;
+//        color = vec3(0.0);
+//        fragColor = vec4(color, 0.0);
+//        return;
+//    }
 
     vec3 viewPos = screenToViewSpace(texCoord, depth).xyz;
     vec3 normal = vec3(0.0);
@@ -127,7 +131,9 @@ void main() {
 
     vec3 LIGHT_DIR = vec3(sin(GameTime * 1000), 1, cos(GameTime * 1000));
 //    vec3 LIGHT_DIR = vec3(1);
-    rayMarchNuke(color, viewPos, normal, hit);
+    if(smokeRiseTimer > 0.0){
+        rayMarchNuke(color, viewPos, normal, hit);
+    }
 
     fragColor = vec4(color, 1.0);
 }

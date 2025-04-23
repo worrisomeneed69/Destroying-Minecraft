@@ -5,6 +5,7 @@ import com.sp.render.CameraShake;
 import com.sp.render.PrevUniforms;
 import com.sp.render.ShadowMapRenderer;
 import com.sp.render.blackhole.BlockInstanceRenderer;
+import com.sp.render.nuke.NukeRenderer;
 import com.sp.render.supernova.SupernovaRenderer;
 import com.sp.util.BetterUniforms;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
@@ -20,8 +21,10 @@ import net.minecraft.world.World;
 import org.joml.Matrix4f;
 
 public class DestroyingMinecraftClient implements ClientModInitializer {
-//	public static DestroyingMinecraftClient INSTANCE;
 	public BlockInstanceRenderer blockInstanceRenderer;
+	public static NukeRenderer nukeRenderer = new NukeRenderer(400);
+	public static SupernovaRenderer supernovaRenderer = new SupernovaRenderer(100);
+
 	private static final Identifier BLACK_HOLE_POST = DestroyingMinecraft.idOf("black_hole");
 	private static final Identifier BLACK_HOLE_SHADER = DestroyingMinecraft.idOf("blackhole/black_hole");
 
@@ -30,9 +33,6 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 	private static final Identifier SKY_POST = DestroyingMinecraft.idOf("sky");
 	private static final Identifier SKY_SHADER = DestroyingMinecraft.idOf("sky/sky");
-
-	private static final Identifier SUPERNOVA_POST = DestroyingMinecraft.idOf("supernova");
-	private static final Identifier SUPERNOVA_SHADER = DestroyingMinecraft.idOf("supernova/supernova");
 
 	@Override
 	public void onInitializeClient() {
@@ -82,27 +82,29 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 					ShaderProgram shaderProgram = context.getShader(SHADOWS_SHADER);
 					if (shaderProgram != null) {
 						ShadowMapRenderer.setShadowUniforms(shaderProgram, clientWorld);
-						SupernovaRenderer.setSupernovaUniforms(shaderProgram, tickDelta);
+						supernovaRenderer.setUniforms(shaderProgram, tickDelta);
+						nukeRenderer.setUniforms(shaderProgram, tickDelta);
 					}
 				} else if (SKY_POST.equals(name)) {
 					ShaderProgram shaderProgram = context.getShader(SKY_SHADER);
 					if (shaderProgram != null) {
 
 						Matrix4f matrix4f = new Matrix4f();
-						matrix4f.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
-						matrix4f.rotate(RotationAxis.POSITIVE_X.rotationDegrees((clientWorld.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
+						//Supernova
+//						matrix4f.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
+//						matrix4f.rotate(RotationAxis.POSITIVE_X.rotationDegrees((clientWorld.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
+
+						//Nuke
+						matrix4f.rotate(RotationAxis.POSITIVE_X.rotationDegrees(-20.0f));
+						matrix4f.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(0.0f));
 						BetterUniforms.setMatrix(shaderProgram, "sunMat", matrix4f);
 
-						SupernovaRenderer.setSupernovaUniforms(shaderProgram, tickDelta);
+						supernovaRenderer.setUniforms(shaderProgram, tickDelta);
 					}
-				} else if(SUPERNOVA_POST.equals(name)){
-					ShaderProgram shaderProgram = context.getShader(SUPERNOVA_SHADER);
+				} else if(nukeRenderer.POST.equals(name)){
+					ShaderProgram shaderProgram = context.getShader(nukeRenderer.SHADER);
 					if (shaderProgram != null) {
-						Matrix4f matrix4f = new Matrix4f();
-						matrix4f.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
-						matrix4f.rotate(RotationAxis.POSITIVE_X.rotationDegrees((clientWorld.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
-
-						BetterUniforms.setMatrix(shaderProgram, "sunMat", matrix4f);
+						nukeRenderer.setUniforms(shaderProgram, tickDelta);
 					}
 				}
 			}
@@ -122,7 +124,8 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 		});
 
 		ClientTickEvents.END_WORLD_TICK.register(clientWorld -> {
-			SupernovaRenderer.updateSupernovaTimer();
+			supernovaRenderer.updateTimer();
+			nukeRenderer.updateTimer();
 		});
 	}
 }

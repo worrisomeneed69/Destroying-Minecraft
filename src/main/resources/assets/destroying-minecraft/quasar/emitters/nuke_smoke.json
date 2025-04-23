@@ -1,0 +1,11 @@
+{
+  "max_lifetime": 10,
+  "loop": false,
+  "rate": 1,
+  "count": 20,
+  "emitter_settings": {
+    "shape": ["destroying-minecraft:nuke_emitter_shape"],
+    "particle_settings": "destroying-minecraft:nuke_particle_settings"
+  },
+  "particle_data": "destroying-minecraft:nuke_particle_data"
+}

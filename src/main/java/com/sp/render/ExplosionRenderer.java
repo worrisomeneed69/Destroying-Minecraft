@@ -1,13 +1,19 @@
 package com.sp.render;
 
+import com.sp.DestroyingMinecraft;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
+import net.minecraft.util.Identifier;
 
 public abstract class ExplosionRenderer {
     protected boolean enable;
     protected int progress = 0;
     protected final int duration;
+    public final Identifier POST;
+    public final Identifier SHADER;
 
-    protected ExplosionRenderer(int duration){
+    protected ExplosionRenderer(int duration, String postDirectory, String shaderDirectory){
+        this.POST = DestroyingMinecraft.idOf(postDirectory);
+        this.SHADER = DestroyingMinecraft.idOf(shaderDirectory);
         this.duration = duration;
     }
 

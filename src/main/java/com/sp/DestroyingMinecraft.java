@@ -1,7 +1,7 @@
 package com.sp;
 
 import com.sp.block.ModBlocks;
-import com.sp.command.SupernovaCommand;
+import com.sp.command.DestructionCommand;
 import com.sp.item.ModItemGroups;
 import com.sp.item.ModItems;
 import com.sp.networking.InitializePackets;
@@ -26,7 +26,7 @@ public class DestroyingMinecraft implements ModInitializer {
 		ModItemGroups.registerItemGroups();
 		InitializePackets.registerServerNetworking();
 
-		CommandRegistrationCallback.EVENT.register(SupernovaCommand::register);
+		CommandRegistrationCallback.EVENT.register(DestructionCommand::register);
 
 		LOGGER.info("Hello Fabric world!");
 	}
