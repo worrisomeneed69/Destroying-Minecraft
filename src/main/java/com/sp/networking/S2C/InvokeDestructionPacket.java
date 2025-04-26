@@ -33,6 +33,8 @@ public class InvokeDestructionPacket {
                     }
                     break;
                 }
+
+                case 2: DestroyingMinecraftClient.planetRenderer.toggleExplosion(on); break;
             }
 
         });

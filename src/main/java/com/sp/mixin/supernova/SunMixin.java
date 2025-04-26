@@ -2,7 +2,6 @@ package com.sp.mixin.supernova;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.sp.mixininterfaces.SunMatrix;
-import com.sp.render.supernova.SupernovaRenderer;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.math.MatrixStack;

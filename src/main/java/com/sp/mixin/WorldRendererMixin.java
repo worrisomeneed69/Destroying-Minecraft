@@ -1,16 +1,10 @@
 package com.sp.mixin;
 
-import com.sp.DestroyingMinecraftClient;
 import com.sp.mixininterfaces.CullingDataCache;
-import com.sp.render.blackhole.BlockInstanceRenderer;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.chunk.ChunkBuilder;
-import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.*;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin implements CullingDataCache {

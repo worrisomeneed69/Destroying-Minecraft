@@ -2,6 +2,7 @@ package com.sp;
 
 import com.sp.block.ModBlocks;
 import com.sp.command.DestructionCommand;
+import com.sp.entity.ModEntities;
 import com.sp.item.ModItemGroups;
 import com.sp.item.ModItems;
 import com.sp.networking.InitializePackets;
@@ -25,6 +26,7 @@ public class DestroyingMinecraft implements ModInitializer {
 		ModBlocks.init();
 		ModItemGroups.registerItemGroups();
 		InitializePackets.registerServerNetworking();
+		ModEntities.registerEntities();
 
 		CommandRegistrationCallback.EVENT.register(DestructionCommand::register);
 

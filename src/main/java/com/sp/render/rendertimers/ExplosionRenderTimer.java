@@ -1,17 +1,17 @@
-package com.sp.render;
+package com.sp.render.rendertimers;
 
 import com.sp.DestroyingMinecraft;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import net.minecraft.util.Identifier;
 
-public abstract class ExplosionRenderer {
+public abstract class ExplosionRenderTimer {
     protected boolean enable;
     protected int progress = 0;
     protected final int duration;
     public final Identifier POST;
     public final Identifier SHADER;
 
-    protected ExplosionRenderer(int duration, String postDirectory, String shaderDirectory){
+    protected ExplosionRenderTimer(int duration, String postDirectory, String shaderDirectory){
         this.POST = DestroyingMinecraft.idOf(postDirectory);
         this.SHADER = DestroyingMinecraft.idOf(shaderDirectory);
         this.duration = duration;
@@ -25,7 +25,7 @@ public abstract class ExplosionRenderer {
 
     public void resetExplosionTimer(){
         this.progress = 0;
-    };
+    }
 
     public abstract void setUniforms(ShaderProgram shaderProgram, float tickDelta);
 }

@@ -1,4 +1,4 @@
-package com.sp.render.blackhole;
+package com.sp.render.rendertimers.blackhole;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.DestroyingMinecraft;

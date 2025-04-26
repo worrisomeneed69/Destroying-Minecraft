@@ -1,16 +1,16 @@
-package com.sp.render.nuke;
+package com.sp.render.rendertimers.nuke;
 
-import com.sp.render.ExplosionRenderer;
+import com.sp.render.rendertimers.ExplosionRenderTimer;
 import com.sp.util.BetterUniforms;
 import com.sp.util.ShaderTimer;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.client.util.Easing;
 
-public class NukeRenderer extends ExplosionRenderer {
+public class NukeRenderTimer extends ExplosionRenderTimer {
     private static final ShaderTimer smokeRiseTimer = new ShaderTimer();
     private static final ShaderTimer flashTimer = new ShaderTimer();
 
-    public NukeRenderer(int duration) {
+    public NukeRenderTimer(int duration) {
         super(duration, "nuke", "nuke/nuke");
     }
 

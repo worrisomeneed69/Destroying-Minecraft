@@ -41,10 +41,12 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
+	//Veil
 	modImplementation("foundry.veil:veil-fabric-${project.minecraft_version}:${project.veil_version}") {
 		exclude group: "maven.modrinth"
 	}
 
+	//Sodium
 	modCompileOnly "maven.modrinth:sodium:mc1.21.1-${sodium_version}-fabric"
 	
 }

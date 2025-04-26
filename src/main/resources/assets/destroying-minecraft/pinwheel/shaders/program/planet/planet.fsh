@@ -16,11 +16,13 @@ uniform sampler2D PlanetCracks;
 uniform sampler2D PlanetSmallCracks;
 
 uniform float GameTime;
+uniform float planetFallTimer;
 
 in vec2 texCoord;
 out vec4 fragColor;
 
-const vec3 PLANET_POS = vec3(-132, 1700, -3300);
+vec3 PLANET_OFFSET = vec3(0, 100 * planetFallTimer, 0);
+vec3 PLANET_POS = vec3(-132, 1700, -3300) - PLANET_OFFSET;
 const float ZOOM = 0.001;
 const vec3 LIGHT_DIR = normalize(vec3(1, 1, 1));
 const int FBM_ITERATIONS = 5;
@@ -68,12 +70,13 @@ float mapDebrisField(vec3 coneRayPos, vec3 p, float radius, float repetition, fl
 }
 
 float map(in vec3 p, int iterations) {
+    vec3 pos = p + PLANET_OFFSET;
     vec3 rayPos = p - PLANET_POS;
     vec3 coneRayPos = rayPos - (vec3(0.5, -1, 1) * 800);
     coneRayPos.xy *= rot2D(145);
     coneRayPos.yz *= rot2D(-55);
 
-    float chunkNoise = fbm2(p * 0.03, iterations);
+    float chunkNoise = fbm2(pos * 0.03, iterations);
     float cone = sdCappedCone(coneRayPos, 1033.333333, 66.6667, 1206.6667) + chunkNoise * 200;
 
     float sphere = sdSphere(rayPos, 2000);
@@ -82,12 +85,12 @@ float map(in vec3 p, int iterations) {
     float dist = min(opSubtraction(cone, sphere), debrisField3);
 
 
-    vec3 sphereNormal = getPlanetNormal(p);
+    vec3 sphereNormal = getPlanetNormal(pos);
     float crackDir = clamp(dot(sphereNormal, normalize(vec3(1,-1,1))) * 0.6, 0.0, 1.0);
-    float cracks = getSphereTexture(p, sphereNormal, PlanetSmallCracks).r * crackDir;
-    float displacement = getSphereTexture(p, sphereNormal, PebbleDepth).r - cracks;
+    float cracks = getSphereTexture(pos, sphereNormal, PlanetSmallCracks).r * crackDir;
+    float displacement = getSphereTexture(pos, sphereNormal, PebbleDepth).r - cracks;
 
-    float debrisField1 = mapDebrisField(coneRayPos, p, 1500, 500, 30, chunkNoise);
+    float debrisField1 = mapDebrisField(coneRayPos, pos, 1500, 500, 30, chunkNoise);
 //    float debrisField2 = mapDebrisField(coneRayPos, p, 1200, 400, 20, chunkNoise);
 //
 //    float finalDebrisField = min(debrisField1, debrisField2);
@@ -177,7 +180,7 @@ void main() {
 
 
         if(hit) {
-            vec3 planetColor = getSphereTexture(rayPos, abs(normalize(planetNormal * planetNormal)), PlanetColor);
+            vec3 planetColor = getSphereTexture(rayPos + PLANET_OFFSET, abs(normalize(planetNormal * planetNormal)), PlanetColor);
 
             float lighting = clamp(dot(normalize(planetNormal), LIGHT_DIR), 0.0, 1.0);
             fragColor = vec4(planetColor * lighting, 1.0);

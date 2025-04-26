@@ -1,17 +1,17 @@
-package com.sp.render.supernova;
+package com.sp.render.rendertimers.supernova;
 
-import com.sp.render.ExplosionRenderer;
+import com.sp.render.rendertimers.ExplosionRenderTimer;
 import com.sp.util.BetterUniforms;
 import com.sp.util.ShaderTimer;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.client.util.Easing;
 
-public class SupernovaRenderer extends ExplosionRenderer {
+public class SupernovaRenderTimer extends ExplosionRenderTimer {
     private static final ShaderTimer implodeTimer = new ShaderTimer();
     private static final ShaderTimer flashTimer = new ShaderTimer();
     private static final ShaderTimer explosionTimer = new ShaderTimer();
 
-    public SupernovaRenderer(int duration) {
+    public SupernovaRenderTimer(int duration) {
         super(duration, "sky", "sky/sky");
     }
 

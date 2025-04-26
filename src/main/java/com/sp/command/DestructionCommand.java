@@ -14,6 +14,7 @@ public class DestructionCommand {
     //Correlates to the switch statement in the InvokeDestructionPacket
     final static int supernovaType = 0;
     final static int nukeType = 1;
+    final static int planetType = 2;
 
     public static void register(CommandDispatcher<ServerCommandSource> serverCommandSourceCommandDispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
         serverCommandSourceCommandDispatcher.register(
@@ -33,6 +34,14 @@ public class DestructionCommand {
                                 )
                                 .then(CommandManager.literal("reset")
                                         .executes(commandContext -> execute(commandContext, 0, nukeType))))
+
+
+                        .then(CommandManager.literal("planet")
+                                .then(CommandManager.literal("start")
+                                        .executes(commandContext -> execute(commandContext, 1, planetType))
+                                )
+                                .then(CommandManager.literal("reset")
+                                        .executes(commandContext -> execute(commandContext, 0, planetType))))
         );
     }
 
