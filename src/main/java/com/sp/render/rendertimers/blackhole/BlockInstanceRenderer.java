@@ -72,7 +72,7 @@ public class BlockInstanceRenderer {
         this.vertexBuffer.bind();
         shader.bind();
 
-        VeilRenderSystem.drawInstanced(this.vertexBuffer, 500);
+        VeilRenderSystem.drawInstanced(this.vertexBuffer, 1000);
 
         ShaderProgram.unbind();
         VertexBuffer.unbind();

@@ -1,8 +1,6 @@
 package com.sp.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.DestroyingMinecraft;
-import com.sp.mixin.WorldRendererAccessor;
 import com.sp.util.BetterUniforms;
 import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import foundry.veil.api.client.render.VeilRenderSystem;

@@ -23,6 +23,9 @@
 		],
 		"fabric-datagen": [
 			"com.sp.DestroyingMinecraftDataGenerator"
+		],
+		"cardinal-components": [
+			"com.sp.cca.InitializeComponents"
 		]
 	},
 	"mixins": [
@@ -30,6 +33,9 @@
 	],
 	"accessWidener": "destroying-minecraft.accesswidener",
 	"custom": {
+		"cardinal-components": [
+			"destroying-minecraft:spin_block"
+		],
 		"loom:injected_interfaces": {
 			"foundry/veil/api/client/render/shader/program/ShaderProgram": ["com/sp/mixin/BetterUniformsMixin"]
 		}
