@@ -1,12 +1,11 @@
 package com.sp.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.sp.networking.InitializePackets;
-import com.sp.world.spinningblockexplosion.DirectionalSpinningBlockExplosion;
+import com.sp.world.spinningblockexplosion.custom.DirectionalSpinningBlockExplosion;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;

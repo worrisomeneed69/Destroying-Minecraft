@@ -1,6 +1,7 @@
 package com.sp.cca.custom;
 
 import com.sp.cca.InitializeComponents;
+import com.sp.entity.client.renderer.BlockType;
 import com.sp.entity.custom.SpinningBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -8,12 +9,17 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.util.math.random.Random;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 
 import java.util.List;
 
 public class SpinningBlockComponent implements AutoSyncedComponent {
     private final SpinningBlockEntity spinningBlockEntity;
+    private float pitchIncrement;
+    private float yawIncrement;
+    private float scale;
+    private final BlockType blockType;
     private BlockState blockState;
 
     private static final List<BlockState> randomBlocks = List.of(
@@ -27,13 +33,32 @@ public class SpinningBlockComponent implements AutoSyncedComponent {
 
     public SpinningBlockComponent(SpinningBlockEntity spinningBlock) {
         this.spinningBlockEntity = spinningBlock;
-        this.blockState = randomBlocks.get( spinningBlock.getRandom().nextBetween(0, randomBlocks.size() - 1) );
 
-//        this.sync();
+        Random random = spinningBlock.getRandom();
+        this.blockState = randomBlocks.get( random.nextBetween(0, randomBlocks.size() - 1) );
+        this.pitchIncrement = random.nextFloat()*20;
+        this.yawIncrement = random.nextFloat()*20;
+        this.scale = random.nextFloat() + 1;
+
+        BlockType[] values = BlockType.values();
+        this.blockType = values[random.nextBetween(0, values.length - 1)];
     }
 
     public BlockState getBlockState() {
         return this.blockState;
+    }
+
+    public float getYawIncrement() {
+        return yawIncrement;
+    }
+    public float getPitchIncrement() {
+        return pitchIncrement;
+    }
+    public float getScale() {
+        return scale;
+    }
+    public BlockType getBlockType() {
+        return blockType;
     }
 
 
@@ -44,11 +69,17 @@ public class SpinningBlockComponent implements AutoSyncedComponent {
     @Override
     public void readFromNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
         this.blockState = NbtHelper.toBlockState(wrapperLookup.getWrapperOrThrow(RegistryKeys.BLOCK),  nbtCompound.getCompound("blockState"));
+        this.pitchIncrement = nbtCompound.getFloat("pitchIncrement");
+        this.yawIncrement = nbtCompound.getFloat("yawIncrement");
+        this.scale = nbtCompound.getFloat("scale");
     }
 
 
     @Override
     public void writeToNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
         nbtCompound.put("blockState", NbtHelper.fromBlockState(this.blockState));
+        nbtCompound.putFloat("pitchIncrement", this.pitchIncrement);
+        nbtCompound.putFloat("yawIncrement", this.yawIncrement);
+        nbtCompound.putFloat("scale", this.scale);
     }
 }

@@ -1,7 +1,8 @@
-package com.sp.world.spinningblockexplosion;
+package com.sp.world.spinningblockexplosion.custom;
 
 import com.sp.entity.ModEntities;
 import com.sp.entity.custom.SpinningBlockEntity;
+import com.sp.world.spinningblockexplosion.SpinningBlockExplosion;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -24,7 +25,7 @@ public class DirectionalSpinningBlockExplosion extends SpinningBlockExplosion {
     @Override
     public void explode(World world) {
         super.explode(world);
-        if(delay <= 0) {
+        if(this.delay <= 0) {
             if (this.progress > length * 2) {
                 this.explode = false;
                 SpinningBlockExplosion.removeExplosion(this);
@@ -43,7 +44,7 @@ public class DirectionalSpinningBlockExplosion extends SpinningBlockExplosion {
                     world.spawnEntity(spinningBlockEntity);
                 }
             }
-            this.delay = 2;
+            this.delay = 0;
             this.progress++;
         } else {
             this.delay--;

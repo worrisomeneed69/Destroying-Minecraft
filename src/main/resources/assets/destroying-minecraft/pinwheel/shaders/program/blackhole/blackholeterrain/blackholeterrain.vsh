@@ -45,19 +45,23 @@ mat2 rot2D(float angle) {
 }
 
 void main() {
-    float distToBlackHole = fract(GameTime * (hash(gl_InstanceID * 5345) + 0.4) * 10);
+    float distToBlackHole = fract((0.2 + GameTime) * (hash(gl_InstanceID * 5345) + 0.4) * 10);
     vec3 pos = Position;
 
 
+    //Translate Center of the block to the origin
+    pos -= vec3(1);
+
     //Size
-    pos -= vec3(0.5);
     pos *= 1.0 - (distToBlackHole * distToBlackHole * distToBlackHole);
 
     //Random Rotation
     pos.xz *= rot2D(GameTime * 200000 * hash(gl_InstanceID * 1324));
     pos.xy *= rot2D(GameTime * 200000 * hash(gl_InstanceID * 674));
     pos.yz *= rot2D(-GameTime * 20000 * hash(gl_InstanceID * 94));
-    pos += vec3(0.5);
+
+    //Go Back to prev pos
+    pos += vec3(1);
 
     //Random Position
     float randSpread = hash(gl_InstanceID * 634564) * 2.0 - 1.0;

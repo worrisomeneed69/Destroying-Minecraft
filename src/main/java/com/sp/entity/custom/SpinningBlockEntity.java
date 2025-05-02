@@ -1,7 +1,7 @@
 package com.sp.entity.custom;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import com.sp.cca.InitializeComponents;
+import com.sp.cca.custom.SpinningBlockComponent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -11,30 +11,17 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.World;
 
-import java.util.List;
 
 public class SpinningBlockEntity extends Entity {
     private boolean init;
     private float acceleration;
-    private final float pitchIncrement;
-    private final float yawIncrement;
 
     private static final TrackedData<Float> ACCELERATION_FACTOR = DataTracker.registerData(
             SpinningBlockEntity.class, TrackedDataHandlerRegistry.FLOAT
     );
 
-    private static final List<BlockState> randomBlocks = List.of(
-            Blocks.DIRT.getDefaultState(),
-            Blocks.STONE.getDefaultState(),
-            Blocks.GRAVEL.getDefaultState(),
-            Blocks.DEEPSLATE.getDefaultState(),
-            Blocks.GRASS_BLOCK.getDefaultState()
-    );
-
     public SpinningBlockEntity(EntityType<?> entityType, World world) {
         super(entityType, world);
-        this.pitchIncrement = this.getRandom().nextFloat()*20;
-        this.yawIncrement = this.getRandom().nextFloat()*20;
     }
 
     @Override
@@ -44,32 +31,40 @@ public class SpinningBlockEntity extends Entity {
 
     @Override
     public void tick() {
-        super.tick();
-
         if(!this.init && !this.getWorld().isClient) {
-            this.setAccelerationFactor(this.getRandom().nextFloat()*0.1f);
+            this.setAccelerationFactor(this.getRandom().nextFloat()*0.05f + 0.3f);
             this.init = true;
         }
 
 
         float tickDelta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(true);
+        SpinningBlockComponent component = InitializeComponents.SPINNING_BLOCK.get(this);
         if(this.getWorld().isClient) {
+
             this.acceleration += this.getAccelerationFactor();
+//            Vec3d pos = this.getLerpedPos(tickDelta);
             this.setPosition(this.getX(), this.getY() + this.acceleration, this.getZ());
 
 
-            this.setPitch(this.getPitch(tickDelta) + this.pitchIncrement);
-            this.setYaw(this.getYaw(tickDelta) + this.yawIncrement);
+            this.setPitch(this.getPitch() + component.getPitchIncrement());
+            this.setYaw(this.getYaw() + component.getYawIncrement());
         } else {
-            this.acceleration += this.getAccelerationFactor();
-            this.setPosition(this.getX(), this.getY() + this.acceleration, this.getZ());
+//            this.acceleration += this.getAccelerationFactor();
+//            this.pos = new Vec3d(this.getX(), this.getY() + this.acceleration, this.getZ());
 
-            if(this.age > 100){
+//            this.setPitch(this.getPitch() + component.getPitchIncrement());
+//            this.setYaw(this.getYaw() + component.getYawIncrement());
+            if(this.age > 59){
                 this.discard();
             }
         }
     }
 
+
+    @Override
+    public boolean shouldRender(double distance) {
+        return distance < 99999;
+    }
 
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
