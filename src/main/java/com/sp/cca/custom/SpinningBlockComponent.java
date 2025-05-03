@@ -18,6 +18,7 @@ public class SpinningBlockComponent implements AutoSyncedComponent {
     private final SpinningBlockEntity spinningBlockEntity;
     private float pitchIncrement;
     private float yawIncrement;
+    private float accelerationFactor;
     private float scale;
     private final BlockType blockType;
     private BlockState blockState;
@@ -38,6 +39,7 @@ public class SpinningBlockComponent implements AutoSyncedComponent {
         this.blockState = randomBlocks.get( random.nextBetween(0, randomBlocks.size() - 1) );
         this.pitchIncrement = random.nextFloat()*20;
         this.yawIncrement = random.nextFloat()*20;
+        this.accelerationFactor = random.nextFloat()*0.05f + 0.3f;
         this.scale = random.nextFloat() + 1;
 
         BlockType[] values = BlockType.values();
@@ -49,10 +51,13 @@ public class SpinningBlockComponent implements AutoSyncedComponent {
     }
 
     public float getYawIncrement() {
-        return yawIncrement;
+        return this.yawIncrement;
     }
     public float getPitchIncrement() {
-        return pitchIncrement;
+        return this.pitchIncrement;
+    }
+    public float getAccelerationFactor() {
+        return this.accelerationFactor;
     }
     public float getScale() {
         return scale;
@@ -71,6 +76,7 @@ public class SpinningBlockComponent implements AutoSyncedComponent {
         this.blockState = NbtHelper.toBlockState(wrapperLookup.getWrapperOrThrow(RegistryKeys.BLOCK),  nbtCompound.getCompound("blockState"));
         this.pitchIncrement = nbtCompound.getFloat("pitchIncrement");
         this.yawIncrement = nbtCompound.getFloat("yawIncrement");
+        this.accelerationFactor = nbtCompound.getFloat("accelerationFactor");
         this.scale = nbtCompound.getFloat("scale");
     }
 
@@ -80,6 +86,7 @@ public class SpinningBlockComponent implements AutoSyncedComponent {
         nbtCompound.put("blockState", NbtHelper.fromBlockState(this.blockState));
         nbtCompound.putFloat("pitchIncrement", this.pitchIncrement);
         nbtCompound.putFloat("yawIncrement", this.yawIncrement);
+        nbtCompound.putFloat("accelerationFactor", this.accelerationFactor);
         nbtCompound.putFloat("scale", this.scale);
     }
 }

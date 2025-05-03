@@ -22,7 +22,7 @@ out vec4 fragColor;
 
 const vec3 SkyColor = vec3(0.5,0.75,1.1);
 
-vec3 getLightAngle(){
+vec3 getLightAngle() {
     vec3 lightangle = mat3(sunMat) * vec3(0.0, 0.0, 1.0);
     return normalize(lightangle);
 }
@@ -45,11 +45,11 @@ const vec3 color3 = vec3(0.07450980392156863, 0.21568627450980393, 0.41176470588
 const vec3 color4 = vec3(0.788235294117647, 0.21568627450980393, 0.2980392156862745);
 
 //Attenuation formula https://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula
-float attenuation(float value, float a, float b){
+float attenuation(float value, float a, float b) {
     return 1 / (1 + a*abs(value) + b*abs(value)*abs(value));
 }
 
-float map(vec3 rayPos, float radius, float time){
+float map(vec3 rayPos, float radius, float time) {
     rayPos.yz *= rot2D(-15);
     rayPos.xy *= rot2D(-35);
 
@@ -60,7 +60,7 @@ float map(vec3 rayPos, float radius, float time){
     return max(cone, clamp(-sdCylinder(rayPos, smoothstep(0.0, 10.0, 3 - radius) + 0.1, time * 3), 0.0, 1.0));
 }
 
-float getCone(vec3 rayPos, float time){
+float getCone(vec3 rayPos, float time) {
     rayPos.yz *= rot2D(-15);
     rayPos.xy *= rot2D(-35);
 
@@ -69,22 +69,22 @@ float getCone(vec3 rayPos, float time){
     return max(cone1, cone2);
 }
 
-float map2(vec3 rayPos, float radius, float time){
+float map2(vec3 rayPos, float radius, float time) {
     rayPos.yz *= rot2D(-15);
     rayPos.xy *= rot2D(-35);
 
     return clamp(-sdCylinder(rayPos, time * 1.5, time * 3), 0.0, 1.0);
 }
 
-float getBrightness(vec3 color){
+float getBrightness(vec3 color) {
     return (color.r + color.g + color.b) / 3;
 }
 
-float contrast(float color){
+float contrast(float color) {
     return CONTRAST * (color - 0.5) + 0.5;
 }
 
-vec3 rayMarchSupernova(){
+vec3 rayMarchSupernova() {
     vec3 cameraPos = VeilCamera.CameraPosition;
     vec3 centerPos = cameraPos + getLightAngle() * 3;
 
@@ -94,7 +94,7 @@ vec3 rayMarchSupernova(){
     vec3 playerSpace = screenToLocalSpace(texCoord, depth).xyz;
     float worldDepth = length(playerSpace);
 
-    if(depth >= 1.0){
+    if(depth >= 1.0) {
         float stepSize = farPlane / ITERATIONS;
 
         vec3 sunDir = getLightAngle();
@@ -103,11 +103,11 @@ vec3 rayMarchSupernova(){
 
         vec3 fog = vec3(0.0);
 
-        for(int i = 0; i < ITERATIONS; i++){
+        for(int i = 0; i < ITERATIONS; i++) {
             rayPos += rd;
 //            float time = abs(sin(GameTime * 100) * 2);
             float time = min(explosionTimer, 1.0)*2;
-//            float time = 0.2f;
+//            float time = 0.5f*2;
 
             vec3 diskRayPos = rayPos - centerPos;
             float radius = (2.0 - time) * length(diskRayPos);
@@ -117,7 +117,7 @@ vec3 rayMarchSupernova(){
 
             float disk = map(diskRayPos, radius, time) * attenuate;
             float disk2 = map2(diskRayPos, radius, time) * attenuate * attenuate * 0.1;
-            float cone = getCone(diskRayPos, time);
+            float cone = getCone(diskRayPos, 1);
 
             float sphere = clamp(-sdSphere(diskRayPos, time*1.5), 0.0, 1.0)* attenuate * 0.3;
 
@@ -149,7 +149,7 @@ vec3 rayMarchSupernova(){
     return color;
 }
 
-float noise3D(vec3 p){
+float noise3D(vec3 p) {
     float z = p.z*5.0;
     vec2 z1 = (floor(z) * OFFSET + p.xz)/5.0;
     vec2 z2 = ((floor(z) + 1.0) * OFFSET + p.xz)/5.0;
@@ -159,7 +159,7 @@ float noise3D(vec3 p){
     return mix(n1, n2, ratio);
 }
 
-vec3 getClouds(vec4 color, float depth){
+vec3 getClouds(vec4 color, float depth) {
     vec3 cameraPos = VeilCamera.CameraPosition;
     vec3 rd = viewDirFromUv(texCoord);
 
@@ -212,7 +212,7 @@ void main() {
             fragColor = vec4(color, 1.0);
         }
 
-//        fragColor.rgb = getClouds(fragColor, depth);
+//        fragColor.rgb = rayMarchSupernova();
     } else {
         fragColor = vec4(color, 1.0);
     }

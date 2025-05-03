@@ -76,14 +76,14 @@ public class ShadowMapRenderer {
 //        shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
 
         //Supernova
-//        if(client.world != null) {
-//            shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
-//            shadowModelView.rotate(RotationAxis.POSITIVE_Z.rotationDegrees(-(client.world.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
-//        }
+        if(client.world != null) {
+            shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
+            shadowModelView.rotate(RotationAxis.POSITIVE_Z.rotationDegrees(-(client.world.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
+        }
 
         //Nuke
-        shadowModelView.rotate(RotationAxis.POSITIVE_X.rotationDegrees(20.0f));
-        shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(0.0f));
+//        shadowModelView.rotate(RotationAxis.POSITIVE_X.rotationDegrees(20.0f));
+//        shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(0.0f));
 
     }
 
