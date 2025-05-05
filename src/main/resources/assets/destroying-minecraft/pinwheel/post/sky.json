@@ -10,9 +10,9 @@
     "framebuffers": {
     },
     "textures": {
-        "CloudsTexture": {
+        "StarsTexture": {
             "type": "location",
-            "location": "destroying-minecraft:textures/shaders/clouds2.png"
+            "location": "destroying-minecraft:textures/shaders/stars.png"
         }
     }
 }

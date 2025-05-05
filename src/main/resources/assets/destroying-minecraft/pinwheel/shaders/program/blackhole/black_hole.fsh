@@ -10,6 +10,8 @@ uniform sampler2D HandDepth;
 uniform sampler2D DepthComponent;
 uniform sampler2D RandNoise;
 uniform sampler2D PrevSampler;
+uniform sampler2D PrevDepth;
+uniform sampler2D StarsTexture;
 
 uniform vec4 ColorModulator;
 uniform float GameTime;
@@ -18,7 +20,8 @@ uniform mat4 prevProjMat;
 uniform mat4 prevViewMat;
 uniform vec3 prevCameraPos;
 
-
+in vec2 texCoord;
+out vec4 fragColor;
 
 
 const float BH_SIZE = 0.15;
@@ -75,8 +78,10 @@ void raymarchAccretionDisk(vec3 rayPos, float diskDist, vec3 BH_POS, inout vec4 
 //    color.a += 1.0;
 }
 
-in vec2 texCoord;
-out vec4 fragColor;
+vec3 projectAndDivide(mat4 projMat, vec3 position){
+    vec4 homogeneousPos = projMat * vec4(position, 1.0);
+    return homogeneousPos.xyz / homogeneousPos.w;
+}
 
 void main() {
     vec3 cameraPos = VeilCamera.CameraPosition;
@@ -87,21 +92,19 @@ void main() {
     float depth = texture(DiffuseDepthSampler, texCoord).r;
     float handDepth = texture(HandDepth, texCoord).r;
 
-    if(depth >= 1.0){
-        //Don't use normal depth here because of ghosting
-        vec3 worldSpacePos = screenToWorldSpace(texCoord, 1.0).xyz;
+    if(depth >= 1.0) {
+        vec3 worldSpacePos = screenToWorldSpace(texCoord, depth).xyz;
 
 
         vec3 playerSpacePos = worldSpacePos - prevCameraPos;
-        playerSpacePos += (VeilCamera.CameraPosition - prevCameraPos);
         vec3 prevViewPos = (prevViewMat * vec4(playerSpacePos, 1.0)).xyz;
         vec4 homogenousPos = prevProjMat * vec4(prevViewPos, 1.0);
-        vec3 ndcPos = homogenousPos.xyz / homogenousPos.w;
-        vec2 prevTexcoord = (ndcPos * 0.5 + 0.5).xy;
-
+        vec3 prevNDCPos = homogenousPos.xyz / homogenousPos.w;
+        vec2 prevTexcoord = (prevNDCPos * 0.5 + 0.5).xy;
+        float prevDepth = texture(PrevDepth, prevTexcoord).r;
 
         float farPlane = 8.0;
-        vec3 ro = (VeilCamera.CameraPosition) + rand(texCoord + GameTime) * 0.03;
+        vec3 ro = (VeilCamera.CameraPosition) + rand(texCoord + GameTime) * 0.02;
 
         vec3 rayDir = viewDirFromUv(texCoord);
         float stepDist = farPlane / float(ITERATIONS);
@@ -131,6 +134,7 @@ void main() {
                     break;
                 }
             }
+//            color = texture(StarsTexture, rayDir.xy*0.75)*10;
         }
 
         if(hit) {
@@ -140,13 +144,16 @@ void main() {
             fragColor = color;
         }
 
-//        fragColor = vec4(playerSpacePos, 1.0);
 
         if(prevTexcoord.x >= 0 && prevTexcoord.x <= 1.0 && prevTexcoord.y >= 0 && prevTexcoord.y <= 1.0) {
-            fragColor = mix(fragColor, texture(PrevSampler, prevTexcoord), 0.9);
+            if(prevDepth >= 1.0){
+                fragColor = mix(fragColor, texture(PrevSampler, prevTexcoord), 0.9);
+            }
         }
+
     } else {
         fragColor = texture(DiffuseSampler, texCoord);
     }
 
+    gl_FragDepth = depth;
 }

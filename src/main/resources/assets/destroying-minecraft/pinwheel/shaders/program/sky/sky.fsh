@@ -8,7 +8,7 @@
 
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DiffuseDepthSampler;
-uniform sampler2D CloudsTexture;
+uniform sampler2D StarsTexture;
 
 uniform float GameTime;
 uniform mat4 sunMat;
@@ -53,19 +53,19 @@ float map(vec3 rayPos, float radius, float time) {
     rayPos.yz *= rot2D(-15);
     rayPos.xy *= rot2D(-35);
 
-    float cone1 = clamp(-sdCappedCone(rayPos + vec3(0,1,0), time, 1, 0), 0.0, 1.0);
-    float cone2 = clamp(-sdCappedCone(rayPos - vec3(0,1,0), time, 0, 1), 0.0, 1.0);
+    float cone1 = clamp(-sdCappedCone(rayPos + vec3(0,1,0), time, 0.75, 0), 0.0, 1.0);
+    float cone2 = clamp(-sdCappedCone(rayPos - vec3(0,1,0), time, 0, 0.75), 0.0, 1.0);
     float cone = max(cone1, cone2);
 //    return cone;
-    return max(cone, clamp(-sdCylinder(rayPos, smoothstep(0.0, 10.0, 3 - radius) + 0.1, time * 3), 0.0, 1.0));
+    return max(cone, clamp(-sdCylinder(rayPos, smoothstep(0.0, 10.0, 3 - radius) + 0.2, time * 3), 0.0, 1.0));
 }
 
 float getCone(vec3 rayPos, float time) {
     rayPos.yz *= rot2D(-15);
     rayPos.xy *= rot2D(-35);
 
-    float cone1 = clamp(-sdCappedCone(rayPos + vec3(0,1,0), time, 1, 0), 0.0, 1.0);
-    float cone2 = clamp(-sdCappedCone(rayPos - vec3(0,1,0), time, 0, 1), 0.0, 1.0);
+    float cone1 = clamp(-sdCappedCone(rayPos + vec3(0,1,0), time, 0.75, 0), 0.0, 1.0);
+    float cone2 = clamp(-sdCappedCone(rayPos - vec3(0,1,0), time, 0, 0.75), 0.0, 1.0);
     return max(cone1, cone2);
 }
 
@@ -87,6 +87,7 @@ float contrast(float color) {
 vec3 rayMarchSupernova() {
     vec3 cameraPos = VeilCamera.CameraPosition;
     vec3 centerPos = cameraPos + getLightAngle() * 3;
+//    vec3 centerPos = vec3(-811, 80, 234);
 
     vec3 color = texture(DiffuseSampler, texCoord).rgb;
     float depth = texture(DiffuseDepthSampler, texCoord).r;
@@ -94,100 +95,56 @@ vec3 rayMarchSupernova() {
     vec3 playerSpace = screenToLocalSpace(texCoord, depth).xyz;
     float worldDepth = length(playerSpace);
 
-    if(depth >= 1.0) {
-        float stepSize = farPlane / ITERATIONS;
+    float stepSize = farPlane / ITERATIONS;
 
-        vec3 sunDir = getLightAngle();
-        vec3 rd = viewDirFromUv(texCoord) * stepSize;
-        vec3 rayPos = cameraPos + rand(texCoord + GameTime) * 0.01;
+    vec3 sunDir = getLightAngle();
+    vec3 rd = viewDirFromUv(texCoord) * stepSize;
+    vec3 rayPos = cameraPos + rand(texCoord + GameTime) * 0.01;
 
-        vec3 fog = vec3(0.0);
+    vec3 fog = vec3(0.0);
+//    bool hit = false;
+    for(int i = 0; i < ITERATIONS; i++) {
+        rayPos += rd;
+        float time = min(explosionTimer, 1.0)*2;
+//        float time = 0.5f*2;
 
-        for(int i = 0; i < ITERATIONS; i++) {
-            rayPos += rd;
-//            float time = abs(sin(GameTime * 100) * 2);
-            float time = min(explosionTimer, 1.0)*2;
-//            float time = 0.5f*2;
-
-            vec3 diskRayPos = rayPos - centerPos;
-            float radius = (2.0 - time) * length(diskRayPos);
-            vec3 polarPos = vec3(radius * 3, atan2(diskRayPos.x, diskRayPos.z) * 0.5, diskRayPos.y * 2);
-            float attenuate = attenuation(radius / 2.5, 2, 4);
+        vec3 diskRayPos = rayPos - centerPos;
+        float radius = (2.0 - time) * length(diskRayPos);
+        vec3 polarPos = vec3(radius * 2, atan2(diskRayPos.x, diskRayPos.z) * 0.5, diskRayPos.y * 2);
+        float attenuate = attenuation(radius / 2.5, 2, 4);
 
 
-            float disk = map(diskRayPos, radius, time) * attenuate;
-            float disk2 = map2(diskRayPos, radius, time) * attenuate * attenuate * 0.1;
-            float cone = getCone(diskRayPos, 1);
+        float disk = map(diskRayPos, radius, time) * attenuate;
+        float disk2 = map2(diskRayPos, radius, time) * attenuate * attenuate * 0.2;
+        float cone = getCone(diskRayPos, 1);
 
-            float sphere = clamp(-sdSphere(diskRayPos, time*1.5), 0.0, 1.0)* attenuate * 0.3;
+        if(disk > 0.01 || disk2 > 0.01 || cone > 0.01) {
+            float noise = fbm(polarPos * 4, 4);
+            float red = clamp(contrast(fbm(vec3(noise)* RED_STRENGTH, 4)), 0.0, 1.0);
+            float green = clamp(contrast(fbm(vec3(noise) * GREEN_STRENGTH, 4)), 0.0, 1.0);
+            float blue = clamp(contrast(fbm(vec3(noise) * BLUE_STRENGTH, 4)), 0.0, 1.0);
+            vec3 noise1 = ((red * color1) + (green * color2) + (blue * color3)) * attenuate;
 
-            if(disk > 0.01 || disk2 > 0.01 || cone > 0.01) {
-                float noise = fbm(polarPos * 3, 4);
-                float red = clamp(contrast(fbm(vec3(noise)* RED_STRENGTH, 4)), 0.0, 1.0);
-                float green = clamp(contrast(fbm(vec3(noise) * GREEN_STRENGTH, 4)), 0.0, 1.0);
-                float blue = clamp(contrast(fbm(vec3(noise) * BLUE_STRENGTH, 4)), 0.0, 1.0);
-                vec3 noise1 = ((red * color1) + (green * color2) + (blue * color3)) * attenuate;
+            vec3 noise2 = (blue * color4) * attenuate * attenuate;
 
-                vec3 noise2 = (blue * color4) * attenuate * attenuate;
-
-                fog += noise1 * disk*0.7;
-                fog += noise2 * cone*0.7;
-                fog += noise1 * disk2 * 0.6;
-            }
-            float dist = length(cameraPos - rayPos);
-
-
-            if(getBrightness(fog) >= 1.0 || worldDepth < dist){
-                break;
-            }
-
+            fog += noise1 * disk*0.7;
+            fog += noise2 * cone*0.7;
+            fog += noise1 * disk2 * 0.6;
+//            hit = true;
         }
-        color = fog * 5;
+        float dist = length(cameraPos - rayPos);
+
+
+        if(getBrightness(fog) >= 1.0 || worldDepth < dist){
+            break;
+        }
 
     }
+
+    color = fog * 5;
+
 
     return color;
-}
-
-float noise3D(vec3 p) {
-    float z = p.z*5.0;
-    vec2 z1 = (floor(z) * OFFSET + p.xz)/5.0;
-    vec2 z2 = ((floor(z) + 1.0) * OFFSET + p.xz)/5.0;
-    float n1 = texture(CloudsTexture, z1).r;
-    float n2 = texture(CloudsTexture, z2).r;
-    float ratio = fract(z);
-    return mix(n1, n2, ratio);
-}
-
-vec3 getClouds(vec4 color, float depth) {
-    vec3 cameraPos = VeilCamera.CameraPosition;
-    vec3 rd = viewDirFromUv(texCoord);
-
-    vec4 clouds = vec4(0.0);
-    if(rd.y > 0) {
-        vec2 uv = (rd.xz / rd.y);
-        vec2 xz = (rd.xz * (200 - cameraPos.y))/rd.y;
-//        vec3 rayOrigin = vec3(uv.x, 100 + cameraPos.y, uv.y) + cameraPos;
-        vec3 rayOrigin = vec3(xz.x, 0, xz.y) + cameraPos;
-
-        float dist = 0.0;
-        for(int i = 0; i < 50; i++){
-            vec3 rayPos = rayOrigin + rd * dist;
-            dist += 1;
-
-//            clouds += 0.01 * fbm(vec3(fbm(rayPos, 1)), 5);
-            clouds += 0.05 * max(fbm(rayPos*0.1, 3) * fbm(rayPos*0.03, 1), 0.0);
-
-            if(clouds.r >= 1.0){
-                break;
-            }
-
-        }
-//        clouds = texture(CloudsTexture, uv);
-    }
-
-
-    return blend(color, clouds);
 }
 
 void main() {
@@ -201,18 +158,18 @@ void main() {
     float light = smoothstep(0.998 + 0.002 * time, 1.0, dot(rd, sunDir));
     rd += rand(texCoord + GameTime) * 0.01;
     if(depth >= 1.0){
-        color = mix(vec3(SkyColor - rd.y * 0.9), vec3(0.0), time);
+        color = mix(vec3(SkyColor - rd.y * 0.9), texture(StarsTexture, viewDirFromUv(texCoord).zy*0.5).rgb*(0.75 - explosionTimer), time);
         color += vec3(light * 10);
 
 
 
         if (flashTimer > 0.0){
-            fragColor = vec4(max(dot(rd, sunDir), 0.0) * mix(vec3(10.0), rayMarchSupernova(), min(flashTimer, 1.0)), 1.0);
+            fragColor = vec4(max(dot(rd, sunDir), 0.0) * mix(vec3(10.0), color + rayMarchSupernova(), min(flashTimer, 1.0)), 1.0);
         } else {
             fragColor = vec4(color, 1.0);
         }
 
-//        fragColor.rgb = rayMarchSupernova();
+//        fragColor.rgb = texture(StarsTexture, viewDirFromUv(texCoord).zy*0.5).rgb;
     } else {
         fragColor = vec4(color, 1.0);
     }
