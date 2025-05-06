@@ -12,7 +12,7 @@ public class SupernovaRenderTimer extends ExplosionRenderTimer {
     private static final ShaderTimer explosionTimer = new ShaderTimer();
 
     public SupernovaRenderTimer(int duration) {
-        super(duration, "sky", "sky/sky");
+        super(duration);
     }
 
     @Override

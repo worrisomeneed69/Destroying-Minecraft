@@ -17,6 +17,7 @@
     "camerashake.CameraMixin",
     "camerashake.CameraRollMixin",
     "sodiumcompat.SodiumShadowMapShaderMixin",
-    "supernova.SunMixin"
+    "supernova.SunMixin",
+    "PostProcessingManagerAccessor"
   ]
 }

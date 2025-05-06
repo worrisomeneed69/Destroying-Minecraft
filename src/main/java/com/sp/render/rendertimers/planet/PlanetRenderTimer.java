@@ -10,7 +10,7 @@ public class PlanetRenderTimer extends ExplosionRenderTimer {
     private static final ShaderTimer planetFallTimer = new ShaderTimer();
 
     public PlanetRenderTimer(int duration) {
-        super(duration, "planet", "planet/planet");
+        super(duration);
     }
 
     @Override

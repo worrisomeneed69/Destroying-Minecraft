@@ -1,16 +1,17 @@
 package com.sp;
 
+import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.entity.ModEntities;
 import com.sp.entity.client.renderer.SpinningBlockEntityRenderer;
+import com.sp.mixin.PostProcessingManagerAccessor;
 import com.sp.networking.InitializePackets;
 import com.sp.render.CameraShake;
-import com.sp.render.PrevUniforms;
 import com.sp.render.ShadowMapRenderer;
+import com.sp.render.postshaders.PostShader;
+import com.sp.render.postshaders.custom.*;
 import com.sp.render.rendertimers.blackhole.BlockInstanceRenderer;
-import com.sp.render.rendertimers.nuke.NukeRenderTimer;
-import com.sp.render.rendertimers.planet.PlanetRenderTimer;
-import com.sp.render.rendertimers.supernova.SupernovaRenderTimer;
-import com.sp.util.BetterUniforms;
+import foundry.veil.api.client.render.VeilRenderSystem;
+import foundry.veil.api.client.render.post.PostProcessingManager;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
 import foundry.veil.platform.VeilEventPlatform;
@@ -20,25 +21,27 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.World;
-import org.joml.Matrix4f;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class DestroyingMinecraftClient implements ClientModInitializer {
 	public BlockInstanceRenderer blockInstanceRenderer;
-	public static NukeRenderTimer nukeRenderer = new NukeRenderTimer(400);
-	public static SupernovaRenderTimer supernovaRenderer = new SupernovaRenderTimer(100);
-	public static PlanetRenderTimer planetRenderer = new PlanetRenderTimer(400);
 
-	private static final Identifier BLACK_HOLE_POST = DestroyingMinecraft.idOf("black_hole");
-	private static final Identifier BLACK_HOLE_SHADER = DestroyingMinecraft.idOf("blackhole/black_hole");
+	public static NukePostShader nukePostShader = new NukePostShader();
+	public static PlanetPostShader planetPostShader = new PlanetPostShader();
+	public static SupernovaPostShader supernovaPostShader = new SupernovaPostShader();
+	public static BlackHolePostShader blackHolePostShader = new BlackHolePostShader();
+	public static ShadowPostShader shadowPostShader = new ShadowPostShader();
 
-	private static final Identifier SHADOWS_POST = DestroyingMinecraft.idOf("shadows");
-	private static final Identifier SHADOWS_SHADER = DestroyingMinecraft.idOf("shadows/shadows");
+	public static final Identifier BLOOM_POST = DestroyingMinecraft.idOf("bloom");
+
+	private static DestroyingMinecraftConfig.ShaderType prevShaderType;
+	private static Set<Identifier> removedPipelines = new HashSet<>(1);
 
 	@Override
 	public void onInitializeClient() {
-//		INSTANCE = this;
 		InitializePackets.registerClientNetworking();
 
 		EntityRendererRegistry.register(ModEntities.SPINNING_BLOCK, SpinningBlockEntityRenderer::new);
@@ -48,74 +51,53 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 			World clientWorld = client.world;
 
 			if(clientWorld != null) {
+				//Only render the shadow map with shaders that need it
 				if (stage == VeilRenderLevelStageEvent.Stage.AFTER_LEVEL) {
-					if (camera != null) {
+					if (camera != null && this.needsShadowMap()) {
 						ShadowMapRenderer.renderShadowMap(camera);
 					}
 				}
 
+				//Only render the black hole terrain when rendering the black hole
 				if (stage == VeilRenderLevelStageEvent.Stage.AFTER_SKY){
 					if(this.blockInstanceRenderer == null){
 						this.blockInstanceRenderer = new BlockInstanceRenderer();
 					}
-//					blockInstanceRenderer.render();
+
+					if(DestroyingMinecraftConfig.shaderType == DestroyingMinecraftConfig.ShaderType.BLACK_HOLE) {
+						blockInstanceRenderer.render();
+					}
 				}
 			}
+
+
+			//Remove all the shaders currently in the pipeline then add back the ones we need in their specific order
+			if(stage == VeilRenderLevelStageEvent.Stage.AFTER_LEVEL) {
+				//Only update when the shaderType changes
+				if(prevShaderType != DestroyingMinecraftConfig.shaderType) {
+					this.updatePostShader();
+					prevShaderType = DestroyingMinecraftConfig.shaderType;
+				}
+			}
+
 		}));
 
+		//Set the uniforms for all the post shaders
 		VeilEventPlatform.INSTANCE.preVeilPostProcessing((name, pipeline, context) -> {
 			MinecraftClient client = MinecraftClient.getInstance();
 			World clientWorld = client.world;
 			float tickDelta = client.getRenderTickCounter().getTickDelta(true);
 
 			if(clientWorld != null) {
-				if (BLACK_HOLE_POST.equals(name)) {
-					ShaderProgram shaderProgram = context.getShader(BLACK_HOLE_SHADER);
-					if (shaderProgram != null) {
-						if (PrevUniforms.isInitialized()) {
-							BetterUniforms.setMatrix(shaderProgram, "prevProjMat", PrevUniforms.getPrevProjMat());
-							BetterUniforms.setMatrix(shaderProgram, "prevViewMat", PrevUniforms.getPrevModelViewMat());
-							BetterUniforms.setVector(shaderProgram, "prevCameraPos", PrevUniforms.getPrevCameraPos());
+				for(PostShader postShader : PostShader.getAllInstances()) {
 
+					if(postShader.getPost().equals(name)) {
+						ShaderProgram shaderProgram = context.getShader(postShader.getShader());
+						if (shaderProgram != null) {
+							postShader.setUniforms(shaderProgram, tickDelta, client, clientWorld);
 						}
-
-						PrevUniforms.update();
 					}
 
-				} else if (SHADOWS_POST.equals(name)) {
-					ShaderProgram shaderProgram = context.getShader(SHADOWS_SHADER);
-					if (shaderProgram != null) {
-						ShadowMapRenderer.setShadowUniforms(shaderProgram, clientWorld);
-						supernovaRenderer.setUniforms(shaderProgram, tickDelta);
-						nukeRenderer.setUniforms(shaderProgram, tickDelta);
-					}
-				} else if (supernovaRenderer.POST.equals(name)) {
-					ShaderProgram shaderProgram = context.getShader(supernovaRenderer.SHADER);
-					if (shaderProgram != null) {
-
-						Matrix4f matrix4f = new Matrix4f();
-						//Supernova
-//						matrix4f.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
-//						matrix4f.rotate(RotationAxis.POSITIVE_X.rotationDegrees((clientWorld.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
-
-						//Nuke
-						matrix4f.rotate(RotationAxis.POSITIVE_X.rotationDegrees(-20.0f));
-						matrix4f.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(0.0f));
-
-						BetterUniforms.setMatrix(shaderProgram, "sunMat", matrix4f);
-
-						supernovaRenderer.setUniforms(shaderProgram, tickDelta);
-					}
-				} else if(nukeRenderer.POST.equals(name)){
-					ShaderProgram shaderProgram = context.getShader(nukeRenderer.SHADER);
-					if (shaderProgram != null) {
-						nukeRenderer.setUniforms(shaderProgram, tickDelta);
-					}
-				} else if(planetRenderer.POST.equals(name)){
-					ShaderProgram shaderProgram = context.getShader(planetRenderer.SHADER);
-					if (shaderProgram != null) {
-						planetRenderer.setUniforms(shaderProgram, tickDelta);
-					}
 				}
 			}
 
@@ -126,17 +108,48 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 			this.blockInstanceRenderer = null;
 		});
 
-		//Update rendering
+		//Update camera shakes
 		ClientTickEvents.END_CLIENT_TICK.register(minecraftClient -> {
 			for(CameraShake cameraShake : CameraShake.getAllInstances()){
 				cameraShake.individualTick();
 			}
 		});
 
+		//Update every render timer
 		ClientTickEvents.END_WORLD_TICK.register(clientWorld -> {
-			supernovaRenderer.updateTimer();
-			nukeRenderer.updateTimer();
-			planetRenderer.updateTimer();
+			for(PostShader postShader : PostShader.getAllInstances()) {
+				if(postShader.getRenderTimer() != null){
+					postShader.getRenderTimer().updateTimer();
+				}
+			}
 		});
+	}
+
+	private void updatePostShader(){
+		PostProcessingManager postProcessingManager = VeilRenderSystem.renderer().getPostProcessingManager();
+		removedPipelines.clear();
+
+		//Remove all shaders
+		((PostProcessingManagerAccessor)postProcessingManager).getActuallyActivePipelines().forEach(profileEntry -> {
+			removedPipelines.add(profileEntry.getPipeline());
+		});
+
+		for (Identifier id : removedPipelines){
+			postProcessingManager.remove(id);
+		}
+
+
+
+		//Enable all shaders in their specific order
+		for (Identifier enabledPosts : DestroyingMinecraftConfig.shaderType.getEnabledShaders()) {
+			if (!postProcessingManager.isActive(enabledPosts)) {
+				postProcessingManager.add(enabledPosts);
+			}
+		}
+	}
+
+	private boolean needsShadowMap() {
+		DestroyingMinecraftConfig.ShaderType type = DestroyingMinecraftConfig.shaderType;
+		return type == DestroyingMinecraftConfig.ShaderType.BLACK_HOLE || type == DestroyingMinecraftConfig.ShaderType.SUPERNOVA || type == DestroyingMinecraftConfig.ShaderType.NUKE;
 	}
 }

@@ -11,7 +11,7 @@ public class NukeRenderTimer extends ExplosionRenderTimer {
     private static final ShaderTimer flashTimer = new ShaderTimer();
 
     public NukeRenderTimer(int duration) {
-        super(duration, "nuke", "nuke/nuke");
+        super(duration);
     }
 
     @Override

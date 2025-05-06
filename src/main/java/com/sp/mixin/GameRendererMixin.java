@@ -1,7 +1,7 @@
 package com.sp.mixin;
 
 import com.sp.DestroyingMinecraft;
-import com.sp.render.ShadowMapRenderer;
+import com.sp.render.PerspectiveRenderer;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.render.GameRenderer;
@@ -25,7 +25,7 @@ public abstract class GameRendererMixin {
             "getRenderTypeCutoutMippedProgram"
     }, at = @At("HEAD"), cancellable = true)
     private static void setSolidShader(CallbackInfoReturnable<ShaderProgram> cir) {
-        if(ShadowMapRenderer.isRenderingShadowMap()) {
+        if(PerspectiveRenderer.isRenderingPerspective()) {
             foundry.veil.api.client.render.shader.program.ShaderProgram shader = VeilRenderSystem.renderer().getShaderManager().getShader(shadowSolid);
             if (shader == null) {
                 return;
@@ -42,7 +42,7 @@ public abstract class GameRendererMixin {
             "getRenderTypeEntityTranslucentCullProgram"
     }, at = @At("TAIL"), cancellable = true)
     private static void setPlayerShader(CallbackInfoReturnable<ShaderProgram> cir) {
-        if(ShadowMapRenderer.isRenderingShadowMap()) {
+        if(PerspectiveRenderer.isRenderingPerspective()) {
             foundry.veil.api.client.render.shader.program.ShaderProgram shader = VeilRenderSystem.renderer().getShaderManager().getShader(shadowEntity);
             if (shader == null) {
                 return;

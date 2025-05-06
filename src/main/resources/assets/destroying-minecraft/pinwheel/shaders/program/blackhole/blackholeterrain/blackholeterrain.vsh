@@ -70,7 +70,7 @@ void main() {
     randDir *= 70;
     pos = pos + randDir * distToBlackHole * 20;
 
-    vec3 offsetFromCamera = vec3(randSpread * 500, -VeilCamera.CameraPosition.y + 50,(hash(gl_InstanceID * 5345) * -100) - 200);
+    vec3 offsetFromCamera = vec3(randSpread * 500, -VeilCamera.CameraPosition.y + 50,(hash(gl_InstanceID * 5345) * -100) - 300);
     gl_Position = VeilCamera.ProjMat * VeilCamera.ViewMat * vec4((pos + offsetFromCamera), 1.0);
 
     texCoord = UV0;

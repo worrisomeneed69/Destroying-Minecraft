@@ -1,7 +1,7 @@
 #include veil:space_helper
 #veil:buffer veil:camera VeilCamera
 
-#define SHADOW_SAMPLES 3
+#define SHADOW_SAMPLES 1
 
 #define SHADOW_STRENGTH 0.4
 
@@ -71,7 +71,7 @@ void main() {
 
     vec3 flash = flashTimer > 0 ? vec3(0.6) * (1.0-min(flashTimer, 1.0)) : vec3(0.0);
     if(depth >= 1.0) {
-        fragColor = color + vec4(flash, 0.0);
+        fragColor = color;
         return;
     }
 
@@ -117,9 +117,9 @@ void main() {
 //    vec3 ambientLight = (blockLight + 0.2*skyLight) * clamp(dot(worldNormal, worldNormal), 0.0, 1.0);
     vec3 outputColor;
     if (flashTimer > 0.0) {
-        outputColor = albedoColor * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)) + flash;
+        outputColor = color.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)) + flash;
     } else {
-        outputColor = albedoColor * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)*(1.0 - supernovaTimer));
+        outputColor = color.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)*(1.0 - supernovaTimer));
     }
 
 

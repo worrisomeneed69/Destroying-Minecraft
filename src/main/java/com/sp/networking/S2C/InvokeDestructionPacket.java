@@ -17,9 +17,9 @@ public class InvokeDestructionPacket {
             boolean on = payload.start() == 1;
 
             switch (payload.type()){
-                case 0: DestroyingMinecraftClient.supernovaRenderer.toggleExplosion(on); break;
+                case 0: DestroyingMinecraftClient.supernovaPostShader.getRenderTimer().toggleExplosion(on); break;
                 case 1: {
-                    DestroyingMinecraftClient.nukeRenderer.toggleExplosion(on);
+                    DestroyingMinecraftClient.nukePostShader.getRenderTimer().toggleExplosion(on);
 
                     if(on) {
                         try {
@@ -34,7 +34,7 @@ public class InvokeDestructionPacket {
                     break;
                 }
 
-                case 2: DestroyingMinecraftClient.planetRenderer.toggleExplosion(on); break;
+                case 2: DestroyingMinecraftClient.planetPostShader.getRenderTimer().toggleExplosion(on); break;
             }
 
         });

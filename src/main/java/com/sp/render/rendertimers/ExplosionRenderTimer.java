@@ -1,19 +1,16 @@
 package com.sp.render.rendertimers;
 
-import com.sp.DestroyingMinecraft;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
-import net.minecraft.util.Identifier;
 
+/**
+ * This class is used to update the explosion in any way and sends that data into the shader's uniforms
+ */
 public abstract class ExplosionRenderTimer {
     protected boolean enable;
     protected int progress = 0;
     protected final int duration;
-    public final Identifier POST;
-    public final Identifier SHADER;
 
-    protected ExplosionRenderTimer(int duration, String postDirectory, String shaderDirectory){
-        this.POST = DestroyingMinecraft.idOf(postDirectory);
-        this.SHADER = DestroyingMinecraft.idOf(shaderDirectory);
+    protected ExplosionRenderTimer(int duration) {
         this.duration = duration;
     }
 

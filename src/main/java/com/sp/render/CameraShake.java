@@ -23,7 +23,7 @@ public class CameraShake {
     private final Easing easing;
 
 
-    public CameraShake(float trauma, int duration, Easing easing){
+    public CameraShake(float trauma, int duration, Easing easing) {
         this.trauma = trauma;
         this.duration = duration;
         this.easing = easing;
@@ -31,7 +31,7 @@ public class CameraShake {
         allInstances.add(this);
     }
 
-    public static void totalTick(Camera camera){
+    public static void totalTick(Camera camera) {
         float totalTrauma = 0.0f;
         float frameDelta = MinecraftClient.getInstance().getRenderTickCounter().getLastFrameDuration();
 
@@ -41,16 +41,19 @@ public class CameraShake {
 
 
 
-        for(CameraShake cameraShake : getAllInstances()){
+        for(CameraShake cameraShake : getAllInstances()) {
             if(cameraShake.getTrauma() <= 0.0f || cameraShake.progress >= cameraShake.duration){
                 allInstances.remove(cameraShake);
                 continue;
             }
 
             totalTrauma += cameraShake.getTrauma();
+
+            //Max trauma
+            if(totalTrauma * totalTrauma >= 5.0) break;
         }
 
-        totalTrauma = Math.min(totalTrauma * totalTrauma, 5.0f);
+        totalTrauma = totalTrauma * totalTrauma;
 
         noiseY += (shakeSpeed * frameDelta);
 
@@ -66,7 +69,7 @@ public class CameraShake {
         return zRotation;
     }
 
-    public void individualTick(){
+    public void individualTick() {
         this.progress++;
         float temp = this.trauma * (1.0f - this.easing.ease((float) this.progress / this.duration));
         this.finalTrauma = Math.max(temp, 0.0f);
@@ -78,7 +81,7 @@ public class CameraShake {
         return finalTrauma;
     }
 
-    public static synchronized Vector<CameraShake> getAllInstances(){
+    public static synchronized Vector<CameraShake> getAllInstances() {
         return (Vector<CameraShake>) allInstances.clone();
     }
 }

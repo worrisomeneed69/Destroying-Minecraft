@@ -18,8 +18,7 @@ public class CameraShakeStick extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if(world.isClient){
-            System.out.println("USED");
-            CameraShake cameraShake = new CameraShake(1.5f, 100, Easing.LINEAR);
+            CameraShake cameraShake = new CameraShake(0.75f, 100, Easing.LINEAR);
         }
         return super.use(world, user, hand);
     }

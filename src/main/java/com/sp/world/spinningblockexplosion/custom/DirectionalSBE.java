@@ -6,14 +6,14 @@ import com.sp.world.spinningblockexplosion.SpinningBlockExplosion;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class DirectionalSpinningBlockExplosion extends SpinningBlockExplosion {
+public class DirectionalSBE extends SpinningBlockExplosion {
     private final int length;
     private final int width;
     private final float angle;
     private final float blockDensity;
     private int delay;
 
-    public DirectionalSpinningBlockExplosion(int length, int width, float angle, float blockDensity, Vec3d centerPos) {
+    public DirectionalSBE(int length, int width, float angle, float blockDensity, Vec3d centerPos) {
         super(centerPos);
         this.length = length;
         this.width = width;

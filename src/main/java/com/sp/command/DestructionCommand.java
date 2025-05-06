@@ -5,7 +5,7 @@ import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.sp.networking.InitializePackets;
-import com.sp.world.spinningblockexplosion.custom.DirectionalSpinningBlockExplosion;
+import com.sp.world.spinningblockexplosion.custom.DirectionalSBE;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
@@ -81,7 +81,7 @@ public class DestructionCommand {
     }
 
     private static int spinningBlockExplosion(CommandContext<ServerCommandSource> context, int length, int width, float angle, float density){
-        DirectionalSpinningBlockExplosion explosion = new DirectionalSpinningBlockExplosion(length, width, angle, density, context.getSource().getPlayer().getPos());
+        DirectionalSBE explosion = new DirectionalSBE(length, width, angle, density, context.getSource().getPlayer().getPos());
         explosion.beginExplosion();
 
         return 1;

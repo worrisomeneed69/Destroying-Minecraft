@@ -2,11 +2,13 @@ package com.sp;
 
 import com.sp.block.ModBlocks;
 import com.sp.command.DestructionCommand;
+import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.entity.ModEntities;
 import com.sp.item.ModItemGroups;
 import com.sp.item.ModItems;
 import com.sp.networking.InitializePackets;
 import com.sp.world.spinningblockexplosion.SpinningBlockExplosion;
+import eu.midnightdust.lib.config.MidnightConfig;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -29,6 +31,7 @@ public class DestroyingMinecraft implements ModInitializer {
 		ModItemGroups.registerItemGroups();
 		InitializePackets.registerServerNetworking();
 		ModEntities.registerEntities();
+		MidnightConfig.init(MOD_ID, DestroyingMinecraftConfig.class);
 
 		CommandRegistrationCallback.EVENT.register(DestructionCommand::register);
 

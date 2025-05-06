@@ -1,8 +1,8 @@
 package com.sp.render;
 
 import com.sp.DestroyingMinecraft;
+import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.util.BetterUniforms;
-import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
@@ -11,7 +11,6 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
@@ -34,9 +33,7 @@ public class ShadowMapRenderer {
 
         AdvancedFbo shadowMap = VeilRenderSystem.renderer().getFramebufferManager().getFramebuffer(DestroyingMinecraft.idOf("shadowmap"));
         if(shadowMap != null) {
-            setRenderingShadowMap(true);
-            VeilLevelPerspectiveRenderer.render(shadowMap, shadowModelView.peek().getPositionMatrix(), shadowProjMat, new Vector3d(cameraPos.x, cameraPos.y, cameraPos.z), new Quaternionf(), 20, client.getRenderTickCounter(), true);
-            setRenderingShadowMap(false);
+            PerspectiveRenderer.render(shadowMap, shadowModelView.peek().getPositionMatrix(), shadowProjMat, new Vector3d(cameraPos.x, cameraPos.y, cameraPos.z), new Quaternionf(), 20, client.getRenderTickCounter(), true);
         }
     }
 
@@ -70,20 +67,24 @@ public class ShadowMapRenderer {
     }
 
     //Global Light Rotation
-    public static void rotateShadowModelView(Matrix4f shadowModelView){
-        //Black Hole
-//        shadowModelView.rotate(RotationAxis.POSITIVE_X.rotationDegrees(20.0f));
-//        shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
+    public static void rotateShadowModelView(Matrix4f shadowModelView) {
 
-        //Supernova
-        if(client.world != null) {
-            shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
-            shadowModelView.rotate(RotationAxis.POSITIVE_Z.rotationDegrees(-(client.world.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
+        switch (DestroyingMinecraftConfig.shaderType){
+            case BLACK_HOLE -> {
+                shadowModelView.rotate(RotationAxis.POSITIVE_X.rotationDegrees(20.0f));
+                shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
+            }
+            case SUPERNOVA -> {
+                if(client.world != null) {
+                    shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
+                    shadowModelView.rotate(RotationAxis.POSITIVE_Z.rotationDegrees(-(client.world.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
+                }
+            }
+            case NUKE -> {
+                shadowModelView.rotate(RotationAxis.POSITIVE_X.rotationDegrees(20.0f));
+                shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(0.0f));
+            }
         }
-
-        //Nuke
-//        shadowModelView.rotate(RotationAxis.POSITIVE_X.rotationDegrees(20.0f));
-//        shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(0.0f));
 
     }
 
@@ -94,7 +95,7 @@ public class ShadowMapRenderer {
 
     /**
      Also taken from Iris lol. Turns out their orthographic Matrix is better
-     <a href="https://github.com/IrisShaders/Iris/blob/3fc94e8f41535feebce0bcb4235eff4a809f5eea/common/src/main/java/net/irisshaders/iris/shadows/ShadowMatrices.java">HERE</a>
+     <a href="https://github.com/IrisShaders/Iris/blob/3fc94e8f41535feebce0bcb4235eff4a809f5eea/common/src/main/java/net/irisshaders/iris/shadows/ShadowMatrices.java#L13">HERE</a>
      */
     public static Matrix4f orthographicMatrix(float halfPlaneLength, float nearPlane, float farPlane) {
         return new Matrix4f(
@@ -113,7 +114,7 @@ public class ShadowMapRenderer {
         renderingShadowMap = l;
     }
 
-    public static void setShadowUniforms(ShaderProgram access, World world) {
+    public static void setShadowUniforms(ShaderProgram access) {
         Matrix4f viewMat = ShadowMapRenderer.createShadowModelView(currentCamera.getPos().x, currentCamera.getPos().y, currentCamera.getPos().z, true).peek().getPositionMatrix();
 
         BetterUniforms.setMatrix(access, "shadowViewMatrix", viewMat);
