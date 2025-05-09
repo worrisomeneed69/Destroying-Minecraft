@@ -31,7 +31,7 @@ public class DestroyingMinecraft implements ModInitializer {
 		ModBlocks.init();
 		ModItemGroups.registerItemGroups();
 		InitializePackets.registerServerNetworking();
-		ModEntities.registerEntities();
+		ModEntities.init();
 		MidnightConfig.init(MOD_ID, DestroyingMinecraftConfig.class);
 
 		CommandRegistrationCallback.EVENT.register(DestructionCommand::register);
@@ -39,7 +39,6 @@ public class DestroyingMinecraft implements ModInitializer {
 
 		LOGGER.info("\"It's nukein' time\" -I say as I load a few grapes into the microwave");
 
-		
 		ServerTickEvents.END_WORLD_TICK.register(serverWorld -> {
 			for(SpinningBlockExplosion explosion : SpinningBlockExplosion.getExplosions()){
 				explosion.explode(serverWorld);
