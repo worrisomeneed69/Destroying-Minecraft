@@ -2,7 +2,7 @@ package com.sp;
 
 import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.entity.ModEntities;
-import com.sp.entity.client.renderer.SpinningBlockEntityRenderer;
+import com.sp.entity.client.renderer.BlockPhysicsEntityRenderer;
 import com.sp.mixin.PostProcessingManagerAccessor;
 import com.sp.networking.InitializePackets;
 import com.sp.render.CameraShake;
@@ -44,7 +44,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		InitializePackets.registerClientNetworking();
 
-		EntityRendererRegistry.register(ModEntities.SPINNING_BLOCK, SpinningBlockEntityRenderer::new);
+		EntityRendererRegistry.register(ModEntities.BLOCK_PHYSICS_ENTITY, BlockPhysicsEntityRenderer::new);
 
 		VeilEventPlatform.INSTANCE.onVeilRenderLevelStage(((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, renderTick, deltaTracker, camera, frustum) -> {
 			MinecraftClient client = MinecraftClient.getInstance();

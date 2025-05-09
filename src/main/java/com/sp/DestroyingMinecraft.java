@@ -2,6 +2,7 @@ package com.sp;
 
 import com.sp.block.ModBlocks;
 import com.sp.command.DestructionCommand;
+import com.sp.command.RipPlatformOutCommand;
 import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.entity.ModEntities;
 import com.sp.item.ModItemGroups;
@@ -30,14 +31,14 @@ public class DestroyingMinecraft implements ModInitializer {
 		ModBlocks.init();
 		ModItemGroups.registerItemGroups();
 		InitializePackets.registerServerNetworking();
-		ModEntities.registerEntities();
+		ModEntities.init();
 		MidnightConfig.init(MOD_ID, DestroyingMinecraftConfig.class);
 
 		CommandRegistrationCallback.EVENT.register(DestructionCommand::register);
+		CommandRegistrationCallback.EVENT.register(RipPlatformOutCommand::register);
 
 		LOGGER.info("\"It's nukein' time\" -I say as I load a few grapes into the microwave");
 
-		
 		ServerTickEvents.END_WORLD_TICK.register(serverWorld -> {
 			for(SpinningBlockExplosion explosion : SpinningBlockExplosion.getExplosions()){
 				explosion.explode(serverWorld);
