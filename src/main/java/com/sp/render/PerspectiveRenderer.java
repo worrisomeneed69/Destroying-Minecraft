@@ -2,7 +2,9 @@ package com.sp.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.mixin.WorldRendererAccessor;
+import com.sp.mixininterfaces.CullingDataCache;
 import foundry.veil.api.client.render.CameraMatrices;
+import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.compat.SodiumCompat;
@@ -19,6 +21,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.profiler.Profiler;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 
@@ -46,20 +49,7 @@ public class PerspectiveRenderer {
         return render(framebuffer, MinecraftClient.getInstance().cameraEntity, modelView, projection, cameraPosition, cameraOrientation, renderDistance, deltaTracker, drawLights);
     }
 
-    /**
-     * Renders the level from another POV. Automatically prevents circular render references.
-     *
-     * @param framebuffer       The framebuffer to draw into
-     * @param cameraEntity      The entity to draw the camera in relation to. If unsure use {@link #render(AdvancedFbo, Matrix4fc, Matrix4fc, Vector3dc, Quaternionfc, float, RenderTickCounter, boolean)}
-     * @param modelView         The base modelview matrix
-     * @param projection        The projection matrix
-     * @param cameraPosition    The position of the camera
-     * @param cameraOrientation The orientation of the camera
-     * @param renderDistance    The chunk render distance
-     * @param deltaTracker      The delta tracker instance
-     * @param drawLights        Whether to draw lights to the scene after
-     * @return The full framebuffer including dynamic buffers. This framebuffer is owned by the render system
-     */
+
     public static AdvancedFbo render(AdvancedFbo framebuffer, @Nullable Entity cameraEntity, Matrix4fc modelView, Matrix4fc projection, Vector3dc cameraPosition, Quaternionfc cameraOrientation, float renderDistance, RenderTickCounter deltaTracker, boolean drawLights) {
         if (renderingPerspective) {
             return framebuffer;
@@ -72,7 +62,6 @@ public class PerspectiveRenderer {
         final MinecraftClient minecraft = MinecraftClient.getInstance();
         final GameRenderer gameRenderer = minecraft.gameRenderer;
         final WorldRenderer levelRenderer = minecraft.worldRenderer;
-        final WorldRendererAccessor accessor1 = (WorldRendererAccessor) levelRenderer;
         final LevelRendererAccessor levelRendererAccessor = (LevelRendererAccessor) levelRenderer;
         final Window window = minecraft.getWindow();
         final GameRendererAccessor accessor = (GameRendererAccessor) gameRenderer;
@@ -132,26 +121,11 @@ public class PerspectiveRenderer {
         CameraMatrices matrices = VeilRenderSystem.renderer().getCameraMatrices();
         matrices.backup(BACKUP_CAMERA_MATRICES);
 
+        RenderSystem.disableCull();
+
         try {
             levelRenderer.setupFrustum(new Vec3d(cameraPosition.x(), cameraPosition.y(), cameraPosition.z()), poseStack.peek().getPositionMatrix(), TRANSFORM);
-
-//            accessor1.invokeSetupTerrain(CAMERA, levelRendererAccessor.getCullingFrustum(), false, false);
-            accessor1.invokeRenderLayer(RenderLayer.getCutout(), cameraPosition.x(), cameraPosition.y(), cameraPosition.z(), poseStack.peek().getPositionMatrix(), TRANSFORM);
-            accessor1.invokeRenderLayer(RenderLayer.getCutoutMipped(), cameraPosition.x(), cameraPosition.y(), cameraPosition.z(), poseStack.peek().getPositionMatrix(), TRANSFORM);
-            accessor1.invokeRenderLayer(RenderLayer.getSolid(), cameraPosition.x(), cameraPosition.y(), cameraPosition.z(), poseStack.peek().getPositionMatrix(), TRANSFORM);
-
-            if(minecraft.world != null) {
-                VertexConsumerProvider.Immediate immediate = accessor1.getBufferBuilders().getEntityVertexConsumers();
-
-                for(Entity entity : minecraft.world.getEntities()){
-                    if(accessor1.getEntityRenderDispatcher().shouldRender(entity, levelRendererAccessor.getCullingFrustum(), cameraPosition.x(), cameraPosition.y(), cameraPosition.z()) && !entity.isSpectator()){
-                        accessor1.invokeRenderEntity(entity, cameraPosition.x(), cameraPosition.y(), cameraPosition.z(), minecraft.getRenderTickCounter().getTickDelta(true), poseStack, immediate);
-                    }
-                }
-
-                immediate.draw();
-
-            }
+            levelRenderer.render(deltaTracker, false, CAMERA, gameRenderer, gameRenderer.getLightmapTextureManager(), poseStack.peek().getPositionMatrix(), TRANSFORM);
             // Make sure all buffers have been finished
             bufferSource.draw();
             levelRenderer.drawEntityOutlinesFramebuffer();
@@ -166,6 +140,8 @@ public class PerspectiveRenderer {
                 }
             }
         } finally {
+            RenderSystem.enableCull();
+
             matrices.restore(BACKUP_CAMERA_MATRICES);
 
             levelRendererAccessor.setCullingFrustum(backupFrustum);
@@ -214,6 +190,11 @@ public class PerspectiveRenderer {
      */
     public static boolean isRenderingPerspective() {
         return renderingPerspective;
+    }
+
+    @ApiStatus.Internal
+    public static int getID() {
+        return ID.get();
     }
 
 }

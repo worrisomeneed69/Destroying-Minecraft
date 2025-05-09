@@ -21,10 +21,10 @@ public class InitializePackets {
     }
 
 
-    public record DestructionPayload(int start, int type) implements CustomPayload{
+    public record DestructionPayload(boolean start, int type) implements CustomPayload{
         public static final CustomPayload.Id<DestructionPayload> ID = new CustomPayload.Id<>(DestroyingMinecraft.idOf("dest"));
         public static final PacketCodec<RegistryByteBuf, DestructionPayload> CODEC = PacketCodec.tuple(
-                PacketCodecs.INTEGER, DestructionPayload::start,
+                PacketCodecs.BOOL, DestructionPayload::start,
                 PacketCodecs.INTEGER, DestructionPayload::type,
                 DestructionPayload::new);
 

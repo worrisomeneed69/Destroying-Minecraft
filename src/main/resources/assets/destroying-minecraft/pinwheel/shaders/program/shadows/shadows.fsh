@@ -1,4 +1,5 @@
 #include veil:space_helper
+#include veil:fog
 #veil:buffer veil:camera VeilCamera
 
 #define SHADOW_SAMPLES 1
@@ -25,8 +26,14 @@ uniform float supernovaTimer;
 uniform float flashTimer;
 uniform float explosionTimer;
 
+uniform float FogStart;
+uniform float FogEnd;
+uniform vec4 FogColor;
+
 in vec2 texCoord;
 out vec4 fragColor;
+
+const vec3 SkyColor = vec3(0.596078431372549, 0.8, 0.9);
 
 vec3 projectAndDivide(mat4 projMat, vec3 pos){
     vec4 homogeneousPos = projMat * vec4(pos, 1.0);
@@ -72,6 +79,7 @@ void main() {
     vec3 flash = flashTimer > 0 ? vec3(0.6) * (1.0-min(flashTimer, 1.0)) : vec3(0.0);
     if(depth >= 1.0) {
         fragColor = color;
+        gl_FragDepth = depth;
         return;
     }
 
@@ -128,9 +136,9 @@ void main() {
     }
 
 
-    fragColor = vec4(outputColor, 1.0);
-
-
+    fragColor = linear_fog(vec4(outputColor, 1.0), length(viewPos), FogEnd-70, FogEnd, vec4(SkyColor, 1.0));
+//    fragColor = vec4(outputColor, 1.0);
+    gl_FragDepth = depth;
 
 
 

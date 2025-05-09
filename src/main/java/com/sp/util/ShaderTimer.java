@@ -1,5 +1,7 @@
 package com.sp.util;
 
+import net.minecraft.util.math.MathHelper;
+
 public class ShaderTimer {
     private float timer;
     private float prevTimer;
@@ -22,7 +24,7 @@ public class ShaderTimer {
     }
 
     public float getTimer(float tickDelta) {
-        return this.prevTimer + (this.timer - this.prevTimer) * tickDelta;
+        return MathHelper.lerp(tickDelta, this.prevTimer, this.timer);
     }
 
 }

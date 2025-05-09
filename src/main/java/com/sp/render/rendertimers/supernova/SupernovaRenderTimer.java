@@ -5,6 +5,7 @@ import com.sp.util.BetterUniforms;
 import com.sp.util.ShaderTimer;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.client.util.Easing;
+import net.minecraft.client.world.ClientWorld;
 
 public class SupernovaRenderTimer extends ExplosionRenderTimer {
     private static final ShaderTimer implodeTimer = new ShaderTimer();
@@ -16,8 +17,12 @@ public class SupernovaRenderTimer extends ExplosionRenderTimer {
     }
 
     @Override
-    public void updateTimer() {
+    public void updateTimer(ClientWorld clientWorld) {
         if(this.enable) {
+            implodeTimer.setPrevTimer();
+            flashTimer.setPrevTimer();
+            explosionTimer.setPrevTimer();
+
             this.progress++;
             if (this.progress < this.duration) {
                 //Sun implosion
@@ -30,10 +35,7 @@ public class SupernovaRenderTimer extends ExplosionRenderTimer {
 
             }
 
-            //prevTimer = timer;
-            implodeTimer.setPrevTimer();
-            flashTimer.setPrevTimer();
-            explosionTimer.setPrevTimer();
+
         } else {
             this.resetExplosionTimer();
         }
@@ -49,10 +51,8 @@ public class SupernovaRenderTimer extends ExplosionRenderTimer {
 
     @Override
     public void setUniforms(ShaderProgram shaderProgram, float tickDelta) {
-//        if(this.enable) {
-            BetterUniforms.setFloat(shaderProgram, "supernovaTimer", implodeTimer.getTimer(tickDelta));
-            BetterUniforms.setFloat(shaderProgram, "flashTimer", flashTimer.getTimer(tickDelta));
-            BetterUniforms.setFloat(shaderProgram, "explosionTimer", explosionTimer.getTimer(tickDelta));
-//        }
+        BetterUniforms.setFloat(shaderProgram, "supernovaTimer", implodeTimer.getTimer(tickDelta));
+        BetterUniforms.setFloat(shaderProgram, "flashTimer", flashTimer.getTimer(tickDelta));
+        BetterUniforms.setFloat(shaderProgram, "explosionTimer", explosionTimer.getTimer(tickDelta));
     }
 }

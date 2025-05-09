@@ -2,6 +2,7 @@ package com.sp;
 
 import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.entity.ModEntities;
+import com.sp.entity.client.renderer.BlockPhysicsEntityRenderer;
 import com.sp.entity.client.renderer.SpinningBlockEntityRenderer;
 import com.sp.mixin.PostProcessingManagerAccessor;
 import com.sp.networking.InitializePackets;
@@ -38,13 +39,14 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 	public static final Identifier BLOOM_POST = DestroyingMinecraft.idOf("bloom");
 
 	private static DestroyingMinecraftConfig.ShaderType prevShaderType;
-	private static Set<Identifier> removedPipelines = new HashSet<>(1);
+	private static final Set<Identifier> removedPipelines = new HashSet<>(1);
 
 	@Override
 	public void onInitializeClient() {
 		InitializePackets.registerClientNetworking();
 
 		EntityRendererRegistry.register(ModEntities.SPINNING_BLOCK, SpinningBlockEntityRenderer::new);
+		EntityRendererRegistry.register(ModEntities.BLOCK_PHYSICS_ENTITY, BlockPhysicsEntityRenderer::new);
 
 		VeilEventPlatform.INSTANCE.onVeilRenderLevelStage(((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, renderTick, deltaTracker, camera, frustum) -> {
 			MinecraftClient client = MinecraftClient.getInstance();
@@ -53,7 +55,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 			if(clientWorld != null) {
 				//Only render the shadow map with shaders that need it
 				if (stage == VeilRenderLevelStageEvent.Stage.AFTER_LEVEL) {
-					if (camera != null && this.needsShadowMap()) {
+					if (camera != null) {
 						ShadowMapRenderer.renderShadowMap(camera);
 					}
 				}
@@ -119,7 +121,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 		ClientTickEvents.END_WORLD_TICK.register(clientWorld -> {
 			for(PostShader postShader : PostShader.getAllInstances()) {
 				if(postShader.getRenderTimer() != null){
-					postShader.getRenderTimer().updateTimer();
+					postShader.getRenderTimer().updateTimer(clientWorld);
 				}
 			}
 		});

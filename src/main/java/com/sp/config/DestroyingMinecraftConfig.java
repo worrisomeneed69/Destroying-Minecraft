@@ -3,7 +3,9 @@ package com.sp.config;
 import com.sp.DestroyingMinecraftClient;
 import eu.midnightdust.lib.config.MidnightConfig;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,19 +18,27 @@ public class DestroyingMinecraftConfig extends MidnightConfig {
 
 
     public enum ShaderType {
-        NONE(),
-        NUKE(DestroyingMinecraftClient.shadowPostShader.getPost(), DestroyingMinecraftClient.nukePostShader.getPost(), DestroyingMinecraftClient.BLOOM_POST),
+        NONE(null),
+        NUKE(DestroyingMinecraftClient.nukePostShader.getPost()),
         PLANET(DestroyingMinecraftClient.planetPostShader.getPost()),
-        SUPERNOVA(DestroyingMinecraftClient.shadowPostShader.getPost(), DestroyingMinecraftClient.supernovaPostShader.getPost(), DestroyingMinecraftClient.BLOOM_POST),
-        BLACK_HOLE(DestroyingMinecraftClient.shadowPostShader.getPost(), DestroyingMinecraftClient.blackHolePostShader.getPost(), DestroyingMinecraftClient.BLOOM_POST);
+        SUPERNOVA(),
+        BLACK_HOLE(DestroyingMinecraftClient.blackHolePostShader.getPost());
 
         final List<Identifier> enabledShaders;
 
-        ShaderType(Identifier ... identifiers){
-            this.enabledShaders = Arrays.stream(identifiers).toList();
+        ShaderType(@Nullable Identifier ... identifiers) {
+            this.enabledShaders = new ArrayList<>();
+
+            //Shadows and sky are universal, then add whatever shader after, finally add bloom to all of it
+            if(identifiers != null) {
+                this.enabledShaders.add(DestroyingMinecraftClient.shadowPostShader.getPost());
+                this.enabledShaders.add(DestroyingMinecraftClient.supernovaPostShader.getPost());
+                this.enabledShaders.addAll(Arrays.stream(identifiers).toList());
+                this.enabledShaders.add(DestroyingMinecraftClient.BLOOM_POST);
+            }
         }
 
-        public List<Identifier> getEnabledShaders(){
+        public List<Identifier> getEnabledShaders() {
             return this.enabledShaders;
         }
     }

@@ -5,6 +5,7 @@ import com.sp.util.BetterUniforms;
 import com.sp.util.ShaderTimer;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.client.util.Easing;
+import net.minecraft.client.world.ClientWorld;
 
 public class NukeRenderTimer extends ExplosionRenderTimer {
     private static final ShaderTimer smokeRiseTimer = new ShaderTimer();
@@ -15,17 +16,17 @@ public class NukeRenderTimer extends ExplosionRenderTimer {
     }
 
     @Override
-    public void updateTimer() {
+    public void updateTimer(ClientWorld clientWorld) {
         if(this.enable) {
-            this.progress++;
-            if (this.progress <= this.duration) {
-                smokeRiseTimer.setTimer(Easing.EASE_OUT_SINE.ease((float) this.progress / this.duration));
-                flashTimer.setTimer(Easing.EASE_OUT_SINE.ease(Math.min((float) this.progress / this.duration*1.25f, 1.0f)));
-            }
-
-            //prevTimer = timer;
             smokeRiseTimer.setPrevTimer();
             flashTimer.setPrevTimer();
+
+            this.updateProgress(clientWorld);
+            if (this.progress <= this.duration) {
+                smokeRiseTimer.setTimer(Easing.EASE_OUT_SINE.ease(this.progress));
+                flashTimer.setTimer(Easing.EASE_OUT_SINE.ease(Math.min(this.progress*2.75f, 1.0f)));
+            }
+
         } else {
             this.resetExplosionTimer();
         }
@@ -35,14 +36,13 @@ public class NukeRenderTimer extends ExplosionRenderTimer {
     public void resetExplosionTimer() {
         smokeRiseTimer.reset();
         flashTimer.reset();
+        this.startTime = -1;
         super.resetExplosionTimer();
     }
 
     @Override
     public void setUniforms(ShaderProgram shaderProgram, float tickDelta) {
-//        if(this.enable) {
-            BetterUniforms.setFloat(shaderProgram, "smokeRiseTimer", smokeRiseTimer.getTimer(tickDelta));
-            BetterUniforms.setFloat(shaderProgram, "flashTimer", flashTimer.getTimer(tickDelta));
-//        }
+        BetterUniforms.setFloat(shaderProgram, "smokeRiseTimer", smokeRiseTimer.getTimer(tickDelta));
+        BetterUniforms.setFloat(shaderProgram, "flashTimer", flashTimer.getTimer(tickDelta));
     }
 }

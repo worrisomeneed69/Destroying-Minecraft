@@ -176,5 +176,5 @@ void main() {
 
 
 
-//    fragColor = vec4(1.0);
+//    fragColor = vec4(SkyColor, 1.0);
 }

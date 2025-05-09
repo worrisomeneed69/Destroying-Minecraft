@@ -5,6 +5,7 @@ import com.sp.util.BetterUniforms;
 import com.sp.util.ShaderTimer;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.client.util.Easing;
+import net.minecraft.client.world.ClientWorld;
 
 public class PlanetRenderTimer extends ExplosionRenderTimer {
     private static final ShaderTimer planetFallTimer = new ShaderTimer();
@@ -14,15 +15,16 @@ public class PlanetRenderTimer extends ExplosionRenderTimer {
     }
 
     @Override
-    public void updateTimer() {
+    public void updateTimer(ClientWorld clientWorld) {
         if(this.enable) {
+            planetFallTimer.setPrevTimer();
+
             this.progress++;
             if (this.progress <= this.duration) {
                 planetFallTimer.setTimer(Easing.LINEAR.ease((float) this.progress / this.duration));
             }
 
-            //prevTimer = timer;
-            planetFallTimer.setPrevTimer();
+
         } else {
             this.resetExplosionTimer();
         }

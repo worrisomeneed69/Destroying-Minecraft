@@ -10,6 +10,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.World;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 
 public class SupernovaPostShader extends PostShader {
     public static final Identifier SUPERNOVA_POST = DestroyingMinecraft.idOf("sky");
@@ -22,10 +23,14 @@ public class SupernovaPostShader extends PostShader {
     @Override
     public void setUniforms(ShaderProgram shaderProgram, float tickDelta, MinecraftClient client, World clientWorld) {
         Matrix4f matrix4f = new Matrix4f();
-        matrix4f.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
-        matrix4f.rotate(RotationAxis.POSITIVE_X.rotationDegrees((clientWorld.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
+//        matrix4f.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
+//        matrix4f.rotate(RotationAxis.POSITIVE_X.rotationDegrees((clientWorld.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
 
-        BetterUniforms.setMatrix(shaderProgram, "sunMat", matrix4f);
+        matrix4f.rotate(new Quaternionf().rotateXYZ((float) Math.toRadians(25), (float) Math.toRadians(-45), (float) Math.toRadians(0)));
+//        matrix4f.rotate(RotationAxis.POSITIVE_X.rotationDegrees(-20.0f));
+//        matrix4f.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(45.0f));
+
+        BetterUniforms.setMatrix(shaderProgram, "sunMat", matrix4f.invert());
 
         super.setUniforms(shaderProgram, tickDelta, client, clientWorld);
     }

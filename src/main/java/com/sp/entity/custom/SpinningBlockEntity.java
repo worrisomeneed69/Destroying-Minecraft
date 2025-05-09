@@ -4,9 +4,13 @@ import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.SpinningBlockComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.MovementType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.joml.Quaternionf;
 
 
 public class SpinningBlockEntity extends Entity {
@@ -23,21 +27,35 @@ public class SpinningBlockEntity extends Entity {
 
     @Override
     public void tick() {
+        super.tick();
         SpinningBlockComponent component = InitializeComponents.SPINNING_BLOCK.get(this);
-        if(this.getWorld().isClient) {
-            this.acceleration += component.getAccelerationFactor();
-            this.setPosition(this.getX(), this.getY() + this.acceleration, this.getZ());
+
+//        this.acceleration += component.getAccelerationFactor()*0.1f;
+//        Vec3d randDir = new Vec3d(component.getRandDir());
+//        this.setVelocity(randDir);
 
 
-            this.setPitch(this.getPitch() + component.getPitchIncrement());
-            this.setYaw(this.getYaw() + component.getYawIncrement());
-        } else {
-            if(this.age > 59){
+        if(!this.isOnGround()) {
+            this.setVelocity(this.getVelocity().add(new Vec3d(0, -0.07, 0)));
+//
+            this.velocityDirty = true;
+            this.velocityModified = true;
+
+            this.move(MovementType.SELF, this.getVelocity());
+        }
+
+        if(!this.getWorld().isClient) {
+            if(this.age > 100){
                 this.discard();
             }
         }
+
     }
 
+    @Override
+    protected double getGravity() {
+        return 0.1;
+    }
 
     @Override
     public boolean shouldRender(double distance) {

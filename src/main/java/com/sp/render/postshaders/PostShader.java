@@ -10,7 +10,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Vector;
 
 /**
- * This class is used to keep all the shaders and their uniforms organized
+ * This class is used to keep all the shaders and their uniforms organized<br><br>
+ * If a shader doesn't need any uniforms to be set then there really is no point in instantiating a new Post Shader
  */
 public abstract class PostShader {
     protected final Identifier POST;
@@ -25,6 +26,10 @@ public abstract class PostShader {
         allInstances.add(this);
     }
 
+    /**
+     * Most of the time the shaders will have a render timer that already sets the uniforms.<br><br>
+     * If a shader doesn't have a render timer, you can override this method and add any uniforms you want
+     */
     public void setUniforms(ShaderProgram shaderProgram, float tickDelta, MinecraftClient client, World clientWorld) {
         if(this.renderTimer != null) {
             this.renderTimer.setUniforms(shaderProgram, tickDelta);

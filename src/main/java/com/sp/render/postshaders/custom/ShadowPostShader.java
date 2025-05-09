@@ -23,8 +23,6 @@ public class ShadowPostShader extends PostShader {
         ShadowMapRenderer.setShadowUniforms(shaderProgram);
         if (DestroyingMinecraftConfig.shaderType == DestroyingMinecraftConfig.ShaderType.SUPERNOVA) {
             DestroyingMinecraftClient.supernovaPostShader.getRenderTimer().setUniforms(shaderProgram, tickDelta);
-        } else if (DestroyingMinecraftConfig.shaderType == DestroyingMinecraftConfig.ShaderType.NUKE) {
-            DestroyingMinecraftClient.nukePostShader.getRenderTimer().setUniforms(shaderProgram, tickDelta);
         }
     }
 }

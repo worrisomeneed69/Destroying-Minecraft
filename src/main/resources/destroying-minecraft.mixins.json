@@ -3,6 +3,8 @@
   "package": "com.sp.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "collision.IsGroundedCheckMixin",
+    "collision.PlatformCollisionMixin"
   ],
   "injectors": {
     "defaultRequire": 1
@@ -11,13 +13,13 @@
     "DisableEntityShadowsMixin",
     "GameRendererMixin",
     "NoDirectionalBrightnessMixin",
+    "PostProcessingManagerAccessor",
     "VeilLevelPerspectiveRendererMixin",
     "WorldRendererAccessor",
     "WorldRendererMixin",
     "camerashake.CameraMixin",
     "camerashake.CameraRollMixin",
     "sodiumcompat.SodiumShadowMapShaderMixin",
-    "supernova.SunMixin",
-    "PostProcessingManagerAccessor"
+    "supernova.SunMixin"
   ]
 }

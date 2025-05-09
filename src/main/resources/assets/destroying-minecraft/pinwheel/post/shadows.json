@@ -1,15 +1,14 @@
 {
     "stages": [
         {
+            "type": "veil:mask",
+            "depth": true
+        },
+        {
             "type": "veil:blit",
             "shader": "destroying-minecraft:shadows/shadows",
             "in": "minecraft:main",
-            "out": "swap"
-        },
-        {
-            "type": "veil:copy",
-            "in": "swap",
-            "out": "minecraft:main"
+            "out": "destroying-minecraft:bloom/bloom_start"
         }
     ],
     "framebuffers": {

@@ -3,6 +3,7 @@ package com.sp.render;
 import com.sp.DestroyingMinecraft;
 import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.util.BetterUniforms;
+import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
@@ -19,12 +20,11 @@ import org.joml.Vector3d;
  * Taken from my backrooms mod
  */
 public class ShadowMapRenderer {
-    private static boolean renderingShadowMap;
     private static Camera currentCamera;
     private static MinecraftClient client;
 
 
-    public static void renderShadowMap(Camera camera){
+    public static void renderShadowMap(Camera camera) {
         currentCamera = camera;
         client = MinecraftClient.getInstance();
         Vec3d cameraPos = camera.getPos();
@@ -33,7 +33,16 @@ public class ShadowMapRenderer {
 
         AdvancedFbo shadowMap = VeilRenderSystem.renderer().getFramebufferManager().getFramebuffer(DestroyingMinecraft.idOf("shadowmap"));
         if(shadowMap != null) {
-            PerspectiveRenderer.render(shadowMap, shadowModelView.peek().getPositionMatrix(), shadowProjMat, new Vector3d(cameraPos.x, cameraPos.y, cameraPos.z), new Quaternionf(), 20, client.getRenderTickCounter(), true);
+            PerspectiveRenderer.render(
+                    shadowMap,
+                    shadowModelView.peek().getPositionMatrix(),
+                    shadowProjMat,
+                    new Vector3d(cameraPos.x, cameraPos.y, cameraPos.z),
+                    new Quaternionf(),
+                    20,
+                    client.getRenderTickCounter(),
+                    true
+            );
         }
     }
 
@@ -80,9 +89,9 @@ public class ShadowMapRenderer {
                     shadowModelView.rotate(RotationAxis.POSITIVE_Z.rotationDegrees(-(client.world.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
                 }
             }
-            case NUKE -> {
+            default -> {
                 shadowModelView.rotate(RotationAxis.POSITIVE_X.rotationDegrees(20.0f));
-                shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(0.0f));
+                shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-45.0f));
             }
         }
 
@@ -104,14 +113,6 @@ public class ShadowMapRenderer {
                 0f, 0f, 2.0f / (nearPlane - farPlane), 0f,
                 0f, 0f, -(farPlane + nearPlane) / (farPlane - nearPlane), 1f
         );
-    }
-
-    public static boolean isRenderingShadowMap() {
-        return renderingShadowMap;
-    }
-
-    public static void setRenderingShadowMap(boolean l) {
-        renderingShadowMap = l;
     }
 
     public static void setShadowUniforms(ShaderProgram access) {
