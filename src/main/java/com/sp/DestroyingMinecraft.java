@@ -31,7 +31,7 @@ public class DestroyingMinecraft implements ModInitializer {
 		ModBlocks.init();
 		ModItemGroups.registerItemGroups();
 		InitializePackets.registerServerNetworking();
-		ModEntities.init();
+		ModEntities.registerEntities();
 		MidnightConfig.init(MOD_ID, DestroyingMinecraftConfig.class);
 
 		CommandRegistrationCallback.EVENT.register(DestructionCommand::register);

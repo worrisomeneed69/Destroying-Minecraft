@@ -1,6 +1,7 @@
 {
   "destroying-minecraft.midnightconfig.enum.ShaderType.NONE": "NONE",
   "destroying-minecraft.midnightconfig.enum.ShaderType.NUKE": "NUKE",
+  "destroying-minecraft.midnightconfig.enum.ShaderType.CRACKS": "CRACKS",
   "destroying-minecraft.midnightconfig.enum.ShaderType.PLANET": "PLANET",
   "destroying-minecraft.midnightconfig.enum.ShaderType.SUPERNOVA": "SUPERNOVA",
   "destroying-minecraft.midnightconfig.enum.ShaderType.BLACK_HOLE": "BLACK_HOLE"

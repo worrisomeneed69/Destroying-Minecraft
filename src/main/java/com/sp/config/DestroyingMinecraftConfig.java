@@ -20,6 +20,7 @@ public class DestroyingMinecraftConfig extends MidnightConfig {
     public enum ShaderType {
         NONE(null),
         NUKE(DestroyingMinecraftClient.nukePostShader.getPost()),
+        CRACKS(DestroyingMinecraftClient.cracksPostShader.getPost()),
         PLANET(DestroyingMinecraftClient.planetPostShader.getPost()),
         SUPERNOVA(),
         BLACK_HOLE(DestroyingMinecraftClient.blackHolePostShader.getPost());

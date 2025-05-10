@@ -1,7 +1,6 @@
 package com.sp.mixin.supernova;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.sp.mixininterfaces.SunMatrix;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -12,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(WorldRenderer.class)
-public class SunMixin implements SunMatrix {
+public class SunMixin{
     @Unique MatrixStack sunViewMat;
 
     //@ModifyConstant(method = "renderSky", constant = @Constant(floatValue = 30.0F))
@@ -24,10 +23,5 @@ public class SunMixin implements SunMatrix {
     @Inject(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack$Entry;getPositionMatrix()Lorg/joml/Matrix4f;", ordinal = 2))
     private void getSunViewMatrix(Matrix4f matrix4f, Matrix4f projectionMatrix, float tickDelta, Camera camera, boolean thickFog, Runnable fogCallback, CallbackInfo ci, @Local MatrixStack matrixStack){
         sunViewMat = matrixStack;
-    }
-
-    @Override
-    public Matrix4f getSunViewMat() {
-        return sunViewMat.peek().getPositionMatrix().invert();
     }
 }

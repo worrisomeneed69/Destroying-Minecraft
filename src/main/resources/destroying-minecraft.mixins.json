@@ -4,7 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "collision.IsGroundedCheckMixin",
-    "collision.PlatformCollisionMixin"
+    "collision.PlatformCollisionMixin",
   ],
   "injectors": {
     "defaultRequire": 1
@@ -19,6 +19,8 @@
     "WorldRendererMixin",
     "camerashake.CameraMixin",
     "camerashake.CameraRollMixin",
+    "materialsampler.DynamicBufferProcessorMixin",
+    "materialsampler.DynamicBufferTypeMixin",
     "sodiumcompat.SodiumShadowMapShaderMixin",
     "supernova.SunMixin"
   ]

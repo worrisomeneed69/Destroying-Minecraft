@@ -7,6 +7,7 @@ import com.sp.entity.client.renderer.SpinningBlockEntityRenderer;
 import com.sp.mixin.PostProcessingManagerAccessor;
 import com.sp.networking.InitializePackets;
 import com.sp.render.CameraShake;
+import com.sp.render.CustomDynamicBuffers;
 import com.sp.render.ShadowMapRenderer;
 import com.sp.render.postshaders.PostShader;
 import com.sp.render.postshaders.custom.*;
@@ -31,6 +32,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 	public BlockInstanceRenderer blockInstanceRenderer;
 
 	public static NukePostShader nukePostShader = new NukePostShader();
+	public static CracksPostShader cracksPostShader = new CracksPostShader();
 	public static PlanetPostShader planetPostShader = new PlanetPostShader();
 	public static SupernovaPostShader supernovaPostShader = new SupernovaPostShader();
 	public static BlackHolePostShader blackHolePostShader = new BlackHolePostShader();
