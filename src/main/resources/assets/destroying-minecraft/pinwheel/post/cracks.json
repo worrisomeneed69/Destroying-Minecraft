@@ -21,5 +21,12 @@
         "blur": true
       }
     }
+  },
+  "textures": {
+    "MaterialSampler": {
+      "type": "framebuffer",
+      "name": "veil:dynamic_main",
+      "sampler": 6
+    }
   }
 }

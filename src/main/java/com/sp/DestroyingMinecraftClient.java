@@ -7,7 +7,6 @@ import com.sp.entity.client.renderer.SpinningBlockEntityRenderer;
 import com.sp.mixin.PostProcessingManagerAccessor;
 import com.sp.networking.InitializePackets;
 import com.sp.render.CameraShake;
-import com.sp.render.CustomDynamicBuffers;
 import com.sp.render.ShadowMapRenderer;
 import com.sp.render.postshaders.PostShader;
 import com.sp.render.postshaders.custom.*;
@@ -16,6 +15,7 @@ import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.post.PostProcessingManager;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
+import foundry.veil.impl.client.render.dynamicbuffer.DynamicBufferManger;
 import foundry.veil.platform.VeilEventPlatform;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -46,6 +46,8 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		InitializePackets.registerClientNetworking();
+
+
 
 		EntityRendererRegistry.register(ModEntities.SPINNING_BLOCK, SpinningBlockEntityRenderer::new);
 		EntityRendererRegistry.register(ModEntities.BLOCK_PHYSICS_ENTITY, BlockPhysicsEntityRenderer::new);

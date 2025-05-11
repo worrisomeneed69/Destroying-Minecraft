@@ -6,6 +6,7 @@
 
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DiffuseDepthSampler;
+uniform isampler2D MaterialSampler;
 
 uniform float GameTime;
 uniform float flashTimer;
@@ -30,9 +31,11 @@ float getNoise(vec3 pos, float HOLE_SIZE) {
 void main() {
     vec3 color = texture(DiffuseSampler, texCoord).rgb;
     float depth = texture(DiffuseDepthSampler, texCoord).r;
+    uint material = texture(MaterialSampler, texCoord).r;
 
-    if(depth < 1.0) {
+    if(depth < 1.0 && material == 2) {
         vec3 worldPos = screenToWorldSpace(texCoord, depth).xyz;
+        worldPos.y = 0;
         float time = abs(sin(GameTime*300)) * 100;
 //        float time = 5;
 //        float HOLE_SIZE = smoothstep(0, (100 - time)*0.1, 1 - distance(centerPos, worldPos.xz)/time);
@@ -51,7 +54,7 @@ void main() {
             vec3 magmaColor = vec3(0.0);
             for(int i = 0; i < 50; i++) {
                 rayPos += step;
-                noise = getNoise(vec3(rayPos.x, worldPos.y, rayPos.z), HOLE_SIZE);
+                noise = getNoise(vec3(rayPos.x, 0, rayPos.z), HOLE_SIZE);
 
 
                 magmaColor += vec3(1, 0.4, 0)*0.03;
@@ -62,9 +65,13 @@ void main() {
 
             }
 
-            color = magmaColor;
+            color = magmaColor*2;
         }
     }
+
+//    if( == 1) {
+//        color = vec3(1, 0, 0);
+//    }
 
     fragColor = vec4(color, 1.0);
 }

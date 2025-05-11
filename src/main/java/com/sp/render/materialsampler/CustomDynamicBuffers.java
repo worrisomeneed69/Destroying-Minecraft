@@ -1,4 +1,4 @@
-package com.sp.render;
+package com.sp.render.materialsampler;
 
 import foundry.veil.api.client.render.dynamicbuffer.DynamicBufferType;
 
