@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(BipedEntityModel.class)
 public class NoWalkWhenOnPlatformMixin<T extends LivingEntity> {
 
-    /// FIXME: MAKE LEGS NOT MOVE WHEN ON PLATFORM
+    // FIXME: MAKE LEGS NOT MOVE WHEN ON PLATFORM
     /*
     @Unique
     private float limbSwing = 0.0f;

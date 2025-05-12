@@ -11,7 +11,9 @@ import com.sp.render.ShadowMapRenderer;
 import com.sp.render.postshaders.PostShader;
 import com.sp.render.postshaders.custom.*;
 import com.sp.render.rendertimers.blackhole.BlockInstanceRenderer;
+import foundry.veil.Veil;
 import foundry.veil.api.client.render.VeilRenderSystem;
+import foundry.veil.api.client.render.dynamicbuffer.DynamicBufferType;
 import foundry.veil.api.client.render.post.PostProcessingManager;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
@@ -42,6 +44,8 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 	private static DestroyingMinecraftConfig.ShaderType prevShaderType;
 	private static final Set<Identifier> removedPipelines = new HashSet<>(1);
+
+	private static boolean initialized = false;
 
 	@Override
 	public void onInitializeClient() {
@@ -116,6 +120,10 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 		//Update camera shakes
 		ClientTickEvents.END_CLIENT_TICK.register(minecraftClient -> {
+			if(!initialized){
+				this.enableDynamicBuffers();
+			}
+
 			for(CameraShake cameraShake : CameraShake.getAllInstances()){
 				cameraShake.individualTick();
 			}
@@ -157,5 +165,10 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 	private boolean needsShadowMap() {
 		DestroyingMinecraftConfig.ShaderType type = DestroyingMinecraftConfig.shaderType;
 		return type == DestroyingMinecraftConfig.ShaderType.BLACK_HOLE || type == DestroyingMinecraftConfig.ShaderType.SUPERNOVA || type == DestroyingMinecraftConfig.ShaderType.NUKE;
+	}
+
+	private void enableDynamicBuffers() {
+		Identifier bufferId = Veil.veilPath("forced");
+		VeilRenderSystem.renderer().enableBuffers(bufferId, DynamicBufferType.values());
 	}
 }

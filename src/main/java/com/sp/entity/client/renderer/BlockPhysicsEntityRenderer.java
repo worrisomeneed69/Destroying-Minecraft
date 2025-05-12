@@ -165,7 +165,7 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
         }
          */
 
-        /// FIXME: Colors and light are horribly of.
+        // FIXME: Colors and light are horribly of.
 
         PhysicsBlockComponent component = InitializeComponents.PHYSICS_BLOCK.get(entity);
 

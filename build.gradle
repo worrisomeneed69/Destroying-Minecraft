@@ -59,8 +59,6 @@ dependencies {
 	}
 	include("foundry.veil:veil-fabric-${project.minecraft_version}:${project.veil_version}")
 
-	//Sodium
-	modCompileOnly "maven.modrinth:sodium:mc1.21.1-${sodium_version}-fabric"
 
 	//Cardinal Components API
 	modImplementation "org.ladysnake.cardinal-components-api:cardinal-components-base:${project.cca_version}"
@@ -74,6 +72,14 @@ dependencies {
 
 	//Mod Menu
 	modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}")
+
+
+	//COMPATIBILITY//
+
+	//Sodium
+	modCompileOnly "maven.modrinth:sodium:mc1.21.1-${sodium_version}-fabric"
+	//Flashback
+	modCompileOnly "maven.modrinth:flashback:0.32.0"
 
 }
 

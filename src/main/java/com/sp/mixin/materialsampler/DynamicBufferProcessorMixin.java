@@ -46,6 +46,7 @@ public class DynamicBufferProcessorMixin {
 
     @Shadow @Final private static Set<String> BLOCK_SHADERS;
 
+    //TODO: Don't overwrite this. Find a better inject point
     /**
      * @author
      * @reason
@@ -241,7 +242,6 @@ public class DynamicBufferProcessorMixin {
                 if (type == DynamicBufferType.ALBEDO && !markers.containsKey("veil:" + DynamicBufferType.ALBEDO.getName())) {
                     if (ctx.isVertex()) {
                         if (BLOCK_SHADERS.contains(shaderName)) {
-                            // TODO remove face shading
                         }
 
                         Optional<GlslNode> mixLightOptional = mainFunction.stream().filter(node -> {

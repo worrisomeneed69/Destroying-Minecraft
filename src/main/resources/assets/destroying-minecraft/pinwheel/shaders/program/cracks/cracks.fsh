@@ -7,6 +7,9 @@
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DiffuseDepthSampler;
 uniform isampler2D MaterialSampler;
+uniform sampler2D HandDepthSampler;
+
+uniform sampler2D DirtTexture;
 
 uniform float GameTime;
 uniform float flashTimer;
@@ -16,7 +19,7 @@ in vec2 texCoord;
 out vec4 fragColor;
 
 //const vec2 centerPos = vec2(-1341, 1351);
-const vec2 centerPos = vec2(0, 0);
+const vec2 centerPos = vec2(0.5, 0.5);
 const float TEXTURE_SIZE = 0.5;
 //const float HOLE_SIZE = 0.01;
 
@@ -31,13 +34,14 @@ float getNoise(vec3 pos, float HOLE_SIZE) {
 void main() {
     vec3 color = texture(DiffuseSampler, texCoord).rgb;
     float depth = texture(DiffuseDepthSampler, texCoord).r;
+    float handDepth = texture(HandDepthSampler, texCoord).r;
     uint material = texture(MaterialSampler, texCoord).r;
 
-    if(depth < 1.0 && material == 2) {
+    if(depth < 1.0 && material == 2 && handDepth >= 1.0) {
         vec3 worldPos = screenToWorldSpace(texCoord, depth).xyz;
         worldPos.y = 0;
-        float time = abs(sin(GameTime*300)) * 100;
-//        float time = 5;
+//        float time = abs(sin(GameTime*300)) * 5;
+        float time = 0.5;
 //        float HOLE_SIZE = smoothstep(0, (100 - time)*0.1, 1 - distance(centerPos, worldPos.xz)/time);
         float HOLE_SIZE = pow(1 - distance(centerPos, worldPos.xz)/time, 3);
         float noise = getNoise(worldPos, HOLE_SIZE);
@@ -46,7 +50,7 @@ void main() {
 
         if (noise < HOLE_SIZE) {
             //rayMarch
-            vec3 rayPos = worldPos;
+            vec3 rayPos = worldPos + rand(texCoord + GameTime) * 0.01;
             vec3 rayDir = viewDirFromUv(texCoord);
             vec3 step = rayDir * 0.05;
 
@@ -54,6 +58,7 @@ void main() {
             vec3 magmaColor = vec3(0.0);
             for(int i = 0; i < 50; i++) {
                 rayPos += step;
+                HOLE_SIZE = pow(1 - distance(centerPos, rayPos.xz)/time, 3);
                 noise = getNoise(vec3(rayPos.x, 0, rayPos.z), HOLE_SIZE);
 
 
@@ -68,10 +73,6 @@ void main() {
             color = magmaColor*2;
         }
     }
-
-//    if( == 1) {
-//        color = vec3(1, 0, 0);
-//    }
 
     fragColor = vec4(color, 1.0);
 }

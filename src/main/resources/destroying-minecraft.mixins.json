@@ -19,6 +19,7 @@
     "WorldRendererMixin",
     "camerashake.CameraMixin",
     "camerashake.CameraRollMixin",
+    "flashbackcompat.ExportJobMixin",
     "materialsampler.BufferBuilderMixin",
     "materialsampler.DynamicBufferProcessorMixin",
     "materialsampler.DynamicBufferTypeMixin",

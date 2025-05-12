@@ -23,10 +23,18 @@
     }
   },
   "textures": {
+    "DirtTexture": {
+      "type": "location",
+      "location": "minecraft:textures/block/dirt.png"
+    },
     "MaterialSampler": {
       "type": "framebuffer",
       "name": "veil:dynamic_main",
       "sampler": 6
+    },
+    "HandDepthSampler": {
+      "type": "framebuffer",
+      "name": "veil:first_person:depth"
     }
   }
 }
