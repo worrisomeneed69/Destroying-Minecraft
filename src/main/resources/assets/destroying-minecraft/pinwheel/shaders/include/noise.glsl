@@ -4,6 +4,12 @@ float rand(vec2 coord) {
     return fract(sin(dot(coord, vec2(12.9898, 78.223))) * 43758.5453) * 2.0 - 1.0;
 }
 
+float scanLines(vec2 st) {
+    return sin(dot(st.xy,
+    vec2(0.012,0.0))*
+    437.5453123);
+}
+
 //Thank you https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83 for the noise functions
 float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
 vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}

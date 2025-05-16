@@ -1,6 +1,7 @@
 package com.sp.render.postshaders;
 
 import com.sp.render.rendertimers.ExplosionRenderTimer;
+import foundry.veil.api.client.render.post.PostPipeline;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
@@ -26,11 +27,18 @@ public abstract class PostShader {
         allInstances.add(this);
     }
 
+    public void setUniforms(PostPipeline.Context context, float tickDelta, MinecraftClient client, World clientWorld) {
+        ShaderProgram shaderProgram = context.getShader(this.getShader());
+        if (shaderProgram != null) {
+            this.setUniformsForShader(shaderProgram, tickDelta, client, clientWorld);
+        }
+    }
+
     /**
      * Most of the time the shaders will have a render timer that already sets the uniforms.<br><br>
      * If a shader doesn't have a render timer, you can override this method and add any uniforms you want
      */
-    public void setUniforms(ShaderProgram shaderProgram, float tickDelta, MinecraftClient client, World clientWorld) {
+    public void setUniformsForShader(ShaderProgram shaderProgram, float tickDelta, MinecraftClient client, World clientWorld) {
         if(this.renderTimer != null) {
             this.renderTimer.setUniforms(shaderProgram, tickDelta);
         }

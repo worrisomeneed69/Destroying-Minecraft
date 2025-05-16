@@ -18,7 +18,7 @@ public class CracksPostShader extends PostShader {
     }
 
     @Override
-    public void setUniforms(ShaderProgram shaderProgram, float tickDelta, MinecraftClient client, World clientWorld) {
+    public void setUniformsForShader(ShaderProgram shaderProgram, float tickDelta, MinecraftClient client, World clientWorld) {
 
     }
 }

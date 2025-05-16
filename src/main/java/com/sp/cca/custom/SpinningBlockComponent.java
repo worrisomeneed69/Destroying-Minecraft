@@ -3,7 +3,6 @@ package com.sp.cca.custom;
 import com.sp.cca.InitializeComponents;
 import com.sp.entity.client.renderer.BlockType;
 import com.sp.entity.custom.SpinningBlockEntity;
-import com.sp.util.RandomUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.NbtCompound;
@@ -12,7 +11,6 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
-import org.joml.Vector3f;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent;
 
@@ -28,7 +26,6 @@ public class SpinningBlockComponent implements AutoSyncedComponent, ClientTickin
     private float prevYaw;
 
     private float accelerationFactor;
-    private Vector3f randDir;
     private float scale;
     private final BlockType blockType;
     private BlockState blockState;
@@ -38,7 +35,8 @@ public class SpinningBlockComponent implements AutoSyncedComponent, ClientTickin
             Blocks.DIRT.getDefaultState(),
             Blocks.STONE.getDefaultState(),
             Blocks.GRAVEL.getDefaultState(),
-            Blocks.DEEPSLATE.getDefaultState(),
+            Blocks.OAK_LEAVES.getDefaultState(),
+            Blocks.OAK_LOG.getDefaultState(),
             Blocks.GRASS_BLOCK.getDefaultState()
     );
 
@@ -48,18 +46,16 @@ public class SpinningBlockComponent implements AutoSyncedComponent, ClientTickin
 
         Random random = spinningBlock.getRandom();
         this.blockState = randomBlocks.get( random.nextBetween(0, randomBlocks.size() - 1) );
+//        this.blockState = Blocks.DIRT.getDefaultState();
         this.pitchIncrement = random.nextFloat()*20;
         this.yawIncrement = random.nextFloat()*20;
         this.accelerationFactor = random.nextFloat()*0.05f + 0.1f;
 
-        float spread = 0.5f;
-        this.randDir = new Vector3f(-1 + RandomUtil.nextBetween(random, -spread, spread),  + RandomUtil.nextBetween(random, -spread, spread), -1 + RandomUtil.nextBetween(random, -spread, spread));
-
         this.scale = 1;
 
-        BlockType[] values = BlockType.values();
-        this.blockType = values[random.nextBetween(0, values.length - 1)];
-//        this.blockType = BlockType.COW;
+//        BlockType[] values = BlockType.values();
+//        this.blockType = values[random.nextBetween(0, values.length - 1)];
+        this.blockType = BlockType.SINGLE;
     }
 
 
@@ -80,9 +76,6 @@ public class SpinningBlockComponent implements AutoSyncedComponent, ClientTickin
     public float getAccelerationFactor() {
         return this.accelerationFactor;
     }
-    public Vector3f getRandDir(){
-        return this.randDir;
-    }
     public float getScale() {
         return scale;
     }
@@ -91,7 +84,7 @@ public class SpinningBlockComponent implements AutoSyncedComponent, ClientTickin
     }
 
 
-    public void sync(){
+    public void sync() {
         InitializeComponents.SPINNING_BLOCK.sync(this.spinningBlockEntity);
     }
 
@@ -102,10 +95,6 @@ public class SpinningBlockComponent implements AutoSyncedComponent, ClientTickin
         this.yawIncrement = nbtCompound.getFloat("yawIncrement");
         this.accelerationFactor = nbtCompound.getFloat("accelerationFactor");
         this.scale = nbtCompound.getFloat("scale");
-
-        this.randDir.x = nbtCompound.getFloat("randDirX");
-        this.randDir.y = nbtCompound.getFloat("randDirY");
-        this.randDir.z = nbtCompound.getFloat("randDirZ");
     }
 
 
@@ -116,10 +105,6 @@ public class SpinningBlockComponent implements AutoSyncedComponent, ClientTickin
         nbtCompound.putFloat("yawIncrement", this.yawIncrement);
         nbtCompound.putFloat("accelerationFactor", this.accelerationFactor);
         nbtCompound.putFloat("scale", this.scale);
-
-        nbtCompound.putFloat("randDirX", this.randDir.x);
-        nbtCompound.putFloat("randDirY", this.randDir.y);
-        nbtCompound.putFloat("randDirZ", this.randDir.z);
     }
 
     @Override

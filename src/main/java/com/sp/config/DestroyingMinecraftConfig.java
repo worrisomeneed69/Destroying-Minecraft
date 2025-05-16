@@ -1,13 +1,7 @@
 package com.sp.config;
 
-import com.sp.DestroyingMinecraftClient;
+import com.sp.render.ShaderType;
 import eu.midnightdust.lib.config.MidnightConfig;
-import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class DestroyingMinecraftConfig extends MidnightConfig {
     public static final String SHADERS = "shaders";
@@ -15,32 +9,15 @@ public class DestroyingMinecraftConfig extends MidnightConfig {
     @Entry(category = SHADERS)
     public static ShaderType shaderType = ShaderType.NONE;
 
+//    @Entry(category = SHADERS)
+//    public static Comment spacer1;
 
+    @Entry(category = SHADERS)
+    public static boolean enableDepthOfField = true;
 
-    public enum ShaderType {
-        NONE(null),
-        NUKE(DestroyingMinecraftClient.nukePostShader.getPost()),
-        CRACKS(DestroyingMinecraftClient.cracksPostShader.getPost()),
-        PLANET(DestroyingMinecraftClient.planetPostShader.getPost()),
-        SUPERNOVA(),
-        BLACK_HOLE(DestroyingMinecraftClient.blackHolePostShader.getPost());
+    @Entry(category = SHADERS, isSlider = true, min = 0.1f, max = 3.0f, precision = 10)
+    public static float blurStrength = 1f;
 
-        final List<Identifier> enabledShaders;
-
-        ShaderType(@Nullable Identifier ... identifiers) {
-            this.enabledShaders = new ArrayList<>();
-
-            //Shadows and sky are universal, then add whatever shader after, finally add bloom to all of it
-            if(identifiers != null) {
-                this.enabledShaders.add(DestroyingMinecraftClient.shadowPostShader.getPost());
-                this.enabledShaders.add(DestroyingMinecraftClient.supernovaPostShader.getPost());
-                this.enabledShaders.addAll(Arrays.stream(identifiers).toList());
-                this.enabledShaders.add(DestroyingMinecraftClient.BLOOM_POST);
-            }
-        }
-
-        public List<Identifier> getEnabledShaders() {
-            return this.enabledShaders;
-        }
-    }
+    @Entry(category = SHADERS, isSlider = true, min = 0.1f, max = 0.9f, precision = 10)
+    public static float autoFocusTime = 0.8f;
 }

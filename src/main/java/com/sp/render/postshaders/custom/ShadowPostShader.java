@@ -3,6 +3,7 @@ package com.sp.render.postshaders.custom;
 import com.sp.DestroyingMinecraft;
 import com.sp.DestroyingMinecraftClient;
 import com.sp.config.DestroyingMinecraftConfig;
+import com.sp.render.ShaderType;
 import com.sp.render.ShadowMapRenderer;
 import com.sp.render.postshaders.PostShader;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
@@ -19,9 +20,9 @@ public class ShadowPostShader extends PostShader {
     }
 
     @Override
-    public void setUniforms(ShaderProgram shaderProgram, float tickDelta, MinecraftClient client, World clientWorld) {
+    public void setUniformsForShader(ShaderProgram shaderProgram, float tickDelta, MinecraftClient client, World clientWorld) {
         ShadowMapRenderer.setShadowUniforms(shaderProgram);
-        if (DestroyingMinecraftConfig.shaderType == DestroyingMinecraftConfig.ShaderType.SUPERNOVA) {
+        if (DestroyingMinecraftConfig.shaderType == ShaderType.SUPERNOVA) {
             DestroyingMinecraftClient.supernovaPostShader.getRenderTimer().setUniforms(shaderProgram, tickDelta);
         }
     }

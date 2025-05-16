@@ -2,22 +2,37 @@ package com.sp.entity.custom;
 
 import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.SpinningBlockComponent;
+import com.sp.entity.ModEntities;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.joml.Quaternionf;
 
 
 public class SpinningBlockEntity extends Entity {
-    private float acceleration;
+    private final SpinningBlockComponent component;
 
     public SpinningBlockEntity(EntityType<?> entityType, World world) {
         super(entityType, world);
+        this.component = InitializeComponents.SPINNING_BLOCK.get(this);
+    }
+
+    private SpinningBlockEntity(World world, BlockState state) {
+        this(ModEntities.SPINNING_BLOCK, world);
+        this.component.setBlockState(state);
+    }
+
+    public static SpinningBlockEntity spawnFromBlock(World world, BlockPos pos, BlockState state){
+        SpinningBlockEntity entity = new SpinningBlockEntity(world, state);
+        entity.setPosition(pos.toCenterPos());
+        world.spawnEntity(entity);
+
+        return entity;
     }
 
     @Override
@@ -28,7 +43,7 @@ public class SpinningBlockEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-        SpinningBlockComponent component = InitializeComponents.SPINNING_BLOCK.get(this);
+//        SpinningBlockComponent component = InitializeComponents.SPINNING_BLOCK.get(this);
 
 //        this.acceleration += component.getAccelerationFactor()*0.1f;
 //        Vec3d randDir = new Vec3d(component.getRandDir());
@@ -37,9 +52,6 @@ public class SpinningBlockEntity extends Entity {
 
         if(!this.isOnGround()) {
             this.setVelocity(this.getVelocity().add(new Vec3d(0, -0.07, 0)));
-//
-            this.velocityDirty = true;
-            this.velocityModified = true;
 
             this.move(MovementType.SELF, this.getVelocity());
         }
@@ -50,6 +62,10 @@ public class SpinningBlockEntity extends Entity {
             }
         }
 
+    }
+
+    public SpinningBlockComponent getComponent() {
+        return this.component;
     }
 
     @Override

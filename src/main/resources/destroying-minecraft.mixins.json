@@ -3,6 +3,7 @@
   "package": "com.sp.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "ForceRenderPlayerMixin",
     "collision.IsGroundedCheckMixin",
     "collision.PlatformCollisionMixin"
   ],
@@ -20,11 +21,8 @@
     "camerashake.CameraMixin",
     "camerashake.CameraRollMixin",
     "flashbackcompat.ExportJobMixin",
-    "materialsampler.BufferBuilderMixin",
     "materialsampler.DynamicBufferProcessorMixin",
     "materialsampler.DynamicBufferTypeMixin",
-    "materialsampler.RebuildTaskMixin",
-    "materialsampler.sodium.ChunkBuilderMeshingTaskMixin",
     "materialsampler.sodium.SodiumShaderPreProcessorMixin",
     "sodiumcompat.SodiumShadowMapShaderMixin",
     "supernova.SunMixin"

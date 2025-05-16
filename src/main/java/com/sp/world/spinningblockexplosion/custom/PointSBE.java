@@ -31,21 +31,10 @@ public class PointSBE extends SpinningBlockExplosion {
                     //If it's in the sphere
                     if (mutable.set(this.position.x + x, this.position.y + y, this.position.z + z).isWithinDistance(this.position, this.radius) && world.getBlockState(mutable).isSolid()) {
                         if(this.random.nextFloat() < this.density) {
-                            SpinningBlockEntity spinningBlockEntity = ModEntities.SPINNING_BLOCK.create(world);
-                            if (spinningBlockEntity == null) return;
-                            SpinningBlockComponent component = InitializeComponents.SPINNING_BLOCK.get(spinningBlockEntity);
-
-                            spinningBlockEntity.refreshPositionAndAngles(mutable, 0, 0);
-                            component.setBlockState(world.getBlockState(mutable));
-
+                            SpinningBlockEntity spinningBlockEntity = SpinningBlockEntity.spawnFromBlock(world, mutable, world.getBlockState(mutable));
 
                             spinningBlockEntity.setVelocity(mutable.toCenterPos().subtract(this.position).normalize());
-//                            spinningBlockEntity.setVelocity(new Vec3d(-1, 0, -1));
                             spinningBlockEntity.addVelocityInternal(new Vec3d(-1, 1, -1));
-                            spinningBlockEntity.velocityModified = true;
-                            spinningBlockEntity.velocityDirty = true;
-
-                            world.spawnEntity(spinningBlockEntity);
                         }
 
                         world.setBlockState(mutable, Blocks.AIR.getDefaultState());

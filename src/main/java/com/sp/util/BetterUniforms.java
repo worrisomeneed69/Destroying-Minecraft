@@ -28,4 +28,11 @@ public class BetterUniforms {
         }
     }
 
+    public static void setInt(ShaderProgram shaderProgram, String charSequence, int value) {
+        ShaderUniform uniform = shaderProgram.getUniform(charSequence);
+        if(uniform != null) {
+            uniform.setInt(value);
+        }
+    }
+
 }

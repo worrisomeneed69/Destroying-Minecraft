@@ -37,7 +37,7 @@ public enum BlockType {
     }
 
     private static void renderSingle(BlockRenderManager blockRenderManager, EntityRenderDispatcher entityRenderDispatcher, SpinningBlockEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        SpinningBlockComponent component = InitializeComponents.SPINNING_BLOCK.get(entity);
+        SpinningBlockComponent component = entity.getComponent();
         float scale = component.getScale();
         float halfScale = scale/2;
 //        matrices.multiply(new Quaternionf().rotateXYZ((float) Math.toRadians(entity.getPitch(tickDelta)), (float) Math.toRadians(entity.getYaw(tickDelta)), 0));
@@ -76,7 +76,7 @@ public enum BlockType {
     }
 
     private static Vec3d startRenderingAnimal(EntityRenderDispatcher entityRenderDispatcher, SpinningBlockEntity entity, float tickDelta, MatrixStack matrices) {
-        SpinningBlockComponent component = InitializeComponents.SPINNING_BLOCK.get(entity);
+        SpinningBlockComponent component = entity.getComponent();
         Vec3d cameraPos = entityRenderDispatcher.camera.getPos();
 
         Vec3d pos = entity.getPos().subtract(cameraPos);
@@ -92,7 +92,7 @@ public enum BlockType {
     }
 
     private static void renderDouble(BlockRenderManager blockRenderManager, EntityRenderDispatcher entityRenderDispatcher, SpinningBlockEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        SpinningBlockComponent component = InitializeComponents.SPINNING_BLOCK.get(entity);
+        SpinningBlockComponent component = entity.getComponent();
         float scale = component.getScale();
         float halfScale = scale/2;
 //        matrices.multiply(new Quaternionf().rotateXYZ((float) Math.toRadians(entity.getPitch(tickDelta)), (float) Math.toRadians(entity.getYaw(tickDelta)), 0));
@@ -117,7 +117,7 @@ public enum BlockType {
     }
 
     private static void renderTriple(BlockRenderManager blockRenderManager, EntityRenderDispatcher entityRenderDispatcher, SpinningBlockEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        SpinningBlockComponent component = InitializeComponents.SPINNING_BLOCK.get(entity);
+        SpinningBlockComponent component = entity.getComponent();
         float scale = component.getScale();
         float halfScale = scale/2;
 //        matrices.multiply(new Quaternionf().rotateXYZ((float) Math.toRadians(entity.getPitch(tickDelta)), (float) Math.toRadians(entity.getYaw(tickDelta)), 0));

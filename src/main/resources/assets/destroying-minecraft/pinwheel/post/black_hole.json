@@ -17,8 +17,6 @@
             "depth": true
         }
     ],
-    "framebuffers": {
-    },
     "textures": {
         "PrevSampler": {
             "type": "framebuffer",

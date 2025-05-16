@@ -1,0 +1,35 @@
+{
+    "stages": [
+        {
+            "type": "veil:blit",
+            "shader": "destroying-minecraft:earth/earth",
+            "in": "minecraft:main",
+            "out": "destroying-minecraft:bloom/bloom_start"
+        }
+    ],
+    "textures": {
+        "WorldMap": {
+            "type": "location",
+            "location": "destroying-minecraft:textures/shaders/world_map.png"
+        },
+        "StarsTexture": {
+            "type": "location",
+            "location": "destroying-minecraft:textures/shaders/stars.png"
+        },
+        "CloudsTexture": {
+            "type": "location",
+            "location": "minecraft:textures/environment/clouds.png"
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+

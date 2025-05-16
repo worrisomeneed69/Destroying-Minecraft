@@ -7,6 +7,7 @@ import com.sp.entity.client.renderer.SpinningBlockEntityRenderer;
 import com.sp.mixin.PostProcessingManagerAccessor;
 import com.sp.networking.InitializePackets;
 import com.sp.render.CameraShake;
+import com.sp.render.ShaderType;
 import com.sp.render.ShadowMapRenderer;
 import com.sp.render.postshaders.PostShader;
 import com.sp.render.postshaders.custom.*;
@@ -14,10 +15,10 @@ import com.sp.render.rendertimers.blackhole.BlockInstanceRenderer;
 import foundry.veil.Veil;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.dynamicbuffer.DynamicBufferType;
+import foundry.veil.api.client.render.post.PostPipeline;
 import foundry.veil.api.client.render.post.PostProcessingManager;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
-import foundry.veil.impl.client.render.dynamicbuffer.DynamicBufferManger;
 import foundry.veil.platform.VeilEventPlatform;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -39,10 +40,11 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 	public static SupernovaPostShader supernovaPostShader = new SupernovaPostShader();
 	public static BlackHolePostShader blackHolePostShader = new BlackHolePostShader();
 	public static ShadowPostShader shadowPostShader = new ShadowPostShader();
+	public static EarthPostShader earthPostShader = new EarthPostShader();
+	public static BloomPostShader bloomPostShader = new BloomPostShader();
+	public static PostProcessingPostShader postProcessingPostShader = new PostProcessingPostShader();
 
-	public static final Identifier BLOOM_POST = DestroyingMinecraft.idOf("bloom");
-
-	private static DestroyingMinecraftConfig.ShaderType prevShaderType;
+	private static ShaderType prevShaderType;
 	private static final Set<Identifier> removedPipelines = new HashSet<>(1);
 
 	private static boolean initialized = false;
@@ -74,7 +76,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 						this.blockInstanceRenderer = new BlockInstanceRenderer();
 					}
 
-					if(DestroyingMinecraftConfig.shaderType == DestroyingMinecraftConfig.ShaderType.BLACK_HOLE) {
+					if(DestroyingMinecraftConfig.shaderType == ShaderType.BLACK_HOLE) {
 						blockInstanceRenderer.render();
 					}
 				}
@@ -102,10 +104,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 				for(PostShader postShader : PostShader.getAllInstances()) {
 
 					if(postShader.getPost().equals(name)) {
-						ShaderProgram shaderProgram = context.getShader(postShader.getShader());
-						if (shaderProgram != null) {
-							postShader.setUniforms(shaderProgram, tickDelta, client, clientWorld);
-						}
+						postShader.setUniforms(context, tickDelta, client, clientWorld);
 					}
 
 				}
@@ -163,8 +162,8 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 	}
 
 	private boolean needsShadowMap() {
-		DestroyingMinecraftConfig.ShaderType type = DestroyingMinecraftConfig.shaderType;
-		return type == DestroyingMinecraftConfig.ShaderType.BLACK_HOLE || type == DestroyingMinecraftConfig.ShaderType.SUPERNOVA || type == DestroyingMinecraftConfig.ShaderType.NUKE;
+		ShaderType type = DestroyingMinecraftConfig.shaderType;
+		return type == ShaderType.BLACK_HOLE || type == ShaderType.SUPERNOVA || type == ShaderType.NUKE;
 	}
 
 	private void enableDynamicBuffers() {

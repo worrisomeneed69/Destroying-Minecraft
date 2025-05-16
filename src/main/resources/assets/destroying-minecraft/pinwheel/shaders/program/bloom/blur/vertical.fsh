@@ -3,6 +3,8 @@ uniform sampler2D HandDepth;
 uniform sampler2D DepthComponent;
 
 uniform vec2 ScreenSize;
+uniform float xLimit;
+uniform float blurStrength;
 
 in vec2 texCoord;
 out vec4 fragColor;
@@ -36,14 +38,14 @@ const float WEIGHTS[11] = float[11](
     0.0020726777103066527
 );
 
-const vec2 multiplier = vec2(0.0, 0.5);
+vec2 multiplier = vec2(0.0, 0.1 * blurStrength);
 
 void main() {
-    if(texCoord.x < 0.53) {
+    if(texCoord.x <= xLimit) {
         //half the offset for better results on lower mipmaps
         vec4 color = texture(DiffuseSampler, texCoord + vec2(OFFSETS[5]/ScreenSize) * multiplier) * WEIGHTS[5];
         float count = 1.0;
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < 5; i++) {
             color += texture(DiffuseSampler, texCoord + vec2(OFFSETS[i+6]/ScreenSize) * multiplier) * WEIGHTS[i+6];
             color += texture(DiffuseSampler, texCoord + vec2(OFFSETS[i]/ScreenSize) * multiplier) * WEIGHTS[i];
             count += 1;
