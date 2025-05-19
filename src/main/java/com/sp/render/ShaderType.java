@@ -19,23 +19,28 @@ public enum ShaderType {
 
     final List<Identifier> enabledShaders;
 
-    ShaderType(boolean useUniversal, @Nullable Identifier ... identifiers) {
+    ShaderType(boolean skyAndShadows, @Nullable Identifier ... identifiers) {
         this.enabledShaders = new ArrayList<>();
+        boolean enabled = false;
 
         //Shadows and sky are universal
-        if(useUniversal) {
+        if(skyAndShadows) {
             this.enabledShaders.add(DestroyingMinecraftClient.shadowPostShader.getPost());
             this.enabledShaders.add(DestroyingMinecraftClient.supernovaPostShader.getPost());
+            enabled = true;
         }
 
         //then add whatever shader after
         if(identifiers != null) {
             this.enabledShaders.addAll(Arrays.stream(identifiers).toList());
+            enabled = true;
         }
 
-        //finally add bloom and post to all of it
-        this.enabledShaders.add(DestroyingMinecraftClient.bloomPostShader.getPost());
-        this.enabledShaders.add(DestroyingMinecraftClient.postProcessingPostShader.getPost());
+        //finally add bloom and post to all of it if any shader is enabled
+        if(enabled) {
+            this.enabledShaders.add(DestroyingMinecraftClient.bloomPostShader.getPost());
+            this.enabledShaders.add(DestroyingMinecraftClient.postProcessingPostShader.getPost());
+        }
     }
 
     public List<Identifier> getEnabledShaders() {

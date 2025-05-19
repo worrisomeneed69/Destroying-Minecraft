@@ -38,7 +38,7 @@ const float WEIGHTS[11] = float[11](
     0.0020726777103066527
 );
 
-vec2 multiplier = vec2(1.665 * blurStrength, 0.0);
+vec2 multiplier = vec2(0.5 * blurStrength, 0.0);
 
 void main() {
     if(texCoord.x <= xLimit) {
@@ -46,8 +46,8 @@ void main() {
         vec4 color = texture(DiffuseSampler, texCoord + vec2(OFFSETS[5]/ScreenSize) * multiplier) * WEIGHTS[5];
         float count = 1.0;
         for(int i = 0; i < 5; i++) {
-            color += texture(DiffuseSampler, texCoord + vec2(OFFSETS[i+6]/ScreenSize) * multiplier * (0.5 *(i)) ) * WEIGHTS[i+6];
-            color += texture(DiffuseSampler, texCoord + vec2(OFFSETS[i]/ScreenSize) * multiplier * (0.5 *(i)) ) * WEIGHTS[i];
+            color += texture(DiffuseSampler, texCoord + vec2(OFFSETS[i+6]/ScreenSize) * multiplier) * WEIGHTS[i+6];
+            color += texture(DiffuseSampler, texCoord + vec2(OFFSETS[i]/ScreenSize) * multiplier) * WEIGHTS[i];
             count += 1;
         }
 

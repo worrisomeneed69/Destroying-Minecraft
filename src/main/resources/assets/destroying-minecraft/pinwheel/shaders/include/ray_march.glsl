@@ -41,9 +41,18 @@ float sdCappedCone( vec3 p, float h, float r1, float r2 ) {
     return s*sqrt( min(dot2(ca),dot2(cb)) );
 }
 
+float sdCone( vec3 p, vec2 c, float h ){
+    float q = length(p.xz);
+    return max(dot(c.xy,vec2(q,p.y)),-h-p.y);
+}
+
 float sdCylinder(vec3 p, float h, float r ) {
     vec2 d = abs(vec2(length(p.xz),p.y)) - vec2(r,h);
     return min(max(d.x,d.y),0.0) + length(max(d,0.0));
+}
+
+float sdInfCylinder( vec3 p, vec3 c ) {
+    return length(p.xz-c.xy)-c.z;
 }
 
 float sdRoundedCylinder( vec3 p, float ra, float rb, float h ){
@@ -54,6 +63,12 @@ float sdRoundedCylinder( vec3 p, float ra, float rb, float h ){
 float sdTorus( vec3 p, vec2 t ) {
     vec2 q = vec2(length(p.xz)-t.x,p.y);
     return length(q)-t.y;
+}
+
+float sdEllipsoid( vec3 p, vec3 r ) {
+    float k0 = length(p/r);
+    float k1 = length(p/(r*r));
+    return k0*(k0-1.0)/k1;
 }
 
 mat2 rot2D(float angle) {

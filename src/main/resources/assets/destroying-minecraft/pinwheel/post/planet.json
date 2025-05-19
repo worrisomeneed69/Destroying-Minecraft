@@ -3,11 +3,24 @@
         {
             "type": "veil:blit",
             "shader": "destroying-minecraft:planet/planet",
-            "in": "minecraft:main",
-            "out": "veil:post"
+            "in": "destroying-minecraft:bloom/bloom_start",
+            "out": "swap"
+        },
+        {
+            "type": "veil:copy",
+            "in": "swap",
+            "out": "destroying-minecraft:bloom/bloom_start"
         }
     ],
     "framebuffers": {
+        "swap": {
+            "depth": false,
+            "format": "R11F_G11F_B10F",
+            "autoClear": true,
+            "filter": {
+                "blur": true
+            }
+        }
     },
     "textures": {
         "PlanetColor": {
@@ -29,6 +42,11 @@
         "NoiseTexture": {
             "type": "location",
             "location": "destroying-minecraft:textures/shaders/planet/noise_texture.png"
+        },
+        "MaterialSampler": {
+            "type": "framebuffer",
+            "name": "veil:dynamic_main",
+            "sampler": 6
         }
     }
 }

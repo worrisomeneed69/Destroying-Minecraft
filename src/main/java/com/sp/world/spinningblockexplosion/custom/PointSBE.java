@@ -34,7 +34,7 @@ public class PointSBE extends SpinningBlockExplosion {
                             SpinningBlockEntity spinningBlockEntity = SpinningBlockEntity.spawnFromBlock(world, mutable, world.getBlockState(mutable));
 
                             spinningBlockEntity.setVelocity(mutable.toCenterPos().subtract(this.position).normalize());
-                            spinningBlockEntity.addVelocityInternal(new Vec3d(-1, 1, -1));
+                            spinningBlockEntity.addVelocityInternal(new Vec3d(0, 1, 0));
                         }
 
                         world.setBlockState(mutable, Blocks.AIR.getDefaultState());

@@ -1,0 +1,10 @@
+{
+  "vertex": "destroying-minecraft:meteor/meteor",
+  "fragment": "destroying-minecraft:meteor/meteor",
+  "textures": {
+    "PebbleDepth": {
+      "type": "location",
+      "location": "destroying-minecraft:textures/shaders/planet/shadertoy_depth.png"
+    }
+  }
+}

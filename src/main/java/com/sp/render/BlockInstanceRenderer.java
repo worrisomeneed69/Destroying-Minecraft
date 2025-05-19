@@ -1,7 +1,8 @@
-package com.sp.render.rendertimers.blackhole;
+package com.sp.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.DestroyingMinecraft;
+import com.sp.render.materialsampler.CustomRenderLayersAndVertexFormats;
 import com.sp.util.BetterUniforms;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
@@ -22,19 +23,13 @@ public class BlockInstanceRenderer {
     private static final Identifier gravelTexture = Identifier.ofVanilla("textures/block/gravel.png");
     private static final Identifier deepslateTexture = Identifier.ofVanilla("textures/block/deepslate.png");
 
-    public static final VertexFormat POSITION_TEXTURE_NORMAL = VertexFormat.builder()
-            .add("Position", VertexFormatElement.POSITION)
-            .add("UV0", VertexFormatElement.UV_0)
-            .add("Normal", VertexFormatElement.NORMAL)
-            .build();
-
 
 
 
     public BlockInstanceRenderer() {
         this.vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS, POSITION_TEXTURE_NORMAL);
+        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS, CustomRenderLayersAndVertexFormats.POSITION_TEXTURE_NORMAL);
 
         this.createCube(bufferBuilder, 0, 0, 0, 1, 1, 1);
 

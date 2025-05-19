@@ -38,7 +38,7 @@ const float WEIGHTS[11] = float[11](
     0.0020726777103066527
 );
 
-vec2 multiplier = vec2(0.0, 0.1 * blurStrength);
+vec2 multiplier = vec2(0.0, 0.5 * blurStrength);
 
 void main() {
     if(texCoord.x <= xLimit) {

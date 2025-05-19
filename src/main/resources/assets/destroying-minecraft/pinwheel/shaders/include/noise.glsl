@@ -1,4 +1,7 @@
 
+float rand(float value) {
+    return fract(sin(dot(value, 78.223)) * 43758.5453);
+}
 
 float rand(vec2 coord) {
     return fract(sin(dot(coord, vec2(12.9898, 78.223))) * 43758.5453) * 2.0 - 1.0;

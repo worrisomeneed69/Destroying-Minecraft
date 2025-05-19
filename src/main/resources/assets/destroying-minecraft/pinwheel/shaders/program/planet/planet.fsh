@@ -7,6 +7,7 @@
 
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DiffuseDepthSampler;
+uniform isampler2D MaterialSampler;
 uniform sampler2D PlanetColor;
 uniform sampler2D PebbleDepth;
 
@@ -135,11 +136,11 @@ void rayMarch(in out vec3 rayPos, in vec3 rayOrigin, in vec3 rayDir, in float wo
         shadow = min(shadow, 8*d/dist);
 
         dist += d;
-        if(d < minDist){
+        if(d < minDist) {
             rayPos = rayOrigin + rayDir * dist;
             hit = true;
             break;
-        } else if(d > maxDist || (worldDepth < 256.0 && worldDepth < dist)){
+        } else if(d > maxDist || (worldDepth < 256.0 && worldDepth < dist)) {
             rayPos = rayOrigin + rayDir * dist;
             break;
         }
@@ -149,6 +150,7 @@ void rayMarch(in out vec3 rayPos, in vec3 rayOrigin, in vec3 rayDir, in float wo
 void main() {
     vec4 mainTexture = texture(DiffuseSampler, texCoord);
     float depth = texture(DiffuseDepthSampler, texCoord).r;
+    uint material = texture(MaterialSampler, texCoord).r;
 
     vec3 playerSpace = screenToLocalSpace(texCoord, depth).xyz;
     float worldDepth = length(playerSpace);
@@ -199,7 +201,11 @@ void main() {
         fragColor = mainTexture;
     }
 
-
+    if(material == 5) {
+        fragColor *= 10;
+    } else if(material == 6){
+        fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    }
 
 
 }
