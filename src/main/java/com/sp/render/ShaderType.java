@@ -9,38 +9,34 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum ShaderType {
-    NONE      (false, null),
-    NUKE      (true,  DestroyingMinecraftClient.nukePostShader.getPost()),
-    CRACKS    (true,  DestroyingMinecraftClient.cracksPostShader.getPost()),
-    PLANET    (true,  DestroyingMinecraftClient.planetPostShader.getPost()),
-    SUPERNOVA (true,  null),
-    BLACK_HOLE(true,  DestroyingMinecraftClient.blackHolePostShader.getPost()),
-    EARTH     (false, DestroyingMinecraftClient.earthPostShader.getPost());
+    NONE      (false, false, false, false, null),
+    NUKE      (DestroyingMinecraftClient.nukePostShader.getPost()),
+    CRACKS    (DestroyingMinecraftClient.cracksPostShader.getPost()),
+    PLANET    (DestroyingMinecraftClient.planetPostShader.getPost()),
+    SUPERNOVA (null),
+    BLACK_HOLE(true, false, true, true,  DestroyingMinecraftClient.blackHolePostShader.getPost()),
+    EARTH     (false, false, true, true, DestroyingMinecraftClient.earthPostShader.getPost());
 
     final List<Identifier> enabledShaders;
 
-    ShaderType(boolean skyAndShadows, @Nullable Identifier ... identifiers) {
-        this.enabledShaders = new ArrayList<>();
-        boolean enabled = false;
+    ShaderType(@Nullable Identifier ... identifiers) {
+        this(true, true, true, true, identifiers);
+    }
 
-        //Shadows and sky are universal
-        if(skyAndShadows) {
-            this.enabledShaders.add(DestroyingMinecraftClient.shadowPostShader.getPost());
-            this.enabledShaders.add(DestroyingMinecraftClient.supernovaPostShader.getPost());
-            enabled = true;
-        }
+    ShaderType(boolean enableShadows, boolean enableSky, boolean enableBloom, boolean enablePost, @Nullable Identifier ... identifiers) {
+        this.enabledShaders = new ArrayList<>();
+
+        if(enableShadows) this.enabledShaders.add(DestroyingMinecraftClient.shadowPostShader.getPost());
+        if(enableSky) this.enabledShaders.add(DestroyingMinecraftClient.supernovaPostShader.getPost());
 
         //then add whatever shader after
         if(identifiers != null) {
             this.enabledShaders.addAll(Arrays.stream(identifiers).toList());
-            enabled = true;
         }
 
         //finally add bloom and post to all of it if any shader is enabled
-        if(enabled) {
-            this.enabledShaders.add(DestroyingMinecraftClient.bloomPostShader.getPost());
-            this.enabledShaders.add(DestroyingMinecraftClient.postProcessingPostShader.getPost());
-        }
+        if(enableBloom) this.enabledShaders.add(DestroyingMinecraftClient.bloomPostShader.getPost());
+        if(enablePost) this.enabledShaders.add(DestroyingMinecraftClient.postProcessingPostShader.getPost());
     }
 
     public List<Identifier> getEnabledShaders() {
