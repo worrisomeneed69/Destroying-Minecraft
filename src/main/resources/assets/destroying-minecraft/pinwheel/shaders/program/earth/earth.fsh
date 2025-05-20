@@ -26,7 +26,7 @@ const vec3 sunColor = vec3(1, 0.8, 0.6);
 
 const float maxRaymarchDist = 1000;
 
-bool cube = false;
+bool cube = true;
 
 vec3 centerPos = vec3(-692, 69, 552);
 vec3 lightDir = normalize(vec3(0, 0, -1));
@@ -188,7 +188,8 @@ void rayMarchCloudLayer(inout vec4 color, out vec3 normal, float depth) {
 void main() {
     vec3 cameraPos = VeilCamera.CameraPosition;
     vec3 rayDir = viewDirFromUv(texCoord);
-    vec4 color = texture(StarsTexture, rayDir.xy*0.75);
+    vec4 color = texture(DiffuseSampler, texCoord);
+//    vec4 color = texture(StarsTexture, rayDir.xy*0.75);
 
     vec3 normal = vec3(0.0);
 
@@ -197,7 +198,7 @@ void main() {
 
     float light = 1 / (length((rayDir) - lightDir)*20);
 
-    color.rgb += sunColor * light;
+//    color.rgb += sunColor * light;
 
     rayMarch(color, normal, depth);
 //    rayMarchCloudLayer(color, normal, depth);

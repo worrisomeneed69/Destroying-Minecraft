@@ -134,7 +134,7 @@ void main() {
                     break;
                 }
             }
-//            color = texture(StarsTexture, rayDir.xy*0.75)*10;
+//            color = texture(StarsTexture, rayDir.xy*0.75)*3;
         }
 
         if(hit) {

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+//@SuppressWarnings("unused")
 public enum ShaderType {
     NONE      (false, false, false, false, null),
     NUKE      (DestroyingMinecraftClient.nukePostShader.getPost()),
