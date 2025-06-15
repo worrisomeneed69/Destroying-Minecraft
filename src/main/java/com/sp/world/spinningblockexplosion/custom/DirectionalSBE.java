@@ -1,5 +1,7 @@
 package com.sp.world.spinningblockexplosion.custom;
 
+import com.sp.entity.ModEntities;
+import com.sp.entity.custom.SpinningBlockEntity;
 import com.sp.world.spinningblockexplosion.SpinningBlockExplosion;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -32,7 +34,14 @@ public class DirectionalSBE extends SpinningBlockExplosion {
 
             for (int x = -width; x < width; x++) {
                 if(this.random.nextFloat() < blockDensity) {
+                    SpinningBlockEntity spinningBlockEntity = ModEntities.SPINNING_BLOCK.create(world);
+                    if (spinningBlockEntity == null) return;
 
+                    Vec3d newBlockPos = new Vec3d(x, -5, this.progress - length*2).rotateY((float) Math.toRadians(this.angle));
+
+                    spinningBlockEntity.refreshPositionAndAngles(this.position.add(newBlockPos), 0, 0);
+
+                    world.spawnEntity(spinningBlockEntity);
                 }
             }
             this.delay = 0;

@@ -1,6 +1,7 @@
 package com.sp.item.custom;
 
-import com.sp.render.CameraShake;
+import com.sp.render.camerashake.custom.CameraShakeInstance;
+import com.sp.render.camerashake.CameraShakeManager;
 import foundry.veil.api.client.util.Easing;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -18,7 +19,8 @@ public class CameraShakeStick extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if(world.isClient){
-            CameraShake cameraShake = new CameraShake(0.75f, 100, Easing.LINEAR);
+            CameraShakeInstance cameraShakeInstance = new CameraShakeInstance(0.75f, 100, Easing.LINEAR);
+            CameraShakeManager.addCameraShake(cameraShakeInstance);
         }
         return super.use(world, user, hand);
     }

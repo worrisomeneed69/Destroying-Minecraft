@@ -1,7 +1,7 @@
 package com.sp.mixin.camerashake;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.sp.render.CameraShake;
+import com.sp.render.camerashake.CameraShakeManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.RenderTickCounter;
@@ -25,7 +25,7 @@ public class CameraRollMixin {
         PlayerEntity player = this.client.player;
 
         if (player != null) {
-            matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) CameraShake.getzRotation()));
+            matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) CameraShakeManager.getTotalRoll()));
         }
     }
 

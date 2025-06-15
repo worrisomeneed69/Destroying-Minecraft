@@ -2,7 +2,7 @@ package com.sp.render.postshaders.custom;
 
 import com.sp.DestroyingMinecraft;
 import com.sp.render.postshaders.PostShader;
-import com.sp.render.rendertimers.nuke.NukeRenderTimer;
+import com.sp.render.rendertimers.NukeRenderTimer;
 import net.minecraft.util.Identifier;
 
 public class NukePostShader extends PostShader {

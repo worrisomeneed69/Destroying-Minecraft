@@ -1,6 +1,6 @@
 package com.sp.mixin.camerashake;
 
-import com.sp.render.CameraShake;
+import com.sp.render.camerashake.CameraShakeManager;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.BlockView;
@@ -14,7 +14,7 @@ public class CameraMixin {
 
     @Inject(method = "update", at = @At("TAIL"))
     private void cameraShake(BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo ci){
-        CameraShake.totalTick((Camera) (Object) this);
+        CameraShakeManager.updateCamera((Camera) (Object) this);
     }
 
 }

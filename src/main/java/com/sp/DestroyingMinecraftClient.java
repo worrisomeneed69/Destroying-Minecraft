@@ -7,9 +7,9 @@ import com.sp.entity.client.renderer.MeteorEntityRenderer;
 import com.sp.entity.client.renderer.SpinningBlockEntityRenderer;
 import com.sp.mixin.PostProcessingManagerAccessor;
 import com.sp.networking.InitializePackets;
-import com.sp.render.CameraShake;
 import com.sp.render.ShaderType;
 import com.sp.render.ShadowMapRenderer;
+import com.sp.render.camerashake.CameraShakeManager;
 import com.sp.render.postshaders.PostShader;
 import com.sp.render.postshaders.custom.*;
 import com.sp.render.BlockInstanceRenderer;
@@ -123,9 +123,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 				this.enableDynamicBuffers();
 			}
 
-			for(CameraShake cameraShake : CameraShake.getAllInstances()){
-				cameraShake.individualTick();
-			}
+			CameraShakeManager.instancesTicks();
 		});
 
 		//Update every render timer

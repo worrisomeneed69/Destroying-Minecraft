@@ -2,7 +2,7 @@ package com.sp.render.postshaders.custom;
 
 import com.sp.DestroyingMinecraft;
 import com.sp.render.postshaders.PostShader;
-import com.sp.render.rendertimers.supernova.SupernovaRenderTimer;
+import com.sp.render.rendertimers.SupernovaRenderTimer;
 import com.sp.util.BetterUniforms;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import net.minecraft.client.MinecraftClient;

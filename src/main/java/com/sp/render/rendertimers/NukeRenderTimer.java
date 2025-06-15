@@ -1,6 +1,5 @@
-package com.sp.render.rendertimers.nuke;
+package com.sp.render.rendertimers;
 
-import com.sp.render.rendertimers.ExplosionRenderTimer;
 import com.sp.util.BetterUniforms;
 import com.sp.util.ShaderTimer;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
