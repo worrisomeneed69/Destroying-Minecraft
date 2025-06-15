@@ -20,7 +20,7 @@ public class MeteorEntity extends PersistentProjectileEntity {
     @Override
     public void tick() {
         super.tick();
-        System.out.println(this.inGround);
+
         if(!this.inGround && !this.isOnGround()) {
 
             this.setVelocity(new Vec3d(0, -1, -1));
@@ -29,9 +29,9 @@ public class MeteorEntity extends PersistentProjectileEntity {
 
         if(!this.getWorld().isClient) {
             if(this.inGround || this.isOnGround()) {
-                PointSBE explosion = new PointSBE(5, 0.5f, this.getPos());
-                explosion.beginExplosion();
-                discard();
+//                PointSBE explosion = new PointSBE(5, 0.5f, this.getPos());
+//                explosion.beginExplosion();
+//                discard();
             }
         }
 
