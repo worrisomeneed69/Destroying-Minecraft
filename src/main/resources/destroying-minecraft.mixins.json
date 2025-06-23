@@ -5,7 +5,8 @@
   "mixins": [
     "ForceRenderPlayerMixin",
     "collision.IsGroundedCheckMixin",
-    "collision.PlatformCollisionMixin"
+    "collision.PlatformCollisionMixin",
+    "collision.SneakFixMixinOnPlatforms"
   ],
   "injectors": {
     "defaultRequire": 1

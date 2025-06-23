@@ -71,12 +71,12 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 				}
 
 				//Only render the black hole terrain when rendering the black hole
-				if (stage == VeilRenderLevelStageEvent.Stage.AFTER_SKY){
-					if(this.blockInstanceRenderer == null){
+				if (stage == VeilRenderLevelStageEvent.Stage.AFTER_SKY) {
+					if (this.blockInstanceRenderer == null) {
 						this.blockInstanceRenderer = new BlockInstanceRenderer();
 					}
 
-					if(DestroyingMinecraftConfig.shaderType == ShaderType.BLACK_HOLE) {
+					if (DestroyingMinecraftConfig.shaderType == ShaderType.BLACK_HOLE) {
 						blockInstanceRenderer.render();
 					}
 				}

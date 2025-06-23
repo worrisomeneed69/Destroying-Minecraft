@@ -57,6 +57,7 @@ public class PhysicsBlockComponent implements AutoSyncedComponent {
                     rotationNbt.getFloat("z"),
                     rotationNbt.getFloat("w")
             );
+            this.sync();
         }
 
         if (nbtCompound.contains("blocks")) {
@@ -68,6 +69,7 @@ public class PhysicsBlockComponent implements AutoSyncedComponent {
                         return BlockPhysicsEntity.BlockData.fromNBT(blockNbt, wrapperLookup);
                     }).toList()
             );
+            this.sync();
         }
     }
 

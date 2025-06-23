@@ -51,12 +51,12 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
             drawBox(matrices, vertexConsumers, aabbCorner, entity, 0, 0, 255, 255);
         }
 
-        for (BlockPhysicsEntity.BlockData block : entity.blocks) {
-            BlockOBB obb = new BlockOBB(entity.rotation, block);
+        for (BlockPhysicsEntity.BlockData block : entity.component.getBlocks()) {
+            BlockOBB obb = new BlockOBB(entity.component.getRotation(), block);
 
             List<Vec3d> obbCorners = obb.getGlobalCorners(entity);
 
-            Vec3d globalPos = toVec3d(obb.rotation.transform(toVector3d(obb.blockData.offset))).add(entity.getPos());
+            Vec3d globalPos = toVec3d(obb.rotation.transform(toVector3d(Vec3d.of(obb.blockData.offset)))).add(entity.getPos());
 
             for (Vec3d normalAxi : obb.getNormalAxis()) {
                 Vec3d sideStart = globalPos.add(normalAxi.multiply(0.5));
