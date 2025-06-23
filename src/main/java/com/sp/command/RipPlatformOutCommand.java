@@ -43,7 +43,7 @@ public class RipPlatformOutCommand {
                                                 System.out.println("WORKING 1");
                                                 if (!state.isAir()) {
                                                     System.out.println("WORKING 1.5");
-                                                    component.addBlock(new BlockPhysicsEntity.BlockData(state.getBlock(), relativePos));
+                                                    component.addBlock(new BlockPhysicsEntity.BlockData(state, relativePos));
                                                     System.out.println("WORKING 2");
                                                 }
                                                 System.out.println("WORKING 3");

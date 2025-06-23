@@ -3,7 +3,6 @@ package com.sp.cca.custom;
 import com.sp.cca.InitializeComponents;
 import com.sp.entity.custom.BlockPhysicsEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
 import org.joml.Quaternionf;
@@ -66,7 +65,7 @@ public class PhysicsBlockComponent implements AutoSyncedComponent {
             this.setBlocks(
                     blockList.stream().map((nbtElement) -> {
                         NbtCompound blockNbt = (NbtCompound) nbtElement;
-                        return BlockPhysicsEntity.BlockData.fromNBT(blockNbt);
+                        return BlockPhysicsEntity.BlockData.fromNBT(blockNbt, wrapperLookup);
                     }).toList()
             );
         }

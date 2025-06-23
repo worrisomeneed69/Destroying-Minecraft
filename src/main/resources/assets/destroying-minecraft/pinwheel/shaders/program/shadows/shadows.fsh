@@ -125,9 +125,9 @@ void main() {
 //    vec3 ambientLight = (blockLight + 0.2*skyLight) * clamp(dot(worldNormal, worldNormal), 0.0, 1.0);
     vec3 outputColor;
     if (flashTimer > 0.0) {
-        outputColor = color.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)) + flash;
+        outputColor = albedoColor.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)) + flash;
     } else {
-        outputColor = color.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)*(1.0 - supernovaTimer));
+        outputColor = albedoColor.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)*(1.0 - supernovaTimer));
     }
 
 
@@ -136,8 +136,8 @@ void main() {
     }
 
 
-    fragColor = linear_fog(vec4(outputColor, 1.0), length(viewPos), FogEnd-70, FogEnd, vec4(SkyColor, 1.0));
-//    fragColor = vec4(outputColor, 1.0);
+//    fragColor = linear_fog(vec4(outputColor, 1.0), length(viewPos), FogEnd-70, FogEnd, vec4(SkyColor, 1.0));
+    fragColor = vec4(outputColor, 1.0);
     gl_FragDepth = depth;
 
 

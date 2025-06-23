@@ -3,12 +3,8 @@ package com.sp.entity.client.renderer;
 import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.PhysicsBlockComponent;
 import com.sp.entity.custom.BlockPhysicsEntity;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.debug.DebugRenderer;
 import net.minecraft.client.render.entity.EntityRenderer;
@@ -16,8 +12,11 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.world.World;
 import org.joml.Vector3d;
 
 public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntity> {
@@ -169,6 +168,11 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
 
         PhysicsBlockComponent component = InitializeComponents.PHYSICS_BLOCK.get(entity);
 
+        World world = entity.getWorld();
+        if (world == null) {
+            return;
+        }
+
         for (BlockPhysicsEntity.BlockData blockData : component.getBlocks()) {
             matrices.push();
 
@@ -176,35 +180,21 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
             matrices.translate(-.5, -.5, -.5);
             matrices.translate(blockData.offset.getX(), blockData.offset.getY(), blockData.offset.getZ());
 
-            if (blockData.block == Blocks.GRASS_BLOCK) {
-                // For grass blocks, render using the default method without tinting
-                blockModelRenderer.renderBlockAsEntity(
-                        blockData.block.getDefaultState(),
-                        matrices,
-                        vertexConsumers,
-                        light,
-                        OverlayTexture.DEFAULT_UV
-                );
-            } else {
-                // For other blocks, use the previous tinting approach
-                int biomeColor = MinecraftClient.getInstance().getBlockColors().getColor(
-                        blockData.block.getDefaultState(),
-                        entity.getWorld(),
-                        entity.getBlockPos(),
-                        0
-                );
-                float red = ((biomeColor >> 16) & 0xFF) / 255.0F;
-                float green = ((biomeColor >> 8) & 0xFF) / 255.0F;
-                float blue = (biomeColor & 0xFF) / 255.0F;
+            BlockState blockState = blockData.blockState;
+            BlockPos blockPos = BlockPos.ofFloored(entity.getX(), entity.getBoundingBox().maxY, entity.getZ());
 
-                blockModelRenderer.getModelRenderer().render(
-                        matrices.peek(),
-                        vertexConsumers.getBuffer(RenderLayer.getSolid()),
-                        blockData.block.getDefaultState(),
-                        blockModelRenderer.getModel(blockData.block.getDefaultState()),
-                        red, green, blue, light, OverlayTexture.DEFAULT_UV
-                );
-            }
+            blockModelRenderer.getModelRenderer().render(
+                    world,
+                    blockModelRenderer.getModel(blockState),
+                    blockState,
+                    blockPos,
+                    matrices,
+                    vertexConsumers.getBuffer(RenderLayers.getMovingBlockLayer(blockState)),
+                    true,
+                    Random.create(),
+                    1,
+                    OverlayTexture.DEFAULT_UV
+            );
             matrices.pop();
         }
     }

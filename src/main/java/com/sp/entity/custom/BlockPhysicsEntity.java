@@ -4,14 +4,16 @@ import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.PhysicsBlockComponent;
 import com.sp.collision.BlockOBB;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtHelper;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -21,6 +23,7 @@ import org.joml.Vector3d;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class BlockPhysicsEntity extends Entity {
     public PhysicsBlockComponent component;
@@ -222,13 +225,13 @@ public class BlockPhysicsEntity extends Entity {
     }
 
     public static class BlockData {
-        public Block block;
+        public BlockState blockState;
         public BlockPos offset;
 
         public PacketByteBuf buf;
 
-        public BlockData(Block block, BlockPos offset) {
-            this.block = block;
+        public BlockData(BlockState blockState, BlockPos offset) {
+            this.blockState = blockState;
             this.offset = offset;
         }
 
@@ -238,19 +241,21 @@ public class BlockPhysicsEntity extends Entity {
 
         public NbtCompound asNBT() {
             NbtCompound nbt = new NbtCompound();
-            nbt.putString("block", Registries.BLOCK.getId(block).toString());
+            nbt.put("block", NbtHelper.fromBlockState(this.blockState));
             nbt.putInt("offsetX", offset.getX());
             nbt.putInt("offsetY", offset.getY());
             nbt.putInt("offsetZ", offset.getZ());
             return nbt;
         }
 
-        public static BlockData fromNBT(NbtCompound nbt) {
-            String blockId = nbt.getString("block");
-            Block block = Registries.BLOCK.get(Identifier.of(blockId));
+        public static BlockData fromNBT(NbtCompound nbt, RegistryWrapper.WrapperLookup wrapperLookup) {
+            NbtCompound blockStateCompound = nbt.getCompound("block");
+            Optional<RegistryWrapper.Impl<Block>> wrapper = wrapperLookup.getOptionalWrapper(RegistryKeys.BLOCK);
+
+            BlockState blockState1 = NbtHelper.toBlockState(wrapper.orElse(Registries.BLOCK.getReadOnlyWrapper()), blockStateCompound);
 
             BlockPos offset = new BlockPos(nbt.getInt("offsetX"), nbt.getInt("offsetY"), nbt.getInt("offsetZ"));
-            return new BlockData(block, offset);
+            return new BlockData(blockState1, offset);
         }
     }
 }
