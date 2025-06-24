@@ -32,76 +32,70 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
         return null;
     }
 
-    public static Vector3d toVector3d(Vec3d vec) {
-        return new Vector3d(vec.x, vec.y, vec.z);
-    }
 
-    public static Vec3d toVec3d(Vector3d vec) {
-        return new Vec3d(vec.x, vec.y, vec.z);
-    }
 
     @Override
     public void render(BlockPhysicsEntity entity, float fyaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         super.render(entity, fyaw, tickDelta, matrices, vertexConsumers, light);
 
-        /*
-        List<Vec3d> aabbCorners = BlockOBB.getAABBCorners(MinecraftClient.getInstance().player.getBoundingBox());
 
-        for (Vec3d aabbCorner : aabbCorners) {
-            drawBox(matrices, vertexConsumers, aabbCorner, entity, 0, 0, 255, 255);
-        }
+//        List<Vec3d> aabbCorners = BlockOBB.getAABBCorners(MinecraftClient.getInstance().player.getBoundingBox());
+//
+////        for (Vec3d aabbCorner : aabbCorners) {
+////            drawBox(matrices, vertexConsumers, aabbCorner, entity, 0, 0, 255, 255);
+////        }
+//
+//        for (BlockPhysicsEntity.BlockData block : entity.component.getBlocks()) {
+//            BlockOBB obb = new BlockOBB(entity.component.getRotation(), block);
+//
+//            List<Vec3d> obbCorners = obb.getGlobalCorners(entity);
+//
+//            Vec3d globalPos = MathUtil.toVec3d(obb.rotation.transform(MathUtil.toVector3d(Vec3d.of(obb.blockData.offset)))).add(entity.getPos());
+//
+////            for (Vec3d normalAxi : obb.getNormalAxis()) {
+////                Vec3d sideStart = globalPos.add(normalAxi.multiply(0.5));
+////
+////                drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideStart.add(normalAxi), 0, 0, 255, 255);
+////            }
+//
+////            for (Vec3d globalCorner : obb.getGlobalCorners(entity)) {
+////                drawBox(matrices, vertexConsumers, globalCorner, entity, 255, 0, 0, 255);
+////            }
+//
+//            List<Vec3d> allAxis = obb.getAABBNormalAxis();
+//            allAxis.addAll(obb.getNormalAxis());
+////            allAxis.addAll(obb.getCrossProductAxis(obb.getNormalAxis(), obb.getAABBNormalAxis()));
+//
+//            for (Vec3d axis : allAxis) {
+//                Vec3d sideStart = globalPos.add(axis.multiply(2));
+//                Vec3d sideEnd = globalPos.add(axis.multiply(-2));
+//
+////                drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideEnd, 255, 255, 0, 255);
+//
+//                double obbMin = Double.MAX_VALUE, obbMax = -Double.MAX_VALUE;
+//                double aabbMin = Double.MAX_VALUE, aabbMax = -Double.MAX_VALUE;
+//
+//                for (Vec3d corner : obbCorners) {
+//                    double projection = axis.dotProduct(corner);
+//                    obbMin = Math.min(obbMin, projection);
+//                    obbMax = Math.max(obbMax, projection);
+//                }
+//
+//                for (Vec3d aabbCorner : aabbCorners) {
+//                    double projection = axis.dotProduct(aabbCorner);
+//                    aabbMin = Math.min(aabbMin, projection);
+//                    aabbMax = Math.max(aabbMax, projection);
+//                }
+//
+//                if (obbMax < aabbMin || obbMin > aabbMax) {
+//                    drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideEnd, 0, 255, 0, 255);
+//                } else {
+//                    drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideEnd, 255, 0, 0, 255);
+//                }
+//            }
+//        }
 
-        for (BlockPhysicsEntity.BlockData block : entity.component.getBlocks()) {
-            BlockOBB obb = new BlockOBB(entity.component.getRotation(), block);
 
-            List<Vec3d> obbCorners = obb.getGlobalCorners(entity);
-
-            Vec3d globalPos = toVec3d(obb.rotation.transform(toVector3d(Vec3d.of(obb.blockData.offset)))).add(entity.getPos());
-
-            for (Vec3d normalAxi : obb.getNormalAxis()) {
-                Vec3d sideStart = globalPos.add(normalAxi.multiply(0.5));
-
-                drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideStart.add(normalAxi), 0, 0, 255, 255);
-            }
-
-            for (Vec3d globalCorner : obb.getGlobalCorners(entity)) {
-                drawBox(matrices, vertexConsumers, globalCorner, entity, 255, 0, 0, 255);
-            }
-
-            List<Vec3d> allAxis = obb.getAABBNormalAxis();
-            allAxis.addAll(obb.getNormalAxis());
-            allAxis.addAll(obb.getCrossProductAxis(obb.getNormalAxis(), obb.getAABBNormalAxis()));
-
-            for (Vec3d axis : allAxis) {
-                Vec3d sideStart = globalPos.add(axis.multiply(2));
-                Vec3d sideEnd = globalPos.add(axis.multiply(-2));
-
-                drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideEnd, 255, 255, 0, 255);
-
-                double obbMin = Double.MAX_VALUE, obbMax = -Double.MAX_VALUE;
-                double aabbMin = Double.MAX_VALUE, aabbMax = -Double.MAX_VALUE;
-
-                for (Vec3d corner : obbCorners) {
-                    double projection = axis.dotProduct(corner);
-                    obbMin = Math.min(obbMin, projection);
-                    obbMax = Math.max(obbMax, projection);
-                }
-
-                for (Vec3d aabbCorner : aabbCorners) {
-                    double projection = axis.dotProduct(aabbCorner);
-                    aabbMin = Math.min(aabbMin, projection);
-                    aabbMax = Math.max(aabbMax, projection);
-                }
-
-                if (obbMax < aabbMin || obbMin > aabbMax) {
-                    drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideEnd, 0, 255, 0, 255);
-                } else {
-                    drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideEnd, 255, 0, 0, 255);
-                }
-            }
-        }
-
-         */
 
         /*
         List<Vec3d> aabbCorners = BlockOBB.getAABBCorners(MinecraftClient.getInstance().player.getBoundingBox());
@@ -163,8 +157,6 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
             drawLine(matrices, vertexConsumers, entity.getPos(), MinecraftClient.getInstance().player.getPos(), newPos, 0, 0, 255, 255);
         }
          */
-
-        // FIXME: Colors and light are horribly of.
 
         PhysicsBlockComponent component = InitializeComponents.PHYSICS_BLOCK.get(entity);
 

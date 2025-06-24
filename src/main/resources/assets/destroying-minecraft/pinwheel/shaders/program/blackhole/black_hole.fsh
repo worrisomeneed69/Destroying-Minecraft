@@ -85,7 +85,7 @@ vec3 projectAndDivide(mat4 projMat, vec3 position){
 
 void main() {
     vec3 cameraPos = VeilCamera.CameraPosition;
-    vec3 BH_POS = cameraPos + vec3(0, 1, -3.2);
+    vec3 BH_POS = cameraPos + vec3(0.0, 1.0, -3.2);
 //    vec3 BH_POS = vec3(-96, 80, 156);
 
 //    vec4 color = texture(DiffuseSampler, texCoord) * ColorModulator;
@@ -129,7 +129,7 @@ void main() {
             //Hit Accretion Disk
             if (diskDist <= 0.001) {
                 hit = true;
-                raymarchAccretionDisk(rayPos, clamp(diskDist * 1000, 0.0, 1.0), BH_POS, BHcolor);
+                raymarchAccretionDisk(rayPos, clamp(diskDist * 1000.0, 0.0, 1.0), BH_POS, BHcolor);
                 if (BHcolor.a >= 1.0) {
                     break;
                 }
@@ -145,7 +145,7 @@ void main() {
         }
 
 
-        if(prevTexcoord.x >= 0 && prevTexcoord.x <= 1.0 && prevTexcoord.y >= 0 && prevTexcoord.y <= 1.0) {
+        if(prevTexcoord.x >= 0.0 && prevTexcoord.x <= 1.0 && prevTexcoord.y >= 0.0 && prevTexcoord.y <= 1.0) {
             if(prevDepth >= 1.0){
                 fragColor = mix(fragColor, texture(PrevSampler, prevTexcoord), 0.9);
             }

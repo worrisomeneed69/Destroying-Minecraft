@@ -35,7 +35,7 @@ void main() {
     float dist = max(abs(depth - centerDepth), 0.0);
 //    dist = dist * dist;
 
-    float blur = smoothstep(0, 0.15, dist);
+    float blur = smoothstep(0.0, 0.15, dist);
 //    blur *= blur * blur;
 
 //    float steps = 0.0;

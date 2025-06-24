@@ -2,6 +2,7 @@ package com.sp.collision;
 
 import com.sp.entity.client.renderer.BlockPhysicsEntityRenderer;
 import com.sp.entity.custom.BlockPhysicsEntity;
+import com.sp.util.MathUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -38,7 +39,7 @@ public class BlockOBB {
         for (int i = 0; i < corners.length; i++) {
             Vec3d corner = corners[i];
 
-            Vec3d newCornerPos = BlockPhysicsEntityRenderer.toVec3d(rotation.transform(BlockPhysicsEntityRenderer.toVector3d(corner.add(new Vec3d(blockData.offset.getX(), blockData.offset.getY(), blockData.offset.getZ())))));
+            Vec3d newCornerPos = MathUtil.toVec3d(rotation.transform(MathUtil.toVector3d(corner.add(new Vec3d(blockData.offset.getX(), blockData.offset.getY(), blockData.offset.getZ())))));
 
             corners[i] = newCornerPos.add(-.5, -.5, -.5);
         }
@@ -74,7 +75,7 @@ public class BlockOBB {
 
         for (int i = 0; i < axis.length; i++) {
             Vec3d axisVec = axis[i];
-            axis[i] = BlockPhysicsEntityRenderer.toVec3d(this.rotation.transform(BlockPhysicsEntityRenderer.toVector3d(axisVec))).normalize();
+            axis[i] = MathUtil.toVec3d(this.rotation.transform(axisVec.toVector3f())).normalize();
         }
 
         return Arrays.asList(axis);
@@ -294,7 +295,7 @@ public class BlockOBB {
 
         List<Vec3d> allAxis = getAABBNormalAxis();
         allAxis.addAll(this.getNormalAxis());
-        allAxis.addAll(this.getCrossProductAxis(this.getNormalAxis(), getAABBNormalAxis()));
+//        allAxis.addAll(this.getCrossProductAxis(this.getNormalAxis(), getAABBNormalAxis()));
 
         double minOverlap = Double.MAX_VALUE;
         Vec3d minAxis = null;
@@ -306,8 +307,8 @@ public class BlockOBB {
                 continue;
             }
 
-            double obbMin = Double.MAX_VALUE, obbMax = -Double.MAX_VALUE;
-            double aabbMin = Double.MAX_VALUE, aabbMax = -Double.MAX_VALUE;
+            double obbMin = Double.MAX_VALUE, obbMax = Double.MIN_VALUE;
+            double aabbMin = Double.MAX_VALUE, aabbMax = Double.MIN_VALUE;
 
             for (Vec3d corner : obbCorners) {
                 double projection = axis.dotProduct(corner);

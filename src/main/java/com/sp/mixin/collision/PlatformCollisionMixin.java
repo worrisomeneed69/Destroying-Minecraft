@@ -9,6 +9,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 import java.util.List;
 
@@ -39,13 +40,14 @@ public abstract class PlatformCollisionMixin {
                 for (BlockPhysicsEntity blockPhysicsEntity : blockPhysicsEntities) {
                     if (blockPhysicsEntity != null) {
 
-                        double yAxisCollision = blockPhysicsEntity.getYAxisCollision(entityBoundingBox.offset(adjustedMovement));
-
-                        if (yAxisCollision < 0.1 && yAxisCollision > 1e-7) {
-                            //blockPhysicsEntity.collidingEntities.add(entity);
-                            adjustedMovement = adjustedMovement.add(0, yAxisCollision, 0);
-                            adjustedMovement = adjustedMovement.add(blockPhysicsEntity.getVelocity());
-                            continue;
+                        if (movement.y != 0) {
+                            double yAxisCollision = blockPhysicsEntity.getYAxisCollision(entityBoundingBox.offset(adjustedMovement));
+                            if (yAxisCollision < 0.1 && yAxisCollision > 1e-7) {
+                                //blockPhysicsEntity.collidingEntities.add(entity);
+                                adjustedMovement = adjustedMovement.add(0, yAxisCollision, 0);
+                                adjustedMovement = adjustedMovement.add(blockPhysicsEntity.getVelocity());
+                                continue;
+                            }
                         }
 
                         Vec3d newAdjustment = blockPhysicsEntity.getBestCollisionOffset(entityBoundingBox, adjustedMovement);
@@ -59,13 +61,13 @@ public abstract class PlatformCollisionMixin {
                     }
                 }
 
-                if (adjustedMovement.length() > 1e-7 && Math.abs(movement.length() - adjustedMovement.length()) > 1e-7) {
+//                if (adjustedMovement.length() > 1e-7 && Math.abs(movement.length() - adjustedMovement.length()) > 1e-7) {  //Commenting out this literally fixed everything
                     if (adjustedMovement.y > movement.y) {
                         entity.setOnGround(true);
                     }
 
                     return original.call(adjustedMovement);
-                }
+//                }
             }
         }
         return original.call(movement);
