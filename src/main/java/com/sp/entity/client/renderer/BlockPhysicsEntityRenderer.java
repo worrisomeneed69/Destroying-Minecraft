@@ -1,26 +1,30 @@
 package com.sp.entity.client.renderer;
 
+import com.sp.DestroyingMinecraftClient;
 import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.PhysicsBlockComponent;
+import com.sp.collision.BlockOBB;
 import com.sp.entity.custom.BlockPhysicsEntity;
+import com.sp.util.MathUtil;
+import com.sp.util.RenderUtil;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.BlockRenderManager;
-import net.minecraft.client.render.debug.DebugRenderer;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import org.joml.Vector3d;
+
+import java.util.List;
 
 public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntity> {
     private final BlockRenderManager blockModelRenderer;
+    private List<Vec3d> previousAABBCorners;
 
     public BlockPhysicsEntityRenderer(EntityRendererFactory.Context ctx) {
         super(ctx);
@@ -35,67 +39,13 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
 
 
     @Override
-    public void render(BlockPhysicsEntity entity, float fyaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        super.render(entity, fyaw, tickDelta, matrices, vertexConsumers, light);
+    public void render(BlockPhysicsEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
 
 
-//        List<Vec3d> aabbCorners = BlockOBB.getAABBCorners(MinecraftClient.getInstance().player.getBoundingBox());
-//
-////        for (Vec3d aabbCorner : aabbCorners) {
-////            drawBox(matrices, vertexConsumers, aabbCorner, entity, 0, 0, 255, 255);
-////        }
-//
-//        for (BlockPhysicsEntity.BlockData block : entity.component.getBlocks()) {
-//            BlockOBB obb = new BlockOBB(entity.component.getRotation(), block);
-//
-//            List<Vec3d> obbCorners = obb.getGlobalCorners(entity);
-//
-//            Vec3d globalPos = MathUtil.toVec3d(obb.rotation.transform(MathUtil.toVector3d(Vec3d.of(obb.blockData.offset)))).add(entity.getPos());
-//
-////            for (Vec3d normalAxi : obb.getNormalAxis()) {
-////                Vec3d sideStart = globalPos.add(normalAxi.multiply(0.5));
-////
-////                drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideStart.add(normalAxi), 0, 0, 255, 255);
-////            }
-//
-////            for (Vec3d globalCorner : obb.getGlobalCorners(entity)) {
-////                drawBox(matrices, vertexConsumers, globalCorner, entity, 255, 0, 0, 255);
-////            }
-//
-//            List<Vec3d> allAxis = obb.getAABBNormalAxis();
-//            allAxis.addAll(obb.getNormalAxis());
-////            allAxis.addAll(obb.getCrossProductAxis(obb.getNormalAxis(), obb.getAABBNormalAxis()));
-//
-//            for (Vec3d axis : allAxis) {
-//                Vec3d sideStart = globalPos.add(axis.multiply(2));
-//                Vec3d sideEnd = globalPos.add(axis.multiply(-2));
-//
-////                drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideEnd, 255, 255, 0, 255);
-//
-//                double obbMin = Double.MAX_VALUE, obbMax = -Double.MAX_VALUE;
-//                double aabbMin = Double.MAX_VALUE, aabbMax = -Double.MAX_VALUE;
-//
-//                for (Vec3d corner : obbCorners) {
-//                    double projection = axis.dotProduct(corner);
-//                    obbMin = Math.min(obbMin, projection);
-//                    obbMax = Math.max(obbMax, projection);
-//                }
-//
-//                for (Vec3d aabbCorner : aabbCorners) {
-//                    double projection = axis.dotProduct(aabbCorner);
-//                    aabbMin = Math.min(aabbMin, projection);
-//                    aabbMax = Math.max(aabbMax, projection);
-//                }
-//
-//                if (obbMax < aabbMin || obbMin > aabbMax) {
-//                    drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideEnd, 0, 255, 0, 255);
-//                } else {
-//                    drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideEnd, 255, 0, 0, 255);
-//                }
-//            }
-//        }
-
-
+        if (DestroyingMinecraftClient.shouldRenderDebug) {
+            renderDebug(entity, matrices, vertexConsumers);
+        }
 
         /*
         List<Vec3d> aabbCorners = BlockOBB.getAABBCorners(MinecraftClient.getInstance().player.getBoundingBox());
@@ -168,7 +118,7 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
         for (BlockPhysicsEntity.BlockData blockData : component.getBlocks()) {
             matrices.push();
 
-            matrices.multiply(component.getRotation());
+            matrices.multiply(component.getLerpedRotation(tickDelta));
             matrices.translate(-.5, -.5, -.5);
             matrices.translate(blockData.offset.getX(), blockData.offset.getY(), blockData.offset.getZ());
 
@@ -191,20 +141,64 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
         }
     }
 
+    private void renderDebug(BlockPhysicsEntity entity, MatrixStack matrices, VertexConsumerProvider vertexConsumers) {
+        List<Vec3d> aabbCorners = BlockOBB.getAABBCorners(MinecraftClient.getInstance().player.getBoundingBox());
 
-    static void drawBox(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Vec3d targetPos, Entity entity, int red, int green, int blue, int alpha) {
-        Vec3d offsetEntityPos = entity.getPos().add(0, 0, 0);
+        //Testing out making the debug render smoother
+        for (int i = 0; i < aabbCorners.size(); i++) {
+            Vec3d aabbCorner = aabbCorners.get(i);
 
-        DebugRenderer.drawBox(matrices, vertexConsumers, Box.from(targetPos).contract(0.4).offset(-offsetEntityPos.x, -offsetEntityPos.y, -offsetEntityPos.z), (float) red / 255, (float) green / 255, (float) blue / 255, (float) alpha / 255);
-    }
+            RenderUtil.drawEntityBox(matrices, vertexConsumers, aabbCorner.add(0.5, 0.5, 0.5), 0.2, entity, 0, 0, 255, 255);
+        }
 
-    static void drawLine(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Vec3d camera, Vec3d startPos, Vec3d targetPos, int red, int green, int blue, int alpha) {
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getDebugLineStrip(1.0));
-        vertexConsumer.vertex(matrices.peek(), (float) (startPos.x - camera.x), (float) (startPos.y - camera.y), (float) (startPos.z - camera.z)).color(getArgb(alpha, red, green, blue));
-        vertexConsumer.vertex(matrices.peek(), (float) (targetPos.x - camera.x), (float) (targetPos.y - camera.y), (float) (targetPos.z - camera.z)).color(getArgb(alpha, red, green, blue));
-    }
+        for (BlockPhysicsEntity.BlockData block : entity.component.getBlocks()) {
+            BlockOBB obb = new BlockOBB(entity.component.getRotation(), block);
 
-    static int getArgb(int alpha, int red, int green, int blue) {
-        return alpha << 24 | red << 16 | green << 8 | blue;
+            List<Vec3d> obbCorners = obb.getGlobalCorners(entity);
+
+            Vec3d globalPos = MathUtil.toVec3d(obb.rotation.transform(MathUtil.toVector3d(Vec3d.of(obb.blockData.offset)))).add(entity.getPos());
+
+        for (Vec3d normalAxi : obb.getNormalAxis()) {
+            Vec3d sideStart = globalPos.add(normalAxi.multiply(0.5));
+
+            RenderUtil.drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideStart.add(normalAxi), 0, 0, 255, 255);
+        }
+
+        for (Vec3d globalCorner : obb.getGlobalCorners(entity)) {
+            RenderUtil.drawEntityBox(matrices, vertexConsumers, globalCorner.add(0.5, 0.5, 0.5), 0.2, entity, 255, 0, 0, 255);
+        }
+
+            List<Vec3d> allAxis = obb.getAABBNormalAxis();
+            allAxis.addAll(obb.getNormalAxis());
+//            allAxis.addAll(obb.getCrossProductAxis(obb.getNormalAxis(), obb.getAABBNormalAxis()));
+
+            for (Vec3d axis : allAxis) {
+                Vec3d sideStart = globalPos.add(axis.multiply(2));
+                Vec3d sideEnd = globalPos.add(axis.multiply(-2));
+
+//                RenderUtil.drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideEnd, 255, 255, 0, 255);
+
+                double obbMin = Double.MAX_VALUE, obbMax = -Double.MAX_VALUE;
+                double aabbMin = Double.MAX_VALUE, aabbMax = -Double.MAX_VALUE;
+
+                for (Vec3d corner : obbCorners) {
+                    double projection = axis.dotProduct(corner);
+                    obbMin = Math.min(obbMin, projection);
+                    obbMax = Math.max(obbMax, projection);
+                }
+
+                for (Vec3d aabbCorner : aabbCorners) {
+                    double projection = axis.dotProduct(aabbCorner);
+                    aabbMin = Math.min(aabbMin, projection);
+                    aabbMax = Math.max(aabbMax, projection);
+                }
+
+                if (obbMax < aabbMin || obbMin > aabbMax) {
+                    RenderUtil.drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideEnd, 0, 255, 0, 255);
+                } else {
+                    RenderUtil.drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideEnd, 255, 0, 0, 255);
+                }
+            }
+        }
     }
 }

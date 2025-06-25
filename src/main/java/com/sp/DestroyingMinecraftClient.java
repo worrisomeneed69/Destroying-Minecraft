@@ -13,6 +13,7 @@ import com.sp.render.camerashake.CameraShakeManager;
 import com.sp.render.postshaders.PostShader;
 import com.sp.render.postshaders.custom.*;
 import com.sp.render.BlockInstanceRenderer;
+import com.sp.world.BlackHoleDestruction;
 import foundry.veil.Veil;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.dynamicbuffer.DynamicBufferType;
@@ -31,6 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class DestroyingMinecraftClient implements ClientModInitializer {
+	public static boolean shouldRenderDebug = false;
 	public BlockInstanceRenderer blockInstanceRenderer;
 
 	public static NukePostShader nukePostShader = new NukePostShader();
@@ -63,21 +65,33 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 			World clientWorld = client.world;
 
 			if(clientWorld != null) {
-				//Only render the shadow map with shaders that need it
-				if (stage == VeilRenderLevelStageEvent.Stage.AFTER_LEVEL) {
-					if (camera != null) {
-						ShadowMapRenderer.renderShadowMap(camera);
-					}
-				}
+				switch (stage) {
+					case AFTER_LEVEL -> {
+						//Only render the shadow map with shaders that need it
+						if (camera != null) {
+							ShadowMapRenderer.renderShadowMap(camera);
+						}
 
-				//Only render the black hole terrain when rendering the black hole
-				if (stage == VeilRenderLevelStageEvent.Stage.AFTER_SKY) {
-					if (this.blockInstanceRenderer == null) {
-						this.blockInstanceRenderer = new BlockInstanceRenderer();
+						break;
+					}
+					case AFTER_SKY -> {
+						if (this.blockInstanceRenderer == null) {
+							this.blockInstanceRenderer = new BlockInstanceRenderer();
+						}
+
+						//Only render the black hole terrain when rendering the black hole
+						if (DestroyingMinecraftConfig.shaderType == ShaderType.BLACK_HOLE) {
+							blockInstanceRenderer.render();
+						}
+
+						break;
 					}
 
-					if (DestroyingMinecraftConfig.shaderType == ShaderType.BLACK_HOLE) {
-						blockInstanceRenderer.render();
+					case AFTER_WEATHER -> {
+						if(DestroyingMinecraftClient.shouldRenderDebug) {
+							BlackHoleDestruction.renderSelectionDebug(matrixStack.toPoseStack(), bufferSource, camera);
+						}
+						break;
 					}
 				}
 			}
@@ -133,6 +147,10 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 					postShader.getRenderTimer().updateTimer(clientWorld);
 				}
 			}
+		});
+
+		ClientPlayConnectionEvents.DISCONNECT.register((clientPlayNetworkHandler, minecraftClient) -> {
+			BlackHoleDestruction.clear();
 		});
 	}
 

@@ -5,16 +5,21 @@ import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.sp.networking.InitializePackets;
+import com.sp.world.BlackHoleDestruction;
 import com.sp.world.spinningblockexplosion.custom.DirectionalSBE;
 import com.sp.world.spinningblockexplosion.custom.PointSBE;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.command.argument.Vec3ArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
+import static net.minecraft.server.command.CommandManager.argument;
 
 public class DestructionCommand {
     //Correlates to the switch statement in the InvokeDestructionPacket
@@ -52,6 +57,20 @@ public class DestructionCommand {
                                 )
                                 .then(CommandManager.literal("reset")
                                         .executes(commandContext -> execute(commandContext, false, planetType))
+                                )
+                        )
+
+                        .then(CommandManager.literal("blackhole")
+                                .then(CommandManager.literal("select")
+                                        .then(argument("position", BlockPosArgumentType.blockPos())
+                                                .executes(commandContext -> blackHoleSelect(commandContext, BlockPosArgumentType.getBlockPos(commandContext, "position")))
+                                        )
+                                )
+                                .then(CommandManager.literal("start")
+                                        .executes(commandContext -> blackHoleExecute(commandContext, true))
+                                )
+                                .then(CommandManager.literal("reset")
+                                        .executes(commandContext -> blackHoleExecute(commandContext, false))
                                 )
                         )
 
@@ -93,21 +112,38 @@ public class DestructionCommand {
         );
     }
 
-    private static int execute(CommandContext<ServerCommandSource> context, boolean start, int type){
+    private static int execute(CommandContext<ServerCommandSource> context, boolean start, int type) {
         for(ServerPlayerEntity player : context.getSource().getWorld().getPlayers()) {
             ServerPlayNetworking.send(player, new InitializePackets.DestructionPayload(start, type));
         }
         return 1;
     }
 
-    private static int directionalSpinningBlockExplosion(int length, int width, float angle, float density, Vec3d position){
+    private static int blackHoleSelect(CommandContext<ServerCommandSource> context, BlockPos centerPos) {
+        int i = BlackHoleDestruction.setSelection(centerPos, context.getSource().getWorld());
+        context.getSource().sendFeedback(() -> Text.literal("Successfully selected " + i + " blocks for destruction"), true);
+        return 1;
+    }
+
+    private  static int blackHoleExecute(CommandContext<ServerCommandSource> context, boolean start) {
+        if (start) {
+            BlackHoleDestruction.setStartDestruction(true);
+        } else {
+            BlackHoleDestruction.setStartDestruction(false);
+            BlackHoleDestruction.reset(context.getSource().getWorld());
+        }
+
+        return 1;
+    }
+
+    private static int directionalSpinningBlockExplosion(int length, int width, float angle, float density, Vec3d position) {
         DirectionalSBE explosion = new DirectionalSBE(length, width, angle, density, position);
         explosion.beginExplosion();
 
         return 1;
     }
 
-    private static int pointSpinningBlockExplosion(int radius, float density, Vec3d position){
+    private static int pointSpinningBlockExplosion(int radius, float density, Vec3d position) {
         PointSBE explosion = new PointSBE(radius, density, position);
         explosion.beginExplosion();
 

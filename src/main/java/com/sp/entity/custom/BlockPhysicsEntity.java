@@ -3,8 +3,10 @@ package com.sp.entity.custom;
 import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.PhysicsBlockComponent;
 import com.sp.collision.BlockOBB;
+import com.sp.entity.ModEntities;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.DataTracker;
@@ -27,6 +29,27 @@ import java.util.Optional;
 
 public class BlockPhysicsEntity extends Entity {
     public PhysicsBlockComponent component;
+
+    public static BlockPhysicsEntity ofBlocks(World world, List<BlockPos> blocks) {
+        BlockPhysicsEntity entity = new BlockPhysicsEntity(ModEntities.BLOCK_PHYSICS_ENTITY, world);
+        PhysicsBlockComponent component = InitializeComponents.PHYSICS_BLOCK.get(entity);
+        Vec3d pos = blocks.getFirst().toCenterPos();
+        entity.setPosition(pos);
+
+        for (BlockPos blockPos : blocks) {
+            BlockState state = world.getBlockState(blockPos);
+            BlockPos relativePos = blockPos.subtract(blocks.getFirst());
+
+            if (!state.isAir()) {
+                component.addBlock(new BlockPhysicsEntity.BlockData(state, relativePos));
+            }
+
+            world.setBlockState(blockPos, Blocks.AIR.getDefaultState());
+        }
+
+        world.spawnEntity(entity);
+        return entity;
+    }
 
     public BlockPhysicsEntity(EntityType<?> type, World world) {
         super(type, world);
@@ -81,9 +104,12 @@ public class BlockPhysicsEntity extends Entity {
 
         this.setBoundingBox(this.calculateBoundingBox());
 
-        this.setVelocity(0, 0.0, 0);
+//        this.setVelocity(0, 0.03, -0.05);
 
-//        this.component.getRotation().rotateLocalY((float) Math.toRadians(1f));
+        if(!this.getWorld().isClient) {
+//            this.component.setRotation(this.component.getRotation().rotateLocalX((float) Math.toRadians(5f)));
+        }
+//        this.component.getRotation().rotateLocalX((float) Math.toRadians(1f));
 //        this.component.setRotation(new Quaternionf(0, 0, 0, 0).rotationXYZ(0, 0, (float) Math.toRadians(0f)));
 
         this.move();

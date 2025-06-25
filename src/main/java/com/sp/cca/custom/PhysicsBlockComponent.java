@@ -15,6 +15,7 @@ public class PhysicsBlockComponent implements AutoSyncedComponent {
     private final BlockPhysicsEntity blockPhysicsEntity;
     private List<BlockPhysicsEntity.BlockData> blocks = new ArrayList<>();
     private Quaternionf rotation = new Quaternionf();
+    private Quaternionf prevRotation = new Quaternionf();
 
     public PhysicsBlockComponent(BlockPhysicsEntity spinningBlock) {
         this.blockPhysicsEntity = spinningBlock;
@@ -35,12 +36,18 @@ public class PhysicsBlockComponent implements AutoSyncedComponent {
     }
 
     public void setRotation(Quaternionf rotation) {
+        this.rotation = new Quaternionf(rotation);
         this.sync();
-        this.rotation = rotation;
     }
 
     public Quaternionf getRotation() {
-        return rotation;
+        return this.rotation;
+    }
+
+    public Quaternionf getLerpedRotation(float tickDelta) {
+        Quaternionf lerpedQuaternion = new Quaternionf();
+        this.prevRotation.slerp(this.rotation, tickDelta, lerpedQuaternion);
+        return lerpedQuaternion;
     }
 
     public void sync(){
@@ -51,6 +58,7 @@ public class PhysicsBlockComponent implements AutoSyncedComponent {
     public void readFromNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
         if (nbtCompound.contains("rotation")) {
             NbtCompound rotationNbt = nbtCompound.getCompound("rotation");
+            this.prevRotation = new Quaternionf(this.rotation);
             this.rotation.set(
                     rotationNbt.getFloat("x"),
                     rotationNbt.getFloat("y"),

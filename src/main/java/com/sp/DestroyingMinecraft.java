@@ -8,6 +8,7 @@ import com.sp.entity.ModEntities;
 import com.sp.item.ModItemGroups;
 import com.sp.item.ModItems;
 import com.sp.networking.InitializePackets;
+import com.sp.world.BlackHoleDestruction;
 import com.sp.world.spinningblockexplosion.SpinningBlockExplosion;
 import eu.midnightdust.lib.config.MidnightConfig;
 import net.fabricmc.api.ModInitializer;
@@ -43,6 +44,8 @@ public class DestroyingMinecraft implements ModInitializer {
 			for(SpinningBlockExplosion explosion : SpinningBlockExplosion.getExplosions()){
 				explosion.explode(serverWorld);
 			}
+
+			BlackHoleDestruction.tick(serverWorld);
 		});
 	}
 

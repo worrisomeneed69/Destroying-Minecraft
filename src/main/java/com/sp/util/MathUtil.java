@@ -6,9 +6,25 @@ import net.minecraft.util.math.random.Random;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 
-public class MathUtil {
+import java.util.List;
 
-    public static float nextBetween(Random random, float min, float max){
+public class MathUtil {
+    private static final Random random = Random.create();
+
+    /**
+     * Selects a random object from a list
+     * @param list The list to select from
+     * @return A random object from the list
+     */
+    public static <E> E randomValueInList(List<E> list) {
+        return list.get(random.nextBetween(0, list.size() - 1));
+    }
+
+    public static <E> E randomValueInList(E[] array) {
+        return array[random.nextBetween(0, array.length - 1)];
+    }
+
+    public static float nextBetween(float min, float max){
         return min + random.nextFloat() * (max - min);
     }
 
