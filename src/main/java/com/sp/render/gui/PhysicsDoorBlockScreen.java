@@ -20,6 +20,7 @@ public class PhysicsDoorBlockScreen extends Screen {
     private static final Text CORNER2_TEXT = Text.literal("Corner 2:");
     private static final Text DIRECTION_TEXT = Text.literal("Direction:");
     private static final Text NUM_OF_BLOCKS_TEXT = Text.literal("Number Of Blocks:");
+    private static final Text SHOW_SELECTION_TEXT = Text.literal("Show Selection:");
     private static final Text X_TEXT = Text.literal("X: ");
     private static final Text Y_TEXT = Text.literal("Y: ");
     private static final Text Z_TEXT = Text.literal("Z: ");
@@ -37,6 +38,7 @@ public class PhysicsDoorBlockScreen extends Screen {
     private TextFieldWidget numOfBlocksInput;
 
     private Direction prevDirection;
+    private boolean prevShowSelection;
 
     private SelectionHandler selectionRenderer;
 
@@ -54,13 +56,29 @@ public class PhysicsDoorBlockScreen extends Screen {
 
         //Save the values in case canceled (It's the only one set when the button is pushed)
         this.prevDirection = this.physicsDoorBlockEntity.getMovementDirection();
+        this.prevShowSelection = this.physicsDoorBlockEntity.shouldShowSelection();
 
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Save"), button -> this.done()).dimensions(this.centerWidth - 150, this.centerHeight + 60, 80, 20).build());
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Cancel"), button -> this.cancel()).dimensions(this.centerWidth - 50, this.centerHeight + 60, 80, 20).build());
+
         this.addDrawableChild(ButtonWidget.builder(
                 Text.literal("Select"),
                 button -> this.select()
         ).dimensions(this.centerWidth + 50, this.centerHeight + 60, 80, 20).build());
+
+        this.addDrawableChild(
+                CyclingButtonWidget.<Direction>builder(direction -> Text.literal(direction.getName().toUpperCase()))
+                        .values(Direction.values())
+                        .initially(this.physicsDoorBlockEntity.getMovementDirection())
+                        .omitKeyText()
+                        .build(this.centerWidth - 150, this.centerHeight + 30, 50, 20, Text.literal(""), (button, value) -> this.physicsDoorBlockEntity.setMovementDirection(value))
+        );
+
+        this.addDrawableChild(
+                CyclingButtonWidget.onOffBuilder(this.physicsDoorBlockEntity.shouldShowSelection())
+                        .omitKeyText()
+                        .build(this.centerWidth + 50, this.centerHeight + 30, 80, 20, SHOW_SELECTION_TEXT, (button, showSelection) -> this.physicsDoorBlockEntity.setShowSelection(showSelection))
+        );
 
         this.addDrawableChild(
                 CyclingButtonWidget.<Direction>builder(direction -> Text.literal(direction.getName().toUpperCase()))
@@ -114,7 +132,8 @@ public class PhysicsDoorBlockScreen extends Screen {
                 corner1,
                 corner2,
                 this.physicsDoorBlockEntity.getMovementDirection(),
-                parseInt(this.numOfBlocksInput.getText())
+                parseInt(this.numOfBlocksInput.getText()),
+                this.physicsDoorBlockEntity.shouldShowSelection()
         ));
     }
 
@@ -147,6 +166,8 @@ public class PhysicsDoorBlockScreen extends Screen {
         context.drawTextWithShadow(this.textRenderer, DIRECTION_TEXT, this.centerWidth - 150, this.centerHeight + 30 - this.textRenderer.fontHeight, 10526880);
         context.drawTextWithShadow(this.textRenderer, NUM_OF_BLOCKS_TEXT, this.centerWidth - 80, this.centerHeight + 30 - this.textRenderer.fontHeight, 10526880);
         this.numOfBlocksInput.render(context, mouseX, mouseY, delta);
+
+        context.drawTextWithShadow(this.textRenderer, SHOW_SELECTION_TEXT, this.centerWidth + 50, this.centerHeight + 30 - this.textRenderer.fontHeight, 10526880);
     }
 
     private void drawLetters(DrawContext context) {
@@ -192,6 +213,7 @@ public class PhysicsDoorBlockScreen extends Screen {
     private void cancel() {
         if (this.client != null) {
             this.physicsDoorBlockEntity.setMovementDirection(prevDirection);
+            this.physicsDoorBlockEntity.setShowSelection(prevShowSelection);
             this.client.setScreen(null);
         }
     }
@@ -208,7 +230,10 @@ public class PhysicsDoorBlockScreen extends Screen {
             this.corner2YInput.setText(Integer.toString(corner2.getY()));
             this.corner2ZInput.setText(Integer.toString(corner2.getZ()));
             this.updatePhysicsBlock();
-        });
+            this.physicsDoorBlockEntity.setSettingSelection(false);
+        }, () -> this.physicsDoorBlockEntity.setSettingSelection(false));
+
+        this.physicsDoorBlockEntity.setSettingSelection(true);
         this.client.setScreen(null);
     }
 

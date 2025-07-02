@@ -10,6 +10,7 @@ import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -20,24 +21,36 @@ import net.minecraft.world.World;
 public class SelectionHandler {
     private static boolean renderingSelection;
     private static SelectionFunction selectionFunction;
+    private static Runnable cancelFunction;
     private static BlockPos corner1;
     private static BlockPos corner2;
     private static BlockHitResult targetBlock;
     private static int delayTime = 10;
 
 
-    public static void startSelection(SelectionFunction function) {
+    public static void startSelection(SelectionFunction function, Runnable cancelFunction1) {
         renderingSelection = true;
         selectionFunction = function;
+        cancelFunction = cancelFunction1;
     }
 
 
     public static void tickClientWorld(World world) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (!renderingSelection) return;
+        if (!renderingSelection || client.player == null) return;
         client.gameRenderer.setBlockOutlineEnabled(false);
         if (delayTime > 0) {
             delayTime--;
+            return;
+        }
+
+        //Cancel
+        if (client.options.attackKey.isPressed()) {
+            corner1 = targetBlock.getBlockPos();
+            client.player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BIT.value(), 1, 0.1f);
+            end();
+            client.gameRenderer.setBlockOutlineEnabled(true);
+            cancelFunction.run();
             return;
         }
 
@@ -45,6 +58,7 @@ public class SelectionHandler {
         if (corner1 == null && targetBlock != null) {
             if (client.options.useKey.isPressed()) {
                 //Selected first corner
+                client.player.swingHand(Hand.MAIN_HAND);
                 corner1 = targetBlock.getBlockPos();
                 client.player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BELL.value(), 1, 0.1f);
                 delayTime = 10;
@@ -55,6 +69,7 @@ public class SelectionHandler {
         if (corner1 != null && corner2 == null) {
             if (client.options.useKey.isPressed()) {
                 //Selected second corner
+                client.player.swingHand(Hand.MAIN_HAND);
                 corner2 = targetBlock.getBlockPos();
                 client.player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BELL.value(), 1, 1.0f);
             }
@@ -80,9 +95,9 @@ public class SelectionHandler {
 
         if (corner1 == null) {
             Vec3d blockPos = targetBlock.getBlockPos().toCenterPos();
-            RenderUtil.drawBox(matrices, vertexConsumers, blockPos.subtract(camera.getPos()), 1, 100, 255, 100, alpha);
+            RenderUtil.drawBox(matrices, vertexConsumers, blockPos.subtract(camera.getPos()), 1, 100, 255, 100, alpha, true);
         } else if(corner2 == null) {
-            RenderUtil.drawBlocksFromCorners(matrices, vertexConsumers, camera, corner1, targetBlock.getBlockPos(), 100, 255, 100, alpha);
+            RenderUtil.drawBlocksFromCorners(matrices, vertexConsumers, camera, corner1, targetBlock.getBlockPos(), 100, 255, 100, alpha, true);
         }
     }
 

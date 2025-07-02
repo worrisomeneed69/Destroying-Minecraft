@@ -23,6 +23,7 @@ public class UpdatePhysicsDoorPacket {
             physicsDoorBlockEntity.setCorner2(payload.corner2);
             physicsDoorBlockEntity.setMovementDirection(payload.direction);
             physicsDoorBlockEntity.setNumOfBlocks(payload.numOfBlocks);
+            physicsDoorBlockEntity.setShowSelection(payload.showSelection);
             physicsDoorBlockEntity.markDirty();
             context.player().getWorld().updateListeners(payload.blockEntityPos, blockState, blockState, Block.NOTIFY_ALL);
         }
@@ -30,7 +31,7 @@ public class UpdatePhysicsDoorPacket {
 
 
 
-    public record UpdatePhysicsDoorBlock(BlockPos blockEntityPos, BlockPos corner1, BlockPos corner2, Direction direction, int numOfBlocks) implements CustomPayload {
+    public record UpdatePhysicsDoorBlock(BlockPos blockEntityPos, BlockPos corner1, BlockPos corner2, Direction direction, int numOfBlocks, boolean showSelection) implements CustomPayload {
         public static final CustomPayload.Id<UpdatePhysicsDoorBlock> ID = new CustomPayload.Id<>(DestroyingMinecraft.idOf("updatephysdoorblk"));
 
         public static final PacketCodec<RegistryByteBuf, UpdatePhysicsDoorBlock> CODEC = PacketCodec.tuple(
@@ -39,6 +40,7 @@ public class UpdatePhysicsDoorPacket {
                 BlockPos.PACKET_CODEC, UpdatePhysicsDoorBlock::corner2,
                 Direction.PACKET_CODEC, UpdatePhysicsDoorBlock::direction,
                 PacketCodecs.INTEGER, UpdatePhysicsDoorBlock::numOfBlocks,
+                PacketCodecs.BOOL, UpdatePhysicsDoorBlock::showSelection,
                 UpdatePhysicsDoorBlock::new);
 
 

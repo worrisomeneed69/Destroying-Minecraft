@@ -79,13 +79,13 @@ public class BlackHoleDestruction {
         int alpha = (int) ((Math.sin(RenderSystem.getShaderGameTime()*2000) * 0.5 + 0.5) * 100) + 50;
 
         //Draw center box
-        RenderUtil.drawBox(matrices, vertexConsumers, selection.getCenter(), new Vec3d(1, 2, 1), 0, 0, 255, 150);
+        RenderUtil.drawBox(matrices, vertexConsumers, selection.getCenter(), new Vec3d(1, 2, 1), 0, 0, 255, 150, false);
 
         //Highlight all the selected blocks
         if (surfaceBlocks != null && !settingSelection) {
             for (BlockPos surfaceBlock : surfaceBlocks) {
                 if(surfaceBlock == null) continue;
-                RenderUtil.drawBox(matrices, vertexConsumers, surfaceBlock.toCenterPos(), 1, 20, 200, 20, alpha);
+                RenderUtil.drawBox(matrices, vertexConsumers, surfaceBlock.toCenterPos(), 1, 20, 200, 20, alpha, false);
             }
         }
 

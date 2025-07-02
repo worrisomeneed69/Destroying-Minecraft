@@ -1,5 +1,7 @@
 package com.sp;
 
+import com.sp.block.entity.ModBlockEntities;
+import com.sp.block.entity.client.PhysicsDoorBlockRenderer;
 import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.entity.ModEntities;
 import com.sp.entity.client.renderer.BlockPhysicsEntityRenderer;
@@ -27,6 +29,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -61,6 +64,8 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 		EntityRendererRegistry.register(ModEntities.SPINNING_BLOCK, SpinningBlockEntityRenderer::new);
 		EntityRendererRegistry.register(ModEntities.BLOCK_PHYSICS_ENTITY, BlockPhysicsEntityRenderer::new);
 		EntityRendererRegistry.register(ModEntities.METEOR_ENTITY, MeteorEntityRenderer::new);
+
+		BlockEntityRendererFactories.register(ModBlockEntities.PHYSICS_DOOR_BE, PhysicsDoorBlockRenderer::new);
 
 		VeilEventPlatform.INSTANCE.onVeilRenderLevelStage(((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, renderTick, deltaTracker, camera, frustum) -> {
 			MinecraftClient client = MinecraftClient.getInstance();

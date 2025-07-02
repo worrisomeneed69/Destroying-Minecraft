@@ -28,6 +28,8 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
     private BlockPos corner2 = BlockPos.ORIGIN;
     private Direction movementDirection = Direction.UP;
     private int numOfBlocks = 0;
+    private boolean showSelection;
+    private boolean settingSelection;
     private boolean open;
     private boolean doorMoving;
     private Vec3d startingPos;
@@ -44,6 +46,7 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
         nbt.put("corner2", NbtHelper.fromBlockPos(this.corner2));
         nbt.putInt("direction", this.movementDirection.getId());
         nbt.putInt("numOfBlocks", this.numOfBlocks);
+        nbt.putBoolean("showSelection", this.showSelection);
         nbt.putBoolean("doorMoving", this.doorMoving);
     }
 
@@ -53,6 +56,7 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
         this.corner2 = NbtHelper.toBlockPos(nbt, "corner2").orElse(null);
         this.movementDirection = Direction.byId(nbt.getInt("direction"));
         this.numOfBlocks = nbt.getInt("numOfBlocks");
+        this.showSelection = nbt.getBoolean("showSelection");
         this.doorMoving = nbt.getBoolean("doorMoving");
     }
 
@@ -154,6 +158,20 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
     }
     public void setNumOfBlocks(int numOfBlocks) {
         this.numOfBlocks = numOfBlocks;
+    }
+
+    public boolean isSettingSelection() {
+        return settingSelection;
+    }
+    public void setSettingSelection(boolean settingSelection) {
+        this.settingSelection = settingSelection;
+    }
+
+    public boolean shouldShowSelection() {
+        return showSelection;
+    }
+    public void setShowSelection(boolean showSelection) {
+        this.showSelection = showSelection;
     }
 
     public boolean isDoorMoving() {
