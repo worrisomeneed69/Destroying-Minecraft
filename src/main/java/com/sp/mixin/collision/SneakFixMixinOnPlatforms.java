@@ -22,10 +22,10 @@ public class SneakFixMixinOnPlatforms {
 
         Box newBox = new Box(box.minX + offsetX, box.minY - (double)f - 9.999999747378752E-6, box.minZ + offsetZ, box.maxX + offsetX, box.minY, box.maxZ + offsetZ);
 
-        boolean collides = player.getWorld().isSpaceEmpty(player, newBox);
+        boolean doesNotCollide = player.getWorld().isSpaceEmpty(player, newBox);
 
-        if (collides) {
-            cir.setReturnValue(true);
+        if (!doesNotCollide) {
+            cir.setReturnValue(false);
         }
 
         List<BlockPhysicsEntity> blockPhysicsEntities = player.getWorld().getEntitiesByType(ModEntities.BLOCK_PHYSICS_ENTITY, newBox, (entity1) -> true);
@@ -33,11 +33,9 @@ public class SneakFixMixinOnPlatforms {
         if (!blockPhysicsEntities.isEmpty()) {
             for (BlockPhysicsEntity blockPhysicsEntity : blockPhysicsEntities) {
                 if (blockPhysicsEntity.collides(newBox)) {
-                    collides = true;
+                    cir.setReturnValue(false);
                 }
             }
         }
-
-        cir.setReturnValue(collides);
     }
 }
