@@ -24,7 +24,6 @@ import java.util.List;
 
 public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntity> {
     private final BlockRenderManager blockModelRenderer;
-    private List<Vec3d> previousAABBCorners;
 
     public BlockPhysicsEntityRenderer(EntityRendererFactory.Context ctx) {
         super(ctx);
@@ -40,8 +39,6 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
 
     @Override
     public void render(BlockPhysicsEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
-
 
         if (DestroyingMinecraftClient.shouldRenderDebug) {
             renderDebug(entity, matrices, vertexConsumers);
@@ -118,12 +115,12 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
         for (BlockPhysicsEntity.BlockData blockData : component.getBlocks()) {
             matrices.push();
 
-            matrices.multiply(component.getLerpedRotation(tickDelta));
+            matrices.multiply(component.getRotation());
             matrices.translate(-.5, -.5, -.5);
             matrices.translate(blockData.offset.getX(), blockData.offset.getY(), blockData.offset.getZ());
 
             BlockState blockState = blockData.blockState;
-            BlockPos blockPos = BlockPos.ofFloored(entity.getX(), entity.getBoundingBox().maxY, entity.getZ());
+            BlockPos blockPos = entity.getBlockPos().add(blockData.offset);
 
             blockModelRenderer.getModelRenderer().render(
                     world,
@@ -132,13 +129,15 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
                     blockPos,
                     matrices,
                     vertexConsumers.getBuffer(RenderLayers.getMovingBlockLayer(blockState)),
-                    true,
+                    false,
                     Random.create(),
                     1,
                     OverlayTexture.DEFAULT_UV
             );
             matrices.pop();
         }
+
+        super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
     }
 
     private void renderDebug(BlockPhysicsEntity entity, MatrixStack matrices, VertexConsumerProvider vertexConsumers) {

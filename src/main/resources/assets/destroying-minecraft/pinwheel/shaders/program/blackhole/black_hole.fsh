@@ -134,13 +134,14 @@ void main() {
                     break;
                 }
             }
-//            color = texture(StarsTexture, rayDir.xy*0.75)*3;
+
         }
 
         if(hit) {
             BHcolor.rgb *= 30;
             fragColor = vec4(blend(color, BHcolor), 1.0);
         } else {
+            color = texture(StarsTexture, viewDirFromUv(texCoord).xy*1);
             fragColor = color;
         }
 

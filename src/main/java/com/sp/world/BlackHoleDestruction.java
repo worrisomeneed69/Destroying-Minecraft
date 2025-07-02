@@ -34,6 +34,7 @@ public class BlackHoleDestruction {
     private static int breakOffCooldown;
     private static final Random random = Random.create();
 
+    //TODO: Update selection again after a set amount of time
     public static void tick(World world) {
         if(!startDestruction) return;
 
@@ -68,30 +69,27 @@ public class BlackHoleDestruction {
     }
 
     public static void renderSelectionDebug(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Camera camera) {
-        Box tempSelection = selection;
-        if (selection != null) {
-            matrices.push();
-            Vec3d cameraPos = camera.getPos();
-            matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
+        if (selection == null) return;
 
-            //Blinking
-            int alpha = (int) ((Math.sin(RenderSystem.getShaderGameTime()*2000) * 0.5 + 0.5) * 100) + 50;
+        matrices.push();
+        Vec3d cameraPos = camera.getPos();
+        matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 
-            //Draw center box
-            RenderUtil.drawBox(matrices, vertexConsumers, selection.getCenter(), new Vec3d(1, 2, 1), 0, 0, 255, 150);
+        //Blinking
+        int alpha = (int) ((Math.sin(RenderSystem.getShaderGameTime()*2000) * 0.5 + 0.5) * 100) + 50;
 
-            //Highlight all the selected blocks
-            if (surfaceBlocks != null && !settingSelection) {
-                for (BlockPos surfaceBlock : surfaceBlocks) {
-                    if(surfaceBlock == null) continue;
-                    RenderUtil.drawBox(matrices, vertexConsumers, surfaceBlock.toCenterPos(), 1, 20, 200, 20, alpha);
-                }
+        //Draw center box
+        RenderUtil.drawBox(matrices, vertexConsumers, selection.getCenter(), new Vec3d(1, 2, 1), 0, 0, 255, 150);
+
+        //Highlight all the selected blocks
+        if (surfaceBlocks != null && !settingSelection) {
+            for (BlockPos surfaceBlock : surfaceBlocks) {
+                if(surfaceBlock == null) continue;
+                RenderUtil.drawBox(matrices, vertexConsumers, surfaceBlock.toCenterPos(), 1, 20, 200, 20, alpha);
             }
-
-            matrices.pop();
         }
 
-        selection = tempSelection;
+        matrices.pop();
     }
 
     /**
@@ -99,13 +97,13 @@ public class BlackHoleDestruction {
      * @param pos The center block pos
      * @return The number of blocks selected
      */
-    public static int setSelection(BlockPos pos, World world) {
+    public static int selectSurfaceBlocks(BlockPos pos, World world) {
         settingSelection = true;
 
         surfaceBlocks = new ArrayList<>();
         selection = Box.enclosing(pos, pos).expand(20, 0, 20);
 
-        //Find all the blocks on the surface and blocks that are visible enough to the sun
+        //Finds all the blocks on the surface and blocks that are visible enough to the sun
         BlockPos.stream(selection.withMaxY(selection.maxY - 0.5).withMaxX(selection.maxX - 0.5).withMaxZ(selection.maxZ - 0.5)).forEachOrdered(blockPos -> {
             BlockPos.Mutable standInBlockPos = blockPos.mutableCopy();
             BlockPos.Mutable standInBlockPos2 = blockPos.mutableCopy();
@@ -174,7 +172,7 @@ public class BlackHoleDestruction {
                             new RaycastContext(
                                     belowPos.toBottomCenterPos(),
                                     belowPos.toCenterPos().add(0, -50, 0),
-                                    RaycastContext.ShapeType.COLLIDER,
+                                    RaycastContext.ShapeType.OUTLINE,
                                     RaycastContext.FluidHandling.NONE,
                                     ShapeContext.absent()
                             )
@@ -246,7 +244,9 @@ public class BlackHoleDestruction {
      */
 
     public static void reset(World world) {
-//        resetBlockMap.forEach(world::setBlockState);
+        resetBlockMap.forEach((blockPos, blockState) -> {
+            world.setBlockState(blockPos.mutableCopy(), blockState);
+        });
 
         resetEntityMap.forEach(blockPhysicsEntity -> {
             if(blockPhysicsEntity != null && !blockPhysicsEntity.isRemoved()){

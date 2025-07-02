@@ -106,7 +106,7 @@ void main() {
 
     float shadowSum = SHADOW_STRENGTH;
 
-    if(lightDir > -0.02){
+    if (lightDir > -0.07) {
         mat2 randRotation = randRotMat(texCoord);
         for (int x = -SHADOW_SAMPLES; x <= SHADOW_SAMPLES; x++){
             for (int y = -SHADOW_SAMPLES; y <= SHADOW_SAMPLES; y++){

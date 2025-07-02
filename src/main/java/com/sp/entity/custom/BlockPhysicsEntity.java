@@ -29,6 +29,19 @@ import java.util.Optional;
 
 public class BlockPhysicsEntity extends Entity {
     public PhysicsBlockComponent component;
+    private boolean markForDiscard;
+    private int startDiscardAge;
+
+    //TODO Make BlockPhysicsEntities work with flashback (The list of blocks are not being saved?)
+
+    public static BlockPhysicsEntity ofBlocks(World world, BlockPos corner1, BlockPos corner2) {
+        List<BlockPos> positions = new ArrayList<>();
+        BlockPos.stream(corner2, corner1).forEachOrdered(blockPos -> {
+            positions.add(blockPos.mutableCopy());
+        });
+
+        return BlockPhysicsEntity.ofBlocks(world, positions);
+    }
 
     public static BlockPhysicsEntity ofBlocks(World world, List<BlockPos> blocks) {
         BlockPhysicsEntity entity = new BlockPhysicsEntity(ModEntities.BLOCK_PHYSICS_ENTITY, world);
@@ -51,67 +64,32 @@ public class BlockPhysicsEntity extends Entity {
         return entity;
     }
 
+    public void setDown() {
+        PhysicsBlockComponent component = InitializeComponents.PHYSICS_BLOCK.get(this);
+
+        for (BlockPhysicsEntity.BlockData blockData : component.getBlocks()) {
+            this.getWorld().setBlockState(this.getBlockPos().add(blockData.offset), blockData.blockState);
+        }
+    }
+
     public BlockPhysicsEntity(EntityType<?> type, World world) {
         super(type, world);
-
         this.component = InitializeComponents.PHYSICS_BLOCK.get(this);
-
-        /*
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(0, 0, 0)));
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(0, 0, 1)));
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(0, 0, 2)));
-
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(1, 0, 0)));
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(1, 0, 1)));
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(1, 0, 2)));
-
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(2, 0, 0)));
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(2, 0, 1)));
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(2, 0, 2)));
-
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(3, 0, 0)));
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(3, 0, 1)));
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(3, 0, 2)));
-
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(4, 0, 0)));
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(4, 0, 1)));
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(4, 0, 2)));
-
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(5, 0, 0)));
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(5, 0, 1)));
-        this.component.addBlock(new BlockData(Blocks.GRASS_BLOCK, new BlockPos(5, 0, 2)));
-        */
     }
 
-    @Override
-    protected void initDataTracker(DataTracker.Builder builder) {
-
-    }
-
-    @Override
-    protected void writeCustomDataToNbt(NbtCompound nbt) {
-
-    }
-
-    @Override
-    protected void readCustomDataFromNbt(NbtCompound nbt) {
-
-    }
 
     @Override
     public void tick() {
         super.tick();
+        if (!this.getWorld().isClient) {
+            if (this.markForDiscard) {
+                if(this.age - this.startDiscardAge >= 2) this.discard();
+            }
+        }
 
         this.setBoundingBox(this.calculateBoundingBox());
-
-//        this.setVelocity(0, 0.03, -0.05);
-
-        if(!this.getWorld().isClient) {
-//            this.component.setRotation(this.component.getRotation().rotateLocalX((float) Math.toRadians(5f)));
-        }
-//        this.component.getRotation().rotateLocalX((float) Math.toRadians(1f));
+//        this.component.getRotation().rotateLocalY((float) Math.toRadians(1f));
 //        this.component.setRotation(new Quaternionf(0, 0, 0, 0).rotationXYZ(0, 0, (float) Math.toRadians(0f)));
-
         this.move();
     }
 
@@ -186,14 +164,6 @@ public class BlockPhysicsEntity extends Entity {
         this.setPosition(this.getPos().add(this.getVelocity()));
     }
 
-    public static Vec3d toVec3(Vector3d vector3d) {
-        return new Vec3d(vector3d.x(), vector3d.y(), vector3d.z());
-    }
-
-    public static Vector3d toVector3d(Vec3d vec3d) {
-        return new Vector3d(vec3d.x, vec3d.y, vec3d.z);
-    }
-
     @Override
     protected Box calculateBoundingBox() {
         if (this.component == null || this.component.getBlocks() == null || this.component.getBlocks().isEmpty()) {
@@ -248,6 +218,29 @@ public class BlockPhysicsEntity extends Entity {
         Vector3d result = quaternion.transform(new Vector3d(vec.x, vec.y, vec.z));
 
         return new Vec3d(result.x, result.y, result.z);
+    }
+
+    public void markForDiscard() {
+        this.markForDiscard = true;
+        this.setVelocity(0, 0, 0);
+        this.velocityModified = true;
+        this.velocityDirty = true;
+        this.startDiscardAge = this.age;
+    }
+
+    @Override
+    protected void initDataTracker(DataTracker.Builder builder) {
+
+    }
+
+    @Override
+    protected void writeCustomDataToNbt(NbtCompound nbt) {
+
+    }
+
+    @Override
+    protected void readCustomDataFromNbt(NbtCompound nbt) {
+
     }
 
     public static class BlockData {

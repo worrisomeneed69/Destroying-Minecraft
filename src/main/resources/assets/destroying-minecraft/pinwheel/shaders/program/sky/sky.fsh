@@ -20,7 +20,7 @@ uniform float explosionTimer;
 in vec2 texCoord;
 out vec4 fragColor;
 
-const vec3 SkyColor = vec3(0.5,0.75,1.1);
+const vec3 SkyColor = vec3(0.4,0.65,1.0);
 
 vec3 getLightAngle() {
     vec3 lightangle = mat3(sunMat) * vec3(0.0, 0.0, 1.0);
@@ -158,7 +158,7 @@ void main() {
     float light = smoothstep(0.998 + 0.002 * time, 1.0, dot(rd, sunDir));
     rd += rand(texCoord + GameTime) * 0.01;
     if(depth >= 1.0){
-        color = mix(vec3(SkyColor - rd.y * 0.9), texture(StarsTexture, viewDirFromUv(texCoord).zy*0.5).rgb*(0.75 - explosionTimer), time);
+        color = mix(vec3(SkyColor - rd.y * 0.7), texture(StarsTexture, viewDirFromUv(texCoord).zy*0.5).rgb*(0.75 - explosionTimer), time)*2;
         color += vec3(light * 10);
 
 

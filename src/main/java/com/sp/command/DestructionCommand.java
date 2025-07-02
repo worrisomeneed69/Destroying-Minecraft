@@ -4,7 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import com.sp.networking.InitializePackets;
+import com.sp.networking.S2C.InvokeDestructionPacket;
 import com.sp.world.BlackHoleDestruction;
 import com.sp.world.spinningblockexplosion.custom.DirectionalSBE;
 import com.sp.world.spinningblockexplosion.custom.PointSBE;
@@ -114,13 +114,13 @@ public class DestructionCommand {
 
     private static int execute(CommandContext<ServerCommandSource> context, boolean start, int type) {
         for(ServerPlayerEntity player : context.getSource().getWorld().getPlayers()) {
-            ServerPlayNetworking.send(player, new InitializePackets.DestructionPayload(start, type));
+            ServerPlayNetworking.send(player, new InvokeDestructionPacket.DestructionPayload(start, type));
         }
         return 1;
     }
 
     private static int blackHoleSelect(CommandContext<ServerCommandSource> context, BlockPos centerPos) {
-        int i = BlackHoleDestruction.setSelection(centerPos, context.getSource().getWorld());
+        int i = BlackHoleDestruction.selectSurfaceBlocks(centerPos, context.getSource().getWorld());
         context.getSource().sendFeedback(() -> Text.literal("Successfully selected " + i + " blocks for destruction"), true);
         return 1;
     }

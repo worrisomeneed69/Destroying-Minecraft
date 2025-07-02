@@ -1,16 +1,24 @@
 package com.sp.util;
 
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.debug.DebugRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
 public class RenderUtil {
     //TODO put draw selection from BlackHoleDestruction in here (Input a list of blocks. Renders a box for each block)
+
+    public static void drawBlocksFromCorners(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Camera camera, BlockPos corner1, BlockPos corner2, int red, int green, int blue, int alpha) {
+        BlockPos.iterate(corner1, corner2).forEach(blockPos -> {
+            drawBox(matrices, vertexConsumers, blockPos.toCenterPos().subtract(camera.getPos()), new Vec3d(1, 1, 1), red, green, blue, alpha);
+        });
+    }
 
     public static void drawBox(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Vec3d targetPos, double size, int red, int green, int blue, int alpha) {
         drawBox(matrices, vertexConsumers, targetPos, new Vec3d(size, size, size), red, green, blue, alpha);
@@ -37,6 +45,10 @@ public class RenderUtil {
 
     public static int getArgb(int alpha, int red, int green, int blue) {
         return alpha << 24 | red << 16 | green << 8 | blue;
+    }
+
+    public static int getRgb(int red, int green, int blue) {
+        return red << 16 | green << 8 | blue;
     }
 
 }

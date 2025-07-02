@@ -18,7 +18,7 @@ float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
 vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
 vec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}
 
-float noise(vec3 p){
+float noise(vec3 p) {
     vec3 a = floor(p);
     vec3 d = p - a;
     d = d * d * (3.0 - 2.0 * d);
@@ -92,8 +92,7 @@ vec4 grad4(float j, vec4 ip)
 // (sqrt(5) - 1)/4 = F4, used once below
 #define F4 0.309016994374947451
 
-float snoise(vec4 v)
-{
+float snoise(vec4 v) {
     const vec4  C = vec4( 0.138196601125011,  // (5 - sqrt(5))/20  G4
     0.276393202250021,  // 2 * G4
     0.414589803375032,  // 3 * G4

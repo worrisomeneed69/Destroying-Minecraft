@@ -1,0 +1,225 @@
+package com.sp.render.gui;
+
+import com.sp.block.entity.custom.PhysicsDoorBlockEntity;
+import com.sp.networking.C2S.UpdatePhysicsDoorPacket;
+import com.sp.render.SelectionHandler;
+import com.sp.util.RenderUtil;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.CyclingButtonWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+
+public class PhysicsDoorBlockScreen extends Screen {
+    private final PhysicsDoorBlockEntity physicsDoorBlockEntity;
+    private static final Text CORNER1_TEXT = Text.literal("Corner 1:");
+    private static final Text CORNER2_TEXT = Text.literal("Corner 2:");
+    private static final Text DIRECTION_TEXT = Text.literal("Direction:");
+    private static final Text NUM_OF_BLOCKS_TEXT = Text.literal("Number Of Blocks:");
+    private static final Text X_TEXT = Text.literal("X: ");
+    private static final Text Y_TEXT = Text.literal("Y: ");
+    private static final Text Z_TEXT = Text.literal("Z: ");
+    private int centerWidth;
+    private int centerHeight;
+
+    private TextFieldWidget corner1XInput;
+    private TextFieldWidget corner1YInput;
+    private TextFieldWidget corner1ZInput;
+
+    private TextFieldWidget corner2XInput;
+    private TextFieldWidget corner2YInput;
+    private TextFieldWidget corner2ZInput;
+
+    private TextFieldWidget numOfBlocksInput;
+
+    private Direction prevDirection;
+
+    private SelectionHandler selectionRenderer;
+
+
+
+    public PhysicsDoorBlockScreen(PhysicsDoorBlockEntity physicsDoorBlockEntity) {
+        super(Text.literal("Physics Door Block"));
+        this.physicsDoorBlockEntity = physicsDoorBlockEntity;
+    }
+
+    @Override
+    protected void init() {
+        this.centerWidth = this.width / 2;
+        this.centerHeight = this.height / 2;
+
+        //Save the values in case canceled (It's the only one set when the button is pushed)
+        this.prevDirection = this.physicsDoorBlockEntity.getMovementDirection();
+
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("Save"), button -> this.done()).dimensions(this.centerWidth - 150, this.centerHeight + 60, 80, 20).build());
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("Cancel"), button -> this.cancel()).dimensions(this.centerWidth - 50, this.centerHeight + 60, 80, 20).build());
+        this.addDrawableChild(ButtonWidget.builder(
+                Text.literal("Select"),
+                button -> this.select()
+        ).dimensions(this.centerWidth + 50, this.centerHeight + 60, 80, 20).build());
+
+        this.addDrawableChild(
+                CyclingButtonWidget.<Direction>builder(direction -> Text.literal(direction.getName().toUpperCase()))
+                        .values(Direction.values())
+                        .initially(this.physicsDoorBlockEntity.getMovementDirection())
+                        .omitKeyText()
+                        .build(this.centerWidth - 150, this.centerHeight + 30, 50, 20, Text.literal(""), (button, value) -> this.physicsDoorBlockEntity.setMovementDirection(value))
+        );
+
+
+
+
+        BlockPos corner1 = physicsDoorBlockEntity.getCorner1();
+        this.corner1XInput = new TextFieldWidget(this.textRenderer, this.centerWidth - 150, this.centerHeight - 50, 80, 20, Text.literal("Corner 1 X"));
+        this.corner1XInput.setText(Integer.toString(corner1.getX()));
+        this.addSelectableChild(this.corner1XInput);
+        this.corner1YInput = new TextFieldWidget(this.textRenderer, this.centerWidth - 40, this.centerHeight - 50, 80, 20, Text.literal("Corner 1 Y"));
+        this.corner1YInput.setText(Integer.toString(corner1.getY()));
+        this.addSelectableChild(this.corner1YInput);
+        this.corner1ZInput = new TextFieldWidget(this.textRenderer, this.centerWidth + 70, this.centerHeight - 50, 80, 20, Text.literal("Corner 1 Z"));
+        this.corner1ZInput.setText(Integer.toString(corner1.getZ()));
+        this.addSelectableChild(this.corner1ZInput);
+
+        BlockPos corner2 = physicsDoorBlockEntity.getCorner2();
+        this.corner2XInput = new TextFieldWidget(this.textRenderer, this.centerWidth - 150, this.height /2 - 10, 80, 20, Text.literal("Corner 2 X"));
+        this.corner2XInput.setText(Integer.toString(corner2.getX()));
+        this.addSelectableChild(this.corner2XInput);
+        this.corner2YInput = new TextFieldWidget(this.textRenderer, this.centerWidth - 40, this.centerHeight - 10, 80, 20, Text.literal("Corner 2 Y"));
+        this.corner2YInput.setText(Integer.toString(corner2.getY()));
+        this.addSelectableChild(this.corner2YInput);
+        this.corner2ZInput = new TextFieldWidget(this.textRenderer, this.centerWidth + 70, this.centerHeight - 10, 80, 20, Text.literal("Corner 2 Z"));
+        this.corner2ZInput.setText(Integer.toString(corner2.getZ()));
+        this.addSelectableChild(this.corner2ZInput);
+
+        this.numOfBlocksInput = new TextFieldWidget(this.textRenderer, this.centerWidth - 80, this.centerHeight + 30, 80, 20, Text.literal("Number of Blocks"));
+        this.numOfBlocksInput.setText(Integer.toString(this.physicsDoorBlockEntity.getNumOfBlocks()));
+        this.addSelectableChild(this.numOfBlocksInput);
+    }
+
+    @Override
+    public void tick() {
+
+    }
+
+    private void updatePhysicsBlock() {
+        BlockPos corner1 = new BlockPos(parseInt(this.corner1XInput.getText()), parseInt(this.corner1YInput.getText()), parseInt(this.corner1ZInput.getText()));
+        BlockPos corner2 = new BlockPos(parseInt(this.corner2XInput.getText()), parseInt(this.corner2YInput.getText()), parseInt(this.corner2ZInput.getText()));
+
+        ClientPlayNetworking.send(new UpdatePhysicsDoorPacket.UpdatePhysicsDoorBlock(
+                this.physicsDoorBlockEntity.getPos(),
+                corner1,
+                corner2,
+                this.physicsDoorBlockEntity.getMovementDirection(),
+                parseInt(this.numOfBlocksInput.getText())
+        ));
+    }
+
+    private int parseInt(String integer) {
+        try {
+            return Integer.parseInt(integer);
+        } catch (NumberFormatException var3) {
+            return 0;
+        }
+    }
+
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.centerWidth, 10, 16777215);
+
+        context.drawTextWithShadow(this.textRenderer, CORNER1_TEXT, this.centerWidth - 150, this.centerHeight - 50 - this.textRenderer.fontHeight, 10526880);
+        this.drawLetters(context);
+
+        this.corner1XInput.render(context, mouseX, mouseY, delta);
+        this.corner1YInput.render(context, mouseX, mouseY, delta);
+        this.corner1ZInput.render(context, mouseX, mouseY, delta);
+
+
+        context.drawTextWithShadow(this.textRenderer, CORNER2_TEXT, this.centerWidth - 150, this.centerHeight - 10 - this.textRenderer.fontHeight, 10526880);
+        this.corner2XInput.render(context, mouseX, mouseY, delta);
+        this.corner2YInput.render(context, mouseX, mouseY, delta);
+        this.corner2ZInput.render(context, mouseX, mouseY, delta);
+
+        context.drawTextWithShadow(this.textRenderer, DIRECTION_TEXT, this.centerWidth - 150, this.centerHeight + 30 - this.textRenderer.fontHeight, 10526880);
+        context.drawTextWithShadow(this.textRenderer, NUM_OF_BLOCKS_TEXT, this.centerWidth - 80, this.centerHeight + 30 - this.textRenderer.fontHeight, 10526880);
+        this.numOfBlocksInput.render(context, mouseX, mouseY, delta);
+    }
+
+    private void drawLetters(DrawContext context) {
+        for (int i = 0; i <= 1; i++) {
+            context.drawTextWithShadow(
+                    this.textRenderer,
+                    X_TEXT,
+                    this.centerWidth - 150 - this.textRenderer.getWidth(X_TEXT),
+                    this.centerHeight - 40 + (i*40) - this.textRenderer.fontHeight / 2,
+                    RenderUtil.getRgb(255, 0, 0)
+            );
+
+            context.drawTextWithShadow(
+                    this.textRenderer,
+                    Y_TEXT,
+                    this.centerWidth - 40 - this.textRenderer.getWidth(Y_TEXT),
+                    this.centerHeight - 40 + (i*40) - this.textRenderer.fontHeight / 2,
+                    RenderUtil.getRgb(0, 255, 0)
+            );
+
+            context.drawTextWithShadow(
+                    this.textRenderer,
+                    Z_TEXT,
+                    this.centerWidth + 70 - this.textRenderer.getWidth(Z_TEXT),
+                    this.centerHeight - 40 + (i*40) - this.textRenderer.fontHeight / 2,
+                    RenderUtil.getRgb(0, 0, 255)
+            );
+        }
+    }
+
+    @Override
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+        this.renderInGameBackground(context);
+    }
+
+    private void done() {
+        if (this.client != null) {
+            this.updatePhysicsBlock();
+            this.client.setScreen(null);
+        }
+    }
+
+    private void cancel() {
+        if (this.client != null) {
+            this.physicsDoorBlockEntity.setMovementDirection(prevDirection);
+            this.client.setScreen(null);
+        }
+    }
+
+    private void select() {
+        if(client == null) return;
+
+        SelectionHandler.startSelection((corner1, corner2) -> {
+            this.corner1XInput.setText(Integer.toString(corner1.getX()));
+            this.corner1YInput.setText(Integer.toString(corner1.getY()));
+            this.corner1ZInput.setText(Integer.toString(corner1.getZ()));
+
+            this.corner2XInput.setText(Integer.toString(corner2.getX()));
+            this.corner2YInput.setText(Integer.toString(corner2.getY()));
+            this.corner2ZInput.setText(Integer.toString(corner2.getZ()));
+            this.updatePhysicsBlock();
+        });
+        this.client.setScreen(null);
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        this.cancel();
+    }
+
+    @Override
+    public boolean shouldPause() {
+        return false;
+    }
+}

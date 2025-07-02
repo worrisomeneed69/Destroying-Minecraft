@@ -35,6 +35,10 @@
     "HandDepthSampler": {
       "type": "framebuffer",
       "name": "veil:first_person:depth"
+    },
+    "CracksTexture": {
+      "type": "location",
+      "location": "destroying-minecraft:textures/shaders/planet/crack2.png"
     }
   }
 }

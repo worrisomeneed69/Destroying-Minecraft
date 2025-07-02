@@ -21,30 +21,22 @@ public class RipPlatformOutCommand {
         serverCommandSourceCommandDispatcher.register(
                 literal("makeblockphysics")
                         .requires(source -> source.hasPermissionLevel(2)) // Permission level 2 (op)
-                        .then(argument("position", BlockPosArgumentType.blockPos())
-                                .then(argument("size", IntegerArgumentType.integer())
-                                        .executes(context ->
-                                                createPBE(
-                                                        context,
-                                                        BlockPosArgumentType.getBlockPos(context, "position"),
-                                                        IntegerArgumentType.getInteger(context, "size")
-                                                )
-                                        )
+                        .then(argument("position1", BlockPosArgumentType.blockPos())
+                                .then(argument("position2", BlockPosArgumentType.blockPos())
+                                            .executes(context ->
+                                                    createPBE(
+                                                            context,
+                                                            BlockPosArgumentType.getBlockPos(context, "position1"),
+                                                            BlockPosArgumentType.getBlockPos(context, "position2")
+                                                    )
+                                            )
                                 )
                         )
         );
     }
 
-    private static int createPBE(CommandContext<ServerCommandSource> context, BlockPos position, int size) {
-        BlockPos first = new BlockPos(position.getX() + size, position.getY() + size, position.getZ() + size);
-        BlockPos second = new BlockPos(position.getX() - size, position.getY() - size, position.getZ() - size);
-
-        List<BlockPos> positions = new ArrayList<>();
-        BlockPos.stream(second, first).forEachOrdered(blockPos -> {
-            positions.add(blockPos.mutableCopy());
-        });
-
-        BlockPhysicsEntity.ofBlocks(context.getSource().getWorld(), positions);
+    private static int createPBE(CommandContext<ServerCommandSource> context, BlockPos position1, BlockPos position2) {
+        BlockPhysicsEntity.ofBlocks(context.getSource().getWorld(), position1, position2);
         return 1;
     }
 }

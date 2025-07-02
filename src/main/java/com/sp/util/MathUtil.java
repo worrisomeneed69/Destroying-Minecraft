@@ -8,6 +8,8 @@ import org.joml.Vector3f;
 
 import java.util.List;
 
+import static java.lang.Math.floor;
+
 public class MathUtil {
     private static final Random random = Random.create();
 
@@ -24,7 +26,7 @@ public class MathUtil {
         return array[random.nextBetween(0, array.length - 1)];
     }
 
-    public static float nextBetween(float min, float max){
+    public static float nextBetween(float min, float max) {
         return min + random.nextFloat() * (max - min);
     }
 
@@ -32,7 +34,7 @@ public class MathUtil {
      * Framerate Independent lerp
      * <a href="https://www.youtube.com/watch?v=LSNQuFEDOyQ">Learned from here</a>
      */
-    public static float Lerp(float source, float destination, float smoothingFactor, float delta){
+    public static float Lerp(float source, float destination, float smoothingFactor, float delta) {
         return MathHelper.lerp(1.0f - (float) Math.pow(smoothingFactor, delta), source, destination);
     }
 

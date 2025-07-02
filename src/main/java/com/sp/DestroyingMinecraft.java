@@ -1,6 +1,7 @@
 package com.sp;
 
 import com.sp.block.ModBlocks;
+import com.sp.block.entity.ModBlockEntities;
 import com.sp.command.DestructionCommand;
 import com.sp.command.RipPlatformOutCommand;
 import com.sp.config.DestroyingMinecraftConfig;
@@ -8,6 +9,7 @@ import com.sp.entity.ModEntities;
 import com.sp.item.ModItemGroups;
 import com.sp.item.ModItems;
 import com.sp.networking.InitializePackets;
+import com.sp.sounds.ModSounds;
 import com.sp.world.BlackHoleDestruction;
 import com.sp.world.spinningblockexplosion.SpinningBlockExplosion;
 import eu.midnightdust.lib.config.MidnightConfig;
@@ -33,12 +35,14 @@ public class DestroyingMinecraft implements ModInitializer {
 		ModItemGroups.registerItemGroups();
 		InitializePackets.registerServerNetworking();
 		ModEntities.registerEntities();
+		ModBlockEntities.registerBlockEntities();
+		ModSounds.registerSounds();
 		MidnightConfig.init(MOD_ID, DestroyingMinecraftConfig.class);
 
 		CommandRegistrationCallback.EVENT.register(DestructionCommand::register);
 		CommandRegistrationCallback.EVENT.register(RipPlatformOutCommand::register);
 
-		LOGGER.info("\"It's nukein' time\" -I say as I load a few grapes into the microwave");
+		LOGGER.info("\"It's nukein' time\" -He said as he loaded a few grapes into the microwave");
 
 		ServerTickEvents.END_WORLD_TICK.register(serverWorld -> {
 			for(SpinningBlockExplosion explosion : SpinningBlockExplosion.getExplosions()){
@@ -47,6 +51,10 @@ public class DestroyingMinecraft implements ModInitializer {
 
 			BlackHoleDestruction.tick(serverWorld);
 		});
+	}
+
+	public void sendPlaySoundInstancePacket() {
+
 	}
 
 	public static Identifier idOf(String path){

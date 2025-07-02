@@ -1,0 +1,17 @@
+{
+  "door_open": {
+    "sounds": [
+      "destroying-minecraft:door/door_open"
+    ]
+  },
+  "door_opening_loop": {
+    "sounds": [
+      "destroying-minecraft:door/door_opening_loop"
+    ]
+  },
+  "door_close": {
+    "sounds": [
+      "destroying-minecraft:door/door_close"
+    ]
+  }
+}

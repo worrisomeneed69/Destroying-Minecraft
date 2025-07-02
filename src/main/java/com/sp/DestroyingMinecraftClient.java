@@ -7,12 +7,14 @@ import com.sp.entity.client.renderer.MeteorEntityRenderer;
 import com.sp.entity.client.renderer.SpinningBlockEntityRenderer;
 import com.sp.mixin.PostProcessingManagerAccessor;
 import com.sp.networking.InitializePackets;
+import com.sp.render.SelectionHandler;
 import com.sp.render.ShaderType;
 import com.sp.render.ShadowMapRenderer;
 import com.sp.render.camerashake.CameraShakeManager;
 import com.sp.render.postshaders.PostShader;
 import com.sp.render.postshaders.custom.*;
 import com.sp.render.BlockInstanceRenderer;
+import com.sp.util.tickinstances.client.ClientTickInstances;
 import com.sp.world.BlackHoleDestruction;
 import foundry.veil.Veil;
 import foundry.veil.api.client.render.VeilRenderSystem;
@@ -53,7 +55,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		InitializePackets.registerClientNetworking();
-
+		ClientTickInstances.registerAllClientTickInstances();
 
 
 		EntityRendererRegistry.register(ModEntities.SPINNING_BLOCK, SpinningBlockEntityRenderer::new);
@@ -91,6 +93,8 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 						if(DestroyingMinecraftClient.shouldRenderDebug) {
 							BlackHoleDestruction.renderSelectionDebug(matrixStack.toPoseStack(), bufferSource, camera);
 						}
+
+						SelectionHandler.renderSelection(matrixStack.toPoseStack(), bufferSource, deltaTracker, camera);
 						break;
 					}
 				}
@@ -147,6 +151,8 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 					postShader.getRenderTimer().updateTimer(clientWorld);
 				}
 			}
+
+			SelectionHandler.tickClientWorld(clientWorld);
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register((clientPlayNetworkHandler, minecraftClient) -> {

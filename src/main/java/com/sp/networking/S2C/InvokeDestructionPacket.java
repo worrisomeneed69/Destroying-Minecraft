@@ -7,12 +7,16 @@ import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.quasar.particle.ParticleEmitter;
 import foundry.veil.api.quasar.particle.ParticleSystemManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 
 public class InvokeDestructionPacket {
     private static final Identifier nukeSmokeEmitterId = DestroyingMinecraft.idOf("nuke_smoke");
 
-    public static void receive(InitializePackets.DestructionPayload payload, ClientPlayNetworking.Context context) {
+    public static void receive(DestructionPayload payload, ClientPlayNetworking.Context context) {
         context.client().execute(()->{
             boolean on = payload.start();
 
@@ -38,6 +42,22 @@ public class InvokeDestructionPacket {
             }
 
         });
+    }
+
+
+    public record DestructionPayload(boolean start, int type) implements CustomPayload {
+        public static final CustomPayload.Id<DestructionPayload> ID = new CustomPayload.Id<>(DestroyingMinecraft.idOf("dest"));
+
+        public static final PacketCodec<RegistryByteBuf, DestructionPayload> CODEC = PacketCodec.tuple(
+                PacketCodecs.BOOL, DestructionPayload::start,
+                PacketCodecs.INTEGER, DestructionPayload::type,
+                DestructionPayload::new);
+
+
+        @Override
+        public Id<? extends CustomPayload> getId() {
+            return ID;
+        }
     }
 
 }

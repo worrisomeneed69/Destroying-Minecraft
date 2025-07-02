@@ -1,7 +1,7 @@
 package com.sp.block;
 
 import com.sp.DestroyingMinecraft;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import com.sp.block.custom.PhysicsDoorBlock;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -9,12 +9,16 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
 
 public class ModBlocks {
 
-    public static final Block WhiteVoidBlock = registerBlock("white_void_block",
+    public static final Block WHITE_VOID_BLOCK = registerBlock("white_void_block",
             new Block(AbstractBlock.Settings.copy(Blocks.STONE).hardness(-1f).solid().noBlockBreakParticles().luminance(value -> 15)));
+
+    public static final Block PHYSICS_DOOR_BLOCK = registerBlock("physics_door_block",
+            new PhysicsDoorBlock(AbstractBlock.Settings.copy(Blocks.STONE).hardness(-1f).solid().noBlockBreakParticles()));
+
+
 
     private static Block registerBlock(String name, Block block) {
         registerBlockItem(name, block);
