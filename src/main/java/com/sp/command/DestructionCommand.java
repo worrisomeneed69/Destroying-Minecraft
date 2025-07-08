@@ -23,9 +23,11 @@ import static net.minecraft.server.command.CommandManager.argument;
 
 public class DestructionCommand {
     //Correlates to the switch statement in the InvokeDestructionPacket
-    final static int supernovaType = 0;
-    final static int nukeType = 1;
-    final static int planetType = 2;
+    final static int nukeType = 0;
+    final static int orbitalLaserType = 1;
+    final static int supernovaType = 2;
+    final static int planetType = 3;
+    final static int blackHoleType = 4;
 
     public static void register(CommandDispatcher<ServerCommandSource> serverCommandSourceCommandDispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
         serverCommandSourceCommandDispatcher.register(
@@ -60,7 +62,7 @@ public class DestructionCommand {
                                 )
                         )
 
-                        .then(CommandManager.literal("blackhole")
+                        .then(CommandManager.literal("black_hole")
                                 .then(CommandManager.literal("select")
                                         .then(argument("position", BlockPosArgumentType.blockPos())
                                                 .executes(commandContext -> blackHoleSelect(commandContext, BlockPosArgumentType.getBlockPos(commandContext, "position")))
@@ -71,6 +73,15 @@ public class DestructionCommand {
                                 )
                                 .then(CommandManager.literal("reset")
                                         .executes(commandContext -> blackHoleExecute(commandContext, false))
+                                )
+                        )
+
+                        .then(CommandManager.literal("orbital_laser")
+                                .then(CommandManager.literal("start")
+                                        .executes(commandContext -> execute(commandContext, true, orbitalLaserType))
+                                )
+                                .then(CommandManager.literal("reset")
+                                        .executes(commandContext -> execute(commandContext, false, orbitalLaserType))
                                 )
                         )
 
@@ -126,11 +137,15 @@ public class DestructionCommand {
     }
 
     private  static int blackHoleExecute(CommandContext<ServerCommandSource> context, boolean start) {
-        if (start) {
-            BlackHoleDestruction.setStartDestruction(true);
-        } else {
-            BlackHoleDestruction.setStartDestruction(false);
-            BlackHoleDestruction.reset(context.getSource().getWorld());
+//        if (start) {
+//            BlackHoleDestruction.setStartDestruction(true);
+//        } else {
+//            BlackHoleDestruction.setStartDestruction(false);
+//            BlackHoleDestruction.reset(context.getSource().getWorld());
+//        }
+
+        for(ServerPlayerEntity player : context.getSource().getWorld().getPlayers()) {
+            ServerPlayNetworking.send(player, new InvokeDestructionPacket.DestructionPayload(start, blackHoleType));
         }
 
         return 1;

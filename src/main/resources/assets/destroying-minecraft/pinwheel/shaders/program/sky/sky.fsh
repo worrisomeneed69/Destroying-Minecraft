@@ -20,7 +20,7 @@ uniform float explosionTimer;
 in vec2 texCoord;
 out vec4 fragColor;
 
-const vec3 SkyColor = vec3(0.4,0.65,1.0);
+const vec3 SkyColor = vec3(0.3,0.55,1.4);
 
 vec3 getLightAngle() {
     vec3 lightangle = mat3(sunMat) * vec3(0.0, 0.0, 1.0);

@@ -12,6 +12,11 @@ public class ModSounds {
     public static final SoundEvent DOOR_OPENING_LOOP = registerSoundEvent("door_opening_loop");
     public static final SoundEvent DOOR_CLOSE = registerSoundEvent("door_close");
 
+    public static final SoundEvent ORBITAL_LASER_INITIALIZE = registerSoundEvent("ol_initialize");
+    public static final SoundEvent PLANET_INITIALIZE = registerSoundEvent("p_initialize");
+    public static final SoundEvent SUPERNOVA_INITIALIZE = registerSoundEvent("sn_initialize");
+    public static final SoundEvent BLACK_HOLE_INITIALIZE = registerSoundEvent("bh_initialize");
+
 
     private static SoundEvent registerSoundEvent(String name) {
         Identifier id = DestroyingMinecraft.idOf(name);

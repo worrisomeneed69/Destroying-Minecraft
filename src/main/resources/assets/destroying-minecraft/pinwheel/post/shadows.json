@@ -46,6 +46,11 @@
             "name": "veil:dynamic_main",
             "sampler": 4
         },
+        "BloomSampler": {
+            "type": "framebuffer",
+            "name": "veil:dynamic_main",
+            "sampler": 7
+        },
         "HandDepth": {
             "type": "framebuffer",
             "name": "veil:first_person:depth"

@@ -21,9 +21,6 @@ public class ModItemGroups {
                         entries.add(ModBlocks.PHYSICS_DOOR_BLOCK);
 
 
-
-
-
                     }).build());
 
 

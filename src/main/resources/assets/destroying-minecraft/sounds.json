@@ -13,5 +13,25 @@
     "sounds": [
       "destroying-minecraft:door/door_close"
     ]
+  },
+  "ol_initialize": {
+    "sounds": [
+      "destroying-minecraft:initialize/orbital_laser_initialize"
+    ]
+  },
+  "p_initialize": {
+    "sounds": [
+      "destroying-minecraft:initialize/planet_initialize"
+    ]
+  },
+  "sn_initialize": {
+    "sounds": [
+      "destroying-minecraft:initialize/supernova_initialize"
+    ]
+  },
+  "bh_initialize": {
+    "sounds": [
+      "destroying-minecraft:initialize/black_hole_initialize"
+    ]
   }
 }

@@ -46,7 +46,6 @@ public class SelectionHandler {
 
         //Cancel
         if (client.options.attackKey.isPressed()) {
-            corner1 = targetBlock.getBlockPos();
             client.player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BIT.value(), 1, 0.1f);
             end();
             client.gameRenderer.setBlockOutlineEnabled(true);
@@ -80,8 +79,6 @@ public class SelectionHandler {
             end();
             client.gameRenderer.setBlockOutlineEnabled(true);
         }
-
-
     }
 
     public static void renderSelection(MatrixStack matrices, VertexConsumerProvider vertexConsumers, RenderTickCounter renderTickCounter, Camera camera) {
@@ -116,10 +113,6 @@ public class SelectionHandler {
 
     public boolean isRenderingSelection() {
         return renderingSelection;
-    }
-
-    public void setRenderingSelection(boolean renderingSelection) {
-        SelectionHandler.renderingSelection = renderingSelection;
     }
 
 

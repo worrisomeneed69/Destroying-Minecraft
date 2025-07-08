@@ -13,7 +13,7 @@ import net.minecraft.util.Identifier;
 import org.joml.Vector3f;
 
 
-import static foundry.veil.impl.client.render.dynamicbuffer.DynamicBufferManger.MAIN_WRAPPER;
+import static foundry.veil.impl.client.render.dynamicbuffer.DynamicBufferManager.MAIN_WRAPPER;
 
 public class BlockInstanceRenderer {
     VertexBuffer vertexBuffer;

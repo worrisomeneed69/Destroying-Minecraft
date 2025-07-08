@@ -4,15 +4,18 @@ import com.sp.block.entity.ModBlockEntities;
 import com.sp.block.entity.client.PhysicsDoorBlockRenderer;
 import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.entity.ModEntities;
+import com.sp.entity.client.model.StarPiercerModel;
 import com.sp.entity.client.renderer.BlockPhysicsEntityRenderer;
 import com.sp.entity.client.renderer.MeteorEntityRenderer;
 import com.sp.entity.client.renderer.SpinningBlockEntityRenderer;
+import com.sp.entity.client.renderer.StarPiercerEntityRenderer;
 import com.sp.mixin.PostProcessingManagerAccessor;
 import com.sp.networking.InitializePackets;
 import com.sp.render.SelectionHandler;
 import com.sp.render.ShaderType;
 import com.sp.render.ShadowMapRenderer;
 import com.sp.render.camerashake.CameraShakeManager;
+import com.sp.render.gui.DestructionTitleRenderCallback;
 import com.sp.render.postshaders.PostShader;
 import com.sp.render.postshaders.custom.*;
 import com.sp.render.BlockInstanceRenderer;
@@ -27,7 +30,9 @@ import foundry.veil.platform.VeilEventPlatform;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.util.Identifier;
@@ -57,6 +62,8 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
+		HudRenderCallback.EVENT.register(new DestructionTitleRenderCallback());
+
 		InitializePackets.registerClientNetworking();
 		ClientTickInstances.registerAllClientTickInstances();
 
@@ -64,6 +71,9 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 		EntityRendererRegistry.register(ModEntities.SPINNING_BLOCK, SpinningBlockEntityRenderer::new);
 		EntityRendererRegistry.register(ModEntities.BLOCK_PHYSICS_ENTITY, BlockPhysicsEntityRenderer::new);
 		EntityRendererRegistry.register(ModEntities.METEOR_ENTITY, MeteorEntityRenderer::new);
+
+		EntityModelLayerRegistry.registerModelLayer(StarPiercerModel.STAR_PIERCER_MODEL_LAYER, StarPiercerModel::getTexturedModelData);
+		EntityRendererRegistry.register(ModEntities.STAR_PIERCER_ENTITY, StarPiercerEntityRenderer::new);
 
 		BlockEntityRendererFactories.register(ModBlockEntities.PHYSICS_DOOR_BE, PhysicsDoorBlockRenderer::new);
 
@@ -144,6 +154,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(minecraftClient -> {
 			if(!initialized){
 				this.enableDynamicBuffers();
+				initialized = true;
 			}
 
 			CameraShakeManager.instancesTicks();

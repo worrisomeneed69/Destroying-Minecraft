@@ -22,11 +22,12 @@ public abstract class DynamicBufferTypeMixin {
     private static DynamicBufferType[] $VALUES;
 
     private static final DynamicBufferType MATERIAL = CustomDynamicBuffers.MATERIAL_BUFFER = addVariant("Material",GlslTypeSpecifier.BuiltinType.IVEC4, FramebufferAttachmentDefinition.Format.R8UI);
+    private static final DynamicBufferType BLOOM = CustomDynamicBuffers.BLOOM_BUFFER = addVariant("Bloom",GlslTypeSpecifier.BuiltinType.VEC3, FramebufferAttachmentDefinition.Format.R11F_G11F_B10F);
 
     @Shadow
     @Final
     @Mutable
-    public static DynamicBufferType[] BUFFERS = {DynamicBufferType.ALBEDO, DynamicBufferType.NORMAL, DynamicBufferType.LIGHT_UV, DynamicBufferType.LIGHT_COLOR, DynamicBufferType.DEBUG, CustomDynamicBuffers.MATERIAL_BUFFER};
+    public static DynamicBufferType[] BUFFERS = {DynamicBufferType.ALBEDO, DynamicBufferType.NORMAL, DynamicBufferType.LIGHT_UV, DynamicBufferType.LIGHT_COLOR, DynamicBufferType.DEBUG, CustomDynamicBuffers.MATERIAL_BUFFER, CustomDynamicBuffers.BLOOM_BUFFER};
 
     @Shadow
     @Final

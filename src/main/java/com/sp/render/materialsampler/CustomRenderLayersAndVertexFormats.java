@@ -2,11 +2,16 @@ package com.sp.render.materialsampler;
 
 import com.sp.DestroyingMinecraft;
 import foundry.veil.api.client.render.VeilRenderBridge;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderPhase;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormatElement;
+import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.render.*;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
+
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
+import static net.minecraft.client.render.RenderPhase.*;
 
 public class CustomRenderLayersAndVertexFormats {
 
@@ -60,6 +65,12 @@ public class CustomRenderLayersAndVertexFormats {
      */
 
     private static final RenderPhase.ShaderProgram METEOR_SHADER = VeilRenderBridge.shaderState(DestroyingMinecraft.idOf("meteor/meteor"));
+    private static final RenderPhase.ShaderProgram ENTITY_BLOOM_SHADER = VeilRenderBridge.shaderState(DestroyingMinecraft.idOf("star_piercer/star_piercer"));
+//    public static final RenderPhase.ShaderProgram ENTITY_SOLID_PROGRAM = new RenderPhase.ShaderProgram(GameRenderer::getRenderTypeEntitySolidProgram);
+//
+//    public static ShaderProgram getRenderTypeEntitySolidProgram() {
+//        return ENTITY_BLOOM_SHADER;
+//    }
 
     public static final RenderLayer METEOR = RenderLayer.of(
             "meteor",
@@ -72,5 +83,43 @@ public class CustomRenderLayersAndVertexFormats {
                     .program(METEOR_SHADER)
                     .build(false)
     );
+
+    public static final BiFunction<Identifier, Identifier, RenderLayer> ENTITY_BLOOM = Util.memoize (
+            (BiFunction<Identifier, Identifier, RenderLayer>)((texture, bloomTexture) -> {
+                return RenderLayer.of(
+                        "entity_bloom",
+                        VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL,
+                        VertexFormat.DrawMode.QUADS,
+                        1536,
+                        true,
+                        false,
+                        RenderLayer.MultiPhaseParameters.builder()
+                                .texture(RenderPhase.Textures.create()
+                                        .add(texture, false, false)
+                                        .add(bloomTexture, false, false)
+                                        .add(bloomTexture, false, false)
+                                        .add(bloomTexture, false, false)
+                                        .build())
+                                .transparency(NO_TRANSPARENCY)
+                                .lightmap(ENABLE_LIGHTMAP)
+                                .overlay(ENABLE_OVERLAY_COLOR)
+                                .program(ENTITY_BLOOM_SHADER)
+                                .build(true)
+                );
+            })
+    );
+
+//    private static final Function<Identifier, RenderLayer> ENTITY_SOLID = Util.memoize(
+//            (Function<Identifier, RenderLayer>)(texture -> {
+//                RenderLayer.MultiPhaseParameters multiPhaseParameters = RenderLayer.MultiPhaseParameters.builder()
+//                        .program(ENTITY_SOLID_PROGRAM)
+//                        .texture(new RenderPhase.Texture(texture, false, false))
+//                        .transparency(NO_TRANSPARENCY)
+//                        .lightmap(ENABLE_LIGHTMAP)
+//                        .overlay(ENABLE_OVERLAY_COLOR)
+//                        .build(true);
+//                return of("entity_solid", VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL, VertexFormat.DrawMode.QUADS, 1536, true, false, multiPhaseParameters);
+//            })
+//    );
 
 }

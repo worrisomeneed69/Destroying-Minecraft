@@ -42,7 +42,7 @@ public class DestroyingMinecraft implements ModInitializer {
 		CommandRegistrationCallback.EVENT.register(DestructionCommand::register);
 		CommandRegistrationCallback.EVENT.register(RipPlatformOutCommand::register);
 
-		LOGGER.info("\"It's nukein' time\" -He said as he loaded a few grapes into the microwave");
+		LOGGER.info("\"It's nukein' time\" -He said as he loaded the fork into the microwave");
 
 		ServerTickEvents.END_WORLD_TICK.register(serverWorld -> {
 			for(SpinningBlockExplosion explosion : SpinningBlockExplosion.getExplosions()){

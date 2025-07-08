@@ -15,6 +15,7 @@ uniform sampler2D HandDepth;
 uniform sampler2D LightUVSampler;
 uniform sampler2D LightMapSampler;
 uniform sampler2D VanillaLightMapTexture;
+uniform sampler2D BloomSampler;
 
 uniform sampler2D NoiseTex;
 
@@ -130,13 +131,12 @@ void main() {
         outputColor = albedoColor.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)*(1.0 - supernovaTimer));
     }
 
+    outputColor += texture(BloomSampler, texCoord).rgb;
 
-    if(handDepth < 1.0){
+    if (handDepth < 1.0) {
         outputColor = color.rgb;
     }
 
-
-//    fragColor = linear_fog(vec4(outputColor, 1.0), length(viewPos), FogEnd-70, FogEnd, vec4(SkyColor, 1.0));
     fragColor = vec4(outputColor, 1.0);
     gl_FragDepth = depth;
 

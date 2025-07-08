@@ -29,7 +29,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 
-import static foundry.veil.impl.client.render.dynamicbuffer.DynamicBufferManger.MAIN_WRAPPER;
+import static foundry.veil.impl.client.render.dynamicbuffer.DynamicBufferManager.MAIN_WRAPPER;
 
 public class MeteorEntityRenderer extends EntityRenderer<MeteorEntity> {
     private static final Identifier RENDER_TYPE = DestroyingMinecraft.idOf("meteor");

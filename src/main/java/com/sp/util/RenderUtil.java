@@ -23,6 +23,12 @@ public class RenderUtil {
         drawBox(matrices, vertexConsumers, box, red, green, blue, alpha, renderOutline);
     }
 
+    public static void drawBlocksFromCorners(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Camera camera, Vec3d corner1, Vec3d corner2, int red, int green, int blue, int alpha, boolean renderOutline) {
+        if(camera != null) matrices.translate(-camera.getPos().x, -camera.getPos().y, -camera.getPos().z);
+        Box box = new Box(corner1, corner2);
+        drawBox(matrices, vertexConsumers, box, red, green, blue, alpha, renderOutline);
+    }
+
     public static void drawBox(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Vec3d targetPos, double size, int red, int green, int blue, int alpha, boolean renderOutline) {
         drawBox(matrices, vertexConsumers, targetPos, new Vec3d(size, size, size), red, green, blue, alpha, renderOutline);
     }
@@ -34,7 +40,7 @@ public class RenderUtil {
 
     public static void drawBox(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Box box, int red, int green, int blue, int alpha, boolean renderOutline) {
         DebugRenderer.drawBox(matrices, vertexConsumers, box, (float) red / 255, (float) green / 255, (float) blue / 255, (float) alpha / 255);
-        if(renderOutline) renderOutline(matrices, vertexConsumers, box, red, green, blue);
+        if(renderOutline) drawOutline(matrices, vertexConsumers, box, 0.07f, red, green, blue);
     }
 
     public static void drawEntityBox(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Vec3d targetPos, double size, Entity entity, int red, int green, int blue, int alpha) {
@@ -56,8 +62,8 @@ public class RenderUtil {
         return red << 16 | green << 8 | blue;
     }
 
-    private static void renderOutline(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Box box, int red, int green, int blue) {
-        for (Box edge : getEdges(box, 0.1)) {
+    public static void drawOutline(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Box box, float thickness, int red, int green, int blue) {
+        for (Box edge : getEdges(box, thickness)) {
             DebugRenderer.drawBox(matrices, vertexConsumers, edge, (float) red / 255, (float) green / 255, (float) blue / 255, (float) 255 / 255);
         }
     }
