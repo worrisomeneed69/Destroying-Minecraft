@@ -17,6 +17,13 @@ public class ModSounds {
     public static final SoundEvent SUPERNOVA_INITIALIZE = registerSoundEvent("sn_initialize");
     public static final SoundEvent BLACK_HOLE_INITIALIZE = registerSoundEvent("bh_initialize");
 
+    public static final SoundEvent LASER_CHARGE = registerSoundEvent("laser_charge");
+    public static final SoundEvent LASER_FIRE = registerSoundEvent("laser_fire");
+    public static final SoundEvent LASER_POWER_DOWN = registerSoundEvent("laser_power_down");
+    public static final SoundEvent LASER_PAUSE = registerSoundEvent("laser_pause");
+
+    public static final SoundEvent SUPERNOVA_EXPLOSION = registerSoundEvent("supernova_explosion");
+
 
     private static SoundEvent registerSoundEvent(String name) {
         Identifier id = DestroyingMinecraft.idOf(name);

@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CameraShakeManager {
-    private static final List<CameraShakeInstance> INSTANCES = new ArrayList<>();
-    private static PerlinNoiseSampler noiseSampler = new PerlinNoiseSampler(Random.create());
+    private static final List<AbstractCameraShakeInstance> INSTANCES = new ArrayList<>();
+    private static final PerlinNoiseSampler noiseSampler = new PerlinNoiseSampler(Random.create());
 
     private static float noiseY;
     private static float amplitude = 4;
@@ -20,7 +20,7 @@ public class CameraShakeManager {
     private static float totalTrauma;
     private static float totalRoll;
 
-    //I COULD lerp to make it smoother, but it really wouldn't make much of a difference
+    //I COULD lerp it to make it smoother, but it really wouldn't make much of a difference
     public static void updateCamera(Camera camera) {
         float frameDelta = MinecraftClient.getInstance().getRenderTickCounter().getLastFrameDuration();
 
@@ -40,8 +40,8 @@ public class CameraShakeManager {
 
     public static void instancesTicks() {
         float tempTrauma = 0.0f;
-        INSTANCES.removeIf(CameraShakeInstance::isFinished);
-        for(CameraShakeInstance instance : INSTANCES) {
+        INSTANCES.removeIf(AbstractCameraShakeInstance::isFinished);
+        for(AbstractCameraShakeInstance instance : INSTANCES) {
             //Max trauma
             if(tempTrauma >= 5.0f) {
                 tempTrauma = 5.0f;
@@ -61,7 +61,7 @@ public class CameraShakeManager {
         return totalRoll;
     }
 
-    public static void addCameraShake(CameraShakeInstance cameraShakeInstance) {
+    public static void addCameraShake(AbstractCameraShakeInstance cameraShakeInstance) {
         INSTANCES.add(cameraShakeInstance);
     }
 

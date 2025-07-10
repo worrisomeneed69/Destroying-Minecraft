@@ -4,32 +4,14 @@ import com.sp.DestroyingMinecraft;
 import com.sp.entity.custom.MeteorEntity;
 import com.sp.mixininterfaces.BufferBuilderPosition;
 import com.sp.render.PerspectiveRenderer;
-import com.sp.render.materialsampler.CustomRenderLayersAndVertexFormats;
-import com.sp.util.BetterUniforms;
-import foundry.veil.api.client.render.VeilRenderBridge;
-import foundry.veil.api.client.render.VeilRenderSystem;
-import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
-import foundry.veil.api.client.render.rendertype.VeilRenderType;
-import foundry.veil.api.client.render.shader.program.ShaderProgram;
-import net.minecraft.block.Blocks;
+import com.sp.render.CustomRenderLayersAndVertexFormats;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.block.BlockRenderManager;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.scoreboard.ScoreboardCriterion;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-import org.lwjgl.system.MemoryUtil;
-
-import static foundry.veil.impl.client.render.dynamicbuffer.DynamicBufferManager.MAIN_WRAPPER;
 
 public class MeteorEntityRenderer extends EntityRenderer<MeteorEntity> {
     private static final Identifier RENDER_TYPE = DestroyingMinecraft.idOf("meteor");

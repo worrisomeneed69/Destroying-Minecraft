@@ -10,19 +10,16 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.sound.SoundInstance;
-import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.random.Random;
 
 public class DestructionTitleRenderCallback implements HudRenderCallback {
-    private static final DestructionTitle ORBITAL_LASER = new DestructionTitle(DestroyingMinecraft.idOf("textures/gui/orbital_laser.png"), 1024, 134);
-    private static final DestructionTitle PLANET = new DestructionTitle(DestroyingMinecraft.idOf("textures/gui/planet.png"), 1003, 256);
-    private static final DestructionTitle SUPERNOVA = new DestructionTitle(DestroyingMinecraft.idOf("textures/gui/supernova.png"), 1024, 168);
-    private static final DestructionTitle BLACK_HOLE = new DestructionTitle(DestroyingMinecraft.idOf("textures/gui/black_hole.png"), 1024, 171);
+    private static final DestructionTitle ORBITAL_LASER = new DestructionTitle(DestroyingMinecraft.idOf("orbital_laser.png"), 1024, 134);
+    private static final DestructionTitle PLANET = new DestructionTitle(DestroyingMinecraft.idOf("planet.png"), 1003, 256);
+    private static final DestructionTitle SUPERNOVA = new DestructionTitle(DestroyingMinecraft.idOf("supernova.png"), 1024, 168);
+    private static final DestructionTitle BLACK_HOLE = new DestructionTitle(DestroyingMinecraft.idOf("black_hole.png"), 1024, 171);
 
     public static DestructionTitleAnimation ORBITAL_LASER_ANIMATION;
     public static DestructionTitleAnimation PLANET_ANIMATION;
@@ -33,7 +30,6 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
     private static DestructionTitleAnimation currentDestructionTitle;
     private static boolean renderTitle;
     private static boolean initAnimations;
-    private static Random random = Random.create();
 
     public static void setDestructionTitle(DestructionTitleAnimation destructionTitle) {
         if(renderTitle) return;
@@ -87,11 +83,10 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
                     drawContext.drawText(client.textRenderer, text, 0, 0, Colors.WHITE, false);
                     drawContext.getMatrices().pop();
                 }),
-                new Keyframe(0.35f, () -> {
-                }, (globalTime, localTime) -> {
+                new Keyframe(0.35f, (globalTime, localTime) -> {
                     this.renderText(drawContext, localTime);
                 })
-        ), ORBITAL_LASER, 10000L);
+        ), ORBITAL_LASER);
 
         PLANET_ANIMATION = new DestructionTitleAnimation(new KeyframeAnimation(
                 new Keyframe(0.0f, () -> {
@@ -110,11 +105,10 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
                     drawContext.drawText(client.textRenderer, text, 0, 0, Colors.WHITE, false);
                     drawContext.getMatrices().pop();
                 }),
-                new Keyframe(0.31f, () -> {
-                }, (globalTime, localTime) -> {
+                new Keyframe(0.31f, (globalTime, localTime) -> {
                     this.renderText(drawContext, localTime);
                 })
-        ), PLANET, 10000L);
+        ), PLANET);
 
         SUPERNOVA_ANIMATION = new DestructionTitleAnimation(new KeyframeAnimation(
                 new Keyframe(0.0f, () -> {
@@ -133,21 +127,16 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
                     drawContext.drawText(client.textRenderer, text, 0, 0, Colors.WHITE, false);
                     drawContext.getMatrices().pop();
                 }),
-                new Keyframe(0.47f, () -> {
-                }, (globalTime, localTime) -> {
+                new Keyframe(0.47f, (globalTime, localTime) -> {
                     this.renderText(drawContext, localTime);
                 })
-        ), SUPERNOVA, 10000L);
+        ), SUPERNOVA);
 
         BLACK_HOLE_ANIMATION = new DestructionTitleAnimation(new KeyframeAnimation(
                 new Keyframe(0.0f, () -> {
                     client.getSoundManager().play(PositionedSoundInstance.master(ModSounds.BLACK_HOLE_INITIALIZE, 1.0f, 1.0f));
-                }, (globalTime, localTime) -> {
-
                 }),
-                new Keyframe(0.64f, () -> {
-
-                }, (globalTime, localTime) -> {
+                new Keyframe(0.64f, (globalTime, localTime) -> {
                     this.renderText(drawContext, localTime);
                 })
         ), BLACK_HOLE, 25000L);
@@ -168,6 +157,16 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
         drawContext.setShaderColor(1, 1, 1, 1);
     }
 
-    public record DestructionTitleAnimation(KeyframeAnimation keyframeAnimation, DestructionTitle title, long duration){}
-    public record DestructionTitle(Identifier texture, int width, int height) {}
+    public record DestructionTitleAnimation(KeyframeAnimation keyframeAnimation, DestructionTitle title, long duration) {
+        public DestructionTitleAnimation(KeyframeAnimation keyframeAnimation, DestructionTitle title) {
+            this(keyframeAnimation, title, 10000L);
+        }
+    }
+    public record DestructionTitle(Identifier texture, int width, int height) {
+        public DestructionTitle(Identifier texture, int width, int height) {
+            this.texture = texture.withPrefixedPath("textures/gui/");
+            this.width = width;
+            this.height = height;
+        }
+    }
 }

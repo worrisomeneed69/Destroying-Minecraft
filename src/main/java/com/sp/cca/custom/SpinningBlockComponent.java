@@ -10,6 +10,7 @@ import net.minecraft.nbt.NbtHelper;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent;
@@ -24,6 +25,8 @@ public class SpinningBlockComponent implements AutoSyncedComponent, ClientTickin
     private float yaw;
     private float prevPitch;
     private float prevYaw;
+    private Vec3d acceleration;
+    private boolean applyGravity;
 
     private float accelerationFactor;
     private float scale;
@@ -56,6 +59,8 @@ public class SpinningBlockComponent implements AutoSyncedComponent, ClientTickin
 //        BlockType[] values = BlockType.values();
 //        this.blockType = values[random.nextBetween(0, values.length - 1)];
         this.blockType = BlockType.SINGLE;
+        this.acceleration = Vec3d.ZERO;
+        this.applyGravity = true;
     }
 
 
@@ -83,6 +88,22 @@ public class SpinningBlockComponent implements AutoSyncedComponent, ClientTickin
         return blockType;
     }
 
+    public boolean shouldApplyGravity() {
+        return applyGravity;
+    }
+    public void setApplyGravity(boolean applyGravity) {
+        this.applyGravity = applyGravity;
+    }
+    public Vec3d getAcceleration() {
+        return acceleration;
+    }
+    public void setAcceleration(Vec3d acceleration) {
+        this.acceleration = acceleration;
+    }
+    public void setAcceleration(float xAcceleration, float yAcceleration, float zAcceleration) {
+        this.acceleration = new Vec3d(xAcceleration, yAcceleration, zAcceleration);
+    }
+
 
     public void sync() {
         InitializeComponents.SPINNING_BLOCK.sync(this.spinningBlockEntity);
@@ -95,6 +116,12 @@ public class SpinningBlockComponent implements AutoSyncedComponent, ClientTickin
         this.yawIncrement = nbtCompound.getFloat("yawIncrement");
         this.accelerationFactor = nbtCompound.getFloat("accelerationFactor");
         this.scale = nbtCompound.getFloat("scale");
+        this.acceleration = new Vec3d(
+                nbtCompound.getFloat("accelerationX"),
+                nbtCompound.getFloat("accelerationY"),
+                nbtCompound.getFloat("accelerationZ")
+        );
+        this.applyGravity = nbtCompound.getBoolean("applyGravity");
     }
 
 
@@ -105,6 +132,11 @@ public class SpinningBlockComponent implements AutoSyncedComponent, ClientTickin
         nbtCompound.putFloat("yawIncrement", this.yawIncrement);
         nbtCompound.putFloat("accelerationFactor", this.accelerationFactor);
         nbtCompound.putFloat("scale", this.scale);
+
+        nbtCompound.putFloat("accelerationX", (float) this.acceleration.x);
+        nbtCompound.putFloat("accelerationY", (float) this.acceleration.y);
+        nbtCompound.putFloat("accelerationZ", (float) this.acceleration.z);
+        nbtCompound.putBoolean("applyGravity", this.applyGravity);
     }
 
     @Override

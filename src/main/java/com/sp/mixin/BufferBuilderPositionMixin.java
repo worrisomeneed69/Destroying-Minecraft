@@ -1,7 +1,7 @@
 package com.sp.mixin;
 
 import com.sp.mixininterfaces.BufferBuilderPosition;
-import com.sp.render.materialsampler.CustomRenderLayersAndVertexFormats;
+import com.sp.render.CustomRenderLayersAndVertexFormats;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormatElement;
 import org.lwjgl.system.MemoryUtil;

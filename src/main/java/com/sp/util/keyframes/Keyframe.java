@@ -7,6 +7,38 @@ public class Keyframe {
     private final Runnable initAction;
     private final KeyframeAction action;
 
+    /**
+     * No actions taken. Meant to act as a delay
+     * @param keyframeTime The point in time (0 -> 1) that the keyframe should be placed
+     */
+    public Keyframe(float keyframeTime) {
+        this(keyframeTime, () -> {}, (globalTime, localTime) -> {});
+    }
+
+    /**
+     * Only the update action runs
+     * @param keyframeTime The point in time (0 -> 1) that the keyframe should be placed
+     * @param action The action that should be called every time the keyframe is updated
+     */
+    public Keyframe(float keyframeTime, KeyframeAction action) {
+        this(keyframeTime, () -> {}, action);
+    }
+
+    /**
+     * Only the initialize action runs. One time only keyframe
+     * @param keyframeTime The point in time (0 -> 1) that the keyframe should be placed
+     * @param initAction The action that should be called once at the beginning of the keyframe
+     */
+    public Keyframe(float keyframeTime, Runnable initAction) {
+        this(keyframeTime, initAction, (globalTime, localTime) -> {});
+    }
+
+    /**
+     * Full keyframe with both an initializing action and update action
+     * @param keyframeTime The point in time (0 -> 1) that the keyframe should be placed
+     * @param initAction The action that should be called once at the beginning of the keyframe
+     * @param action The action that should be called every time the keyframe is updated
+     */
     public Keyframe(float keyframeTime, Runnable initAction, KeyframeAction action) {
         this.keyframeTime = keyframeTime;
         this.initAction = initAction;

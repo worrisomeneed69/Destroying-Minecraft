@@ -15,12 +15,13 @@ uniform mat4 sunMat;
 uniform float supernovaTimer;
 uniform float flashTimer;
 uniform float explosionTimer;
+uniform float laserLength;
+uniform int flashFrame;
 
 
 in vec2 texCoord;
 out vec4 fragColor;
 
-const vec3 SkyColor = vec3(0.3,0.55,1.4);
 
 vec3 getLightAngle() {
     vec3 lightangle = mat3(sunMat) * vec3(0.0, 0.0, 1.0);
@@ -30,6 +31,8 @@ vec3 getLightAngle() {
 float easeInExpo(float x) {
     return x == 0 ? 0 : pow(2, 200 * x - 200);
 }
+
+const vec3 SkyColor = vec3(0.3,0.55,1.4);
 
 const int ITERATIONS = 75;
 const float CONTRAST = 5;
@@ -43,6 +46,8 @@ const vec3 color1 = vec3(0.4627450980392157, 0.06274509803921569, 0.117647058823
 const vec3 color2 = vec3(0.7607843137254902, 0.8666666666666667, 0.8941176470588236);
 const vec3 color3 = vec3(0.07450980392156863, 0.21568627450980393, 0.4117647058823529);
 const vec3 color4 = vec3(0.788235294117647, 0.21568627450980393, 0.2980392156862745);
+
+const vec3 centerPos = vec3(-1685, 80.9, 1573.5);
 
 //Attenuation formula https://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula
 float attenuation(float value, float a, float b) {
@@ -80,6 +85,10 @@ float getBrightness(vec3 color) {
     return (color.r + color.g + color.b) / 3;
 }
 
+float getLuminance(vec3 color) {
+    return dot(color, vec3(0.2126, 0.7152, 0.0722));
+}
+
 float contrast(float color) {
     return CONTRAST * (color - 0.5) + 0.5;
 }
@@ -97,7 +106,6 @@ vec3 rayMarchSupernova() {
 
     float stepSize = farPlane / ITERATIONS;
 
-    vec3 sunDir = getLightAngle();
     vec3 rd = viewDirFromUv(texCoord) * stepSize;
     vec3 rayPos = cameraPos + rand(texCoord + GameTime) * 0.01;
 
@@ -147,6 +155,41 @@ vec3 rayMarchSupernova() {
     return color;
 }
 
+float mapLaser(vec3 p, vec3 sunDir) {
+    vec3 rayPos = p;
+    float length = laserLength * 20000;
+
+    if (length <= 0.0) return 1.0;
+    rayPos -= vec3(centerPos.x, centerPos.y, centerPos.z);
+    float angle = atan2(sunDir.x, sunDir.y);
+    rayPos.xy *= rot2D(angle * 180/3.141592);
+    rayPos.y -= length;
+    float d = sdCylinder(rayPos, length, 0.5);
+    d -= (sin(p.y*1 + rand(vec2(GameTime*1000, 745))*100)*0.5 + 0.5)*0.1;
+    return d;
+}
+
+void rayMarchLaser(in out vec3 color, vec3 playerPos, vec3 sunDir) {
+    vec3 rayOrigin = VeilCamera.CameraPosition + VeilCamera.CameraBobOffset;
+    vec3 rayDir = viewDirFromUv(texCoord);
+    float dist = 0.0;
+
+    for(int i = 0; i < 200; i++) {
+        vec3 rayPos = rayOrigin + rayDir * dist;
+        float d = mapLaser(rayPos, sunDir);
+        dist += d;
+
+        if(d < 0.01) {
+            color = vec3(10.0, 2.0, 2.0);
+            break;
+        } else if(dist > length(playerPos) || dist > 500.0) {
+            break;
+        }
+
+    }
+
+}
+
 void main() {
     vec3 color = texture(DiffuseSampler, texCoord).rgb;
     float depth = texture(DiffuseDepthSampler, texCoord).r;
@@ -164,17 +207,28 @@ void main() {
 
 
         if (flashTimer > 0.0){
-            fragColor = vec4(max(dot(rd, sunDir), 0.0) * mix(vec3(10.0), color + rayMarchSupernova(), min(flashTimer, 1.0)), 1.0);
+//            fragColor = vec4(max(dot(rd, sunDir), 0.1) * mix(vec3(10.0), color + rayMarchSupernova(), min(flashTimer, 1.0)), 1.0);
+            fragColor = vec4(mix(vec3(10.0), color + rayMarchSupernova(), min(flashTimer, 1.0)), 1.0);
         } else {
             fragColor = vec4(color, 1.0);
         }
 
-//        fragColor.rgb = texture(StarsTexture, viewDirFromUv(texCoord).zy*0.5).rgb;
     } else {
         fragColor = vec4(color, 1.0);
     }
 
+    if (laserLength > 0.0) {
+        vec3 playerPos = screenToLocalSpace(texCoord, depth).rgb;
+        rayMarchLaser(fragColor.rgb, playerPos, sunDir);
+    }
 
-
-//    fragColor = vec4(SkyColor, 1.0);
+    if (flashFrame == 1) {
+        if (getBrightness(fragColor.rgb) > 0.3) {
+            fragColor.rgb = vec3(0.0);
+        } else {
+            fragColor.rgb = vec3(1.0);
+        }
+    }
+//    fragColor.rgb = vec3(getLuminance(fragtColor.rgb));
+//    fragColor.rgb = 1.0 - fragColor.rgb;
 }

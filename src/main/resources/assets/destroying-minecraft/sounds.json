@@ -33,5 +33,30 @@
     "sounds": [
       "destroying-minecraft:initialize/black_hole_initialize"
     ]
+  },
+  "laser_charge": {
+    "sounds": [
+      "destroying-minecraft:laser/laser_charge"
+    ]
+  },
+  "laser_fire": {
+    "sounds": [
+      "destroying-minecraft:laser/laser_fire"
+    ]
+  },
+  "laser_power_down": {
+    "sounds": [
+      "destroying-minecraft:laser/laser_power_down"
+    ]
+  },
+  "laser_pause": {
+    "sounds": [
+      "destroying-minecraft:laser/laser_pause"
+    ]
+  },
+  "supernova_explosion": {
+    "sounds": [
+      "destroying-minecraft:supernova_explosion"
+    ]
   }
 }

@@ -1,5 +1,7 @@
 package com.sp.world.spinningblockexplosion.custom;
 
+import com.sp.cca.InitializeComponents;
+import com.sp.cca.custom.SpinningBlockComponent;
 import com.sp.entity.ModEntities;
 import com.sp.entity.custom.SpinningBlockEntity;
 import com.sp.world.spinningblockexplosion.SpinningBlockExplosion;
@@ -37,8 +39,13 @@ public class DirectionalSBE extends SpinningBlockExplosion {
                     SpinningBlockEntity spinningBlockEntity = ModEntities.SPINNING_BLOCK.create(world);
                     if (spinningBlockEntity == null) return;
 
-                    Vec3d newBlockPos = new Vec3d(x, -5, this.progress - length*2).rotateY((float) Math.toRadians(this.angle));
+                    SpinningBlockComponent component = InitializeComponents.SPINNING_BLOCK.get(spinningBlockEntity);
 
+                    Vec3d newBlockPos = new Vec3d(x, -5, this.progress - length*2).rotateY((float) Math.toRadians(this.angle));
+                    float randomYAcceleration = spinningBlockEntity.getRandom().nextFloat()*0.05f + 0.3f;
+                    component.setAcceleration(0.0f, randomYAcceleration, 0.0f);
+                    component.setApplyGravity(false);
+                    component.sync();
                     spinningBlockEntity.refreshPositionAndAngles(this.position.add(newBlockPos), 0, 0);
 
                     world.spawnEntity(spinningBlockEntity);

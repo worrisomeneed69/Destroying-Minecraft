@@ -3,7 +3,6 @@ package com.sp.render;
 import com.sp.DestroyingMinecraft;
 import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.util.BetterUniforms;
-import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
@@ -15,6 +14,8 @@ import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
+
+import java.util.Optional;
 
 /**
  * Taken from my backrooms mod
@@ -123,6 +124,15 @@ public class ShadowMapRenderer {
         BetterUniforms.setMatrix(access, "shadowProjMat", ShadowMapRenderer.createProjMat());
     }
 
+    public static Optional<Matrix4f> getShadowViewMat() {
+        if (currentCamera != null) {
+            Matrix4f matrix4f = new Matrix4f();
+            rotateShadowModelView(matrix4f);
+            return Optional.of(matrix4f);
+        }
+
+        return Optional.empty();
+    }
 
 
 }

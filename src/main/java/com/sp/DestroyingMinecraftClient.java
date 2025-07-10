@@ -25,7 +25,6 @@ import foundry.veil.Veil;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.dynamicbuffer.DynamicBufferType;
 import foundry.veil.api.client.render.post.PostProcessingManager;
-import foundry.veil.api.event.VeilRenderLevelStageEvent;
 import foundry.veil.platform.VeilEventPlatform;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -89,6 +88,13 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 							ShadowMapRenderer.renderShadowMap(camera);
 						}
 
+						//Remove all the shaders currently in the pipeline then add back the ones we need in their specific order
+						//Only update when the shaderType changes
+						if(prevShaderType != DestroyingMinecraftConfig.shaderType) {
+							this.updatePostShader();
+							prevShaderType = DestroyingMinecraftConfig.shaderType;
+						}
+
 						break;
 					}
 					case AFTER_SKY -> {
@@ -112,16 +118,6 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 						SelectionHandler.renderSelection(matrixStack.toPoseStack(), bufferSource, deltaTracker, camera);
 						break;
 					}
-				}
-			}
-
-
-			//Remove all the shaders currently in the pipeline then add back the ones we need in their specific order
-			if(stage == VeilRenderLevelStageEvent.Stage.AFTER_LEVEL) {
-				//Only update when the shaderType changes
-				if(prevShaderType != DestroyingMinecraftConfig.shaderType) {
-					this.updatePostShader();
-					prevShaderType = DestroyingMinecraftConfig.shaderType;
 				}
 			}
 

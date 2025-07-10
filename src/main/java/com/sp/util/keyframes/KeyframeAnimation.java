@@ -7,7 +7,7 @@ public class KeyframeAnimation {
     private final List<Keyframe> keyframeList;
     private int currentKeyframeindex = 0;
 
-    public KeyframeAnimation(Keyframe ... keyframes) {
+    public KeyframeAnimation(Keyframe... keyframes) {
         if (keyframes.length == 0) throw new RuntimeException("Cannot make a keyframe animation with zero keyframes");
 
         this.keyframeList = Arrays.stream(keyframes).sorted((o1, o2) -> {
@@ -20,10 +20,7 @@ public class KeyframeAnimation {
 
     public void updateKeyframeAnimation(float time) {
         if (time >= 1.0) {
-            currentKeyframeindex = 0;
-            for (Keyframe keyframe : keyframeList) {
-                keyframe.setInitialized(false);
-            }
+            this.resetAnimation();
             return;
         }
 
@@ -45,5 +42,12 @@ public class KeyframeAnimation {
         float nextKeyframeTime = nextKeyframe != null ? nextKeyframe.getKeyframeTime() : 1.0f;
 
         currentKeyframe.getAction().run(time, (time - currentKeyframeTime) / (nextKeyframeTime - currentKeyframeTime));
+    }
+
+    public void resetAnimation() {
+        currentKeyframeindex = 0;
+        for (Keyframe keyframe : keyframeList) {
+            keyframe.setInitialized(false);
+        }
     }
 }

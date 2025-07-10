@@ -2,7 +2,6 @@ package com.sp.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.DestroyingMinecraft;
-import com.sp.render.materialsampler.CustomRenderLayersAndVertexFormats;
 import com.sp.util.BetterUniforms;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;

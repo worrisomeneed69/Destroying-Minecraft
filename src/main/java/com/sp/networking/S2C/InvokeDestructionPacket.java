@@ -2,11 +2,7 @@ package com.sp.networking.S2C;
 
 import com.sp.DestroyingMinecraft;
 import com.sp.DestroyingMinecraftClient;
-import com.sp.networking.InitializePackets;
 import com.sp.render.gui.DestructionTitleRenderCallback;
-import foundry.veil.api.client.render.VeilRenderSystem;
-import foundry.veil.api.quasar.particle.ParticleEmitter;
-import foundry.veil.api.quasar.particle.ParticleSystemManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -39,24 +35,24 @@ public class InvokeDestructionPacket {
                 }
 
                 case 1: {
-                    DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.ORBITAL_LASER_ANIMATION);
+                    if (on) DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.ORBITAL_LASER_ANIMATION);
                     break;
                 }
 
                 case 2: {
-//                    DestroyingMinecraftClient.supernovaPostShader.getRenderTimer().toggleExplosion(on);
-                    DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.SUPERNOVA_ANIMATION);
+                    DestroyingMinecraftClient.supernovaPostShader.getRenderTimer().toggleExplosion(on);
+                    if (on) DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.SUPERNOVA_ANIMATION);
                     break;
                 }
 
                 case 3: {
 //                    DestroyingMinecraftClient.planetPostShader.getRenderTimer().toggleExplosion(on);
-                    DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.PLANET_ANIMATION);
+                    if (on) DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.PLANET_ANIMATION);
                     break;
                 }
 
                 case 4: {
-                    DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.BLACK_HOLE_ANIMATION);
+                    if (on) DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.BLACK_HOLE_ANIMATION);
                 }
             }
 

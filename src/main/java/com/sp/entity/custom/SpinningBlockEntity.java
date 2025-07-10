@@ -43,7 +43,7 @@ public class SpinningBlockEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-//        SpinningBlockComponent component = InitializeComponents.SPINNING_BLOCK.get(this);
+        SpinningBlockComponent component = InitializeComponents.SPINNING_BLOCK.get(this);
 
 //        this.acceleration += component.getAccelerationFactor()*0.1f;
 //        Vec3d randDir = new Vec3d(component.getRandDir());
@@ -51,8 +51,11 @@ public class SpinningBlockEntity extends Entity {
 
 
         if(!this.isOnGround()) {
-            this.setVelocity(this.getVelocity().add(new Vec3d(0, -0.07, 0)));
-
+            Vec3d acceleration = component.getAcceleration();
+            if(!acceleration.equals(Vec3d.ZERO)) this.addVelocity(acceleration);
+            if (component.shouldApplyGravity()) {
+                this.addVelocity(0, -0.07, 0);
+            }
             this.move(MovementType.SELF, this.getVelocity());
         }
 

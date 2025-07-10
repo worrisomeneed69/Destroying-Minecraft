@@ -12,13 +12,14 @@
     "defaultRequire": 1
   },
   "client": [
-    "SodiumAOMixin",
     "BufferBuilderPositionMixin",
     "DisableEntityShadowsMixin",
     "EnableDebugMixin",
     "GameRendererMixin",
     "NoDirectionalBrightnessMixin",
     "PostProcessingManagerAccessor",
+    "SetShadowUniformMixin",
+    "SodiumAOMixin",
     "VeilLevelPerspectiveRendererMixin",
     "WorldRendererAccessor",
     "WorldRendererMixin",

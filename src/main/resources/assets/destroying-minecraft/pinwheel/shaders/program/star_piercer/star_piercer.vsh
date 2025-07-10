@@ -19,6 +19,7 @@ uniform sampler2D Sampler2;
 uniform mat4 ModelViewMat;
 uniform mat4 ProjMat;
 uniform int FogShape;
+uniform int renderingShadow;
 
 uniform vec3 Light0_Direction;
 uniform vec3 Light1_Direction;
@@ -30,8 +31,23 @@ out vec3 normal;
 out ivec2 lightUV;
 out vec2 texCoord0;
 
+vec3 distort(in vec3 shadowPosition) {
+    const float bias0 = 0.95;
+    const float bias1 = 1.0 - bias0;
+
+    float factorDistance = length(shadowPosition.xy);
+
+    float distortFactor = factorDistance * bias0 + bias1;
+
+    return shadowPosition * vec3(vec2(1.0 / distortFactor), 0.2);
+}
+
 void main() {
     gl_Position = ProjMat * ModelViewMat * vec4(Position, 1.0);
+
+    if (renderingShadow == 1) {
+        gl_Position.xyz = distort(gl_Position.xyz);
+    }
 
     vertexDistance = fog_distance(Position, FogShape);
     vertexColor = minecraft_mix_light(Light0_Direction, Light1_Direction, UV0, vec4(0));

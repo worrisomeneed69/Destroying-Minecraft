@@ -19,6 +19,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import static net.minecraft.server.command.CommandManager.argument;
 
 public class DestructionCommand {
@@ -124,8 +129,27 @@ public class DestructionCommand {
     }
 
     private static int execute(CommandContext<ServerCommandSource> context, boolean start, int type) {
-        for(ServerPlayerEntity player : context.getSource().getWorld().getPlayers()) {
+        List<ServerPlayerEntity> playerList = context.getSource().getWorld().getPlayers();
+
+        for(ServerPlayerEntity player : playerList) {
             ServerPlayNetworking.send(player, new InvokeDestructionPacket.DestructionPayload(start, type));
+        }
+
+        switch (type) {
+            case supernovaType -> {
+                ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
+                executorService.schedule(() -> {
+//                    for(ServerPlayerEntity player : playerList) {
+//                        ServerPlayNetworking.send(player, new InvokeDestructionPacket.DestructionPayload(start, type));
+//                    }
+
+                    DirectionalSBE explosion = new DirectionalSBE(50, 50, -90, 0.5f, new Vec3d(-1720, 74, 1595));
+                    explosion.beginExplosion();
+                    executorService.shutdown();
+                }, 144000, TimeUnit.MILLISECONDS);
+                break;
+            }
         }
         return 1;
     }

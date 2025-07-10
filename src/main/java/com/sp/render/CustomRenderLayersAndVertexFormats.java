@@ -1,15 +1,12 @@
-package com.sp.render.materialsampler;
+package com.sp.render;
 
 import com.sp.DestroyingMinecraft;
 import foundry.veil.api.client.render.VeilRenderBridge;
-import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.render.*;
-import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import static net.minecraft.client.render.RenderPhase.*;
 
@@ -108,18 +105,5 @@ public class CustomRenderLayersAndVertexFormats {
                 );
             })
     );
-
-//    private static final Function<Identifier, RenderLayer> ENTITY_SOLID = Util.memoize(
-//            (Function<Identifier, RenderLayer>)(texture -> {
-//                RenderLayer.MultiPhaseParameters multiPhaseParameters = RenderLayer.MultiPhaseParameters.builder()
-//                        .program(ENTITY_SOLID_PROGRAM)
-//                        .texture(new RenderPhase.Texture(texture, false, false))
-//                        .transparency(NO_TRANSPARENCY)
-//                        .lightmap(ENABLE_LIGHTMAP)
-//                        .overlay(ENABLE_OVERLAY_COLOR)
-//                        .build(true);
-//                return of("entity_solid", VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL, VertexFormat.DrawMode.QUADS, 1536, true, false, multiPhaseParameters);
-//            })
-//    );
 
 }
