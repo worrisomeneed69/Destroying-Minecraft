@@ -19,6 +19,7 @@ public class ModItemGroups {
                         entries.add(ModItems.CAMERA_SHAKE_STICK);
                         entries.add(ModBlocks.WHITE_VOID_BLOCK);
                         entries.add(ModBlocks.PHYSICS_DOOR_BLOCK);
+                        entries.add(ModBlocks.CHAIR_BLOCK);
 
 
                     }).build());

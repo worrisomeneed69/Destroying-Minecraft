@@ -1,6 +1,7 @@
 package com.sp.block;
 
 import com.sp.DestroyingMinecraft;
+import com.sp.block.custom.ChairBlock;
 import com.sp.block.custom.PhysicsDoorBlock;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -17,6 +18,9 @@ public class ModBlocks {
 
     public static final Block PHYSICS_DOOR_BLOCK = registerBlock("physics_door_block",
             new PhysicsDoorBlock(AbstractBlock.Settings.copy(Blocks.STONE).hardness(-1f).solid().noBlockBreakParticles()));
+
+    public static final Block CHAIR_BLOCK = registerBlock("chair_block",
+            new ChairBlock(AbstractBlock.Settings.copy(Blocks.SPRUCE_STAIRS).solid().noBlockBreakParticles()));
 
 
 

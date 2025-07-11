@@ -1,5 +1,6 @@
 package com.sp;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.block.entity.ModBlockEntities;
 import com.sp.block.entity.client.PhysicsDoorBlockRenderer;
 import com.sp.config.DestroyingMinecraftConfig;
@@ -57,7 +58,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 	private static ShaderType prevShaderType;
 	private static final Set<Identifier> removedPipelines = new HashSet<>(1);
 
-	private static boolean initialized = false;
+	private static boolean enabledDynamicBuffers = false;
 
 	@Override
 	public void onInitializeClient() {
@@ -111,7 +112,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 					}
 
 					case AFTER_WEATHER -> {
-						if(DestroyingMinecraftClient.shouldRenderDebug) {
+						if(shouldRenderDebug) {
 							BlackHoleDestruction.renderSelectionDebug(matrixStack.toPoseStack(), bufferSource, camera);
 						}
 
@@ -148,9 +149,9 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 		//Update camera shakes
 		ClientTickEvents.END_CLIENT_TICK.register(minecraftClient -> {
-			if(!initialized){
+			if(!enabledDynamicBuffers){
 				this.enableDynamicBuffers();
-				initialized = true;
+				enabledDynamicBuffers = true;
 			}
 
 			CameraShakeManager.instancesTicks();
@@ -172,7 +173,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 		});
 	}
 
-	private void updatePostShader(){
+	private void updatePostShader() {
 		PostProcessingManager postProcessingManager = VeilRenderSystem.renderer().getPostProcessingManager();
 		removedPipelines.clear();
 

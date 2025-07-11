@@ -6,7 +6,10 @@
     "ForceRenderPlayerMixin",
     "collision.IsGroundedCheckMixin",
     "collision.PlatformCollisionMixin",
-    "collision.SneakFixMixinOnPlatforms"
+    "collision.SneakFixMixinOnPlatforms",
+    "layingdown.LyingDownPlayerEntityMixin",
+    "layingdown.SetLayingDownDirectionMixin",
+    "layingdown.SetSleepingPoseMixin"
   ],
   "injectors": {
     "defaultRequire": 1
@@ -19,16 +22,17 @@
     "NoDirectionalBrightnessMixin",
     "PostProcessingManagerAccessor",
     "SetShadowUniformMixin",
-    "SodiumAOMixin",
     "VeilLevelPerspectiveRendererMixin",
     "WorldRendererAccessor",
     "WorldRendererMixin",
     "camerashake.CameraMixin",
     "camerashake.CameraRollMixin",
-    "flashbackcompat.ExportJobMixin",
+    "layingdown.RenderLyingDownPlayerMixin",
     "materialsampler.DynamicBufferProcessorMixin",
     "materialsampler.DynamicBufferTypeMixin",
     "materialsampler.sodium.SodiumShaderPreProcessorMixin",
+    "sodiumcompat.ChunkDestroyingMixin",
+    "sodiumcompat.SodiumAOMixin",
     "sodiumcompat.SodiumShadowMapShaderMixin",
     "supernova.SunMixin"
   ]

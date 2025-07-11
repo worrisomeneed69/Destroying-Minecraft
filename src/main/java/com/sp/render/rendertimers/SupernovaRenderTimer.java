@@ -29,6 +29,7 @@ public class SupernovaRenderTimer extends ExplosionRenderTimer {
     private static KeyframeAnimation supernovaAnimation;
     private static boolean initAnimation;
     private static int flashFrame = -1;
+    public static int destructionDistance = Integer.MAX_VALUE;
 
     public SupernovaRenderTimer(int duration) {
         super(duration);
@@ -59,7 +60,7 @@ public class SupernovaRenderTimer extends ExplosionRenderTimer {
         explosionTimer.reset();
         laserLength = 0;
         starPiercers.forEach(StarPiercerEntity::reset);
-
+        destructionDistance = Integer.MAX_VALUE;
         super.resetExplosionTimer();
     }
 
@@ -76,7 +77,7 @@ public class SupernovaRenderTimer extends ExplosionRenderTimer {
         supernovaAnimation = new KeyframeAnimation(
                 new Keyframe(0.0f),                      //Pause
 
-                new Keyframe((float) 15/150, () -> {     //Startup StarPiercers
+                new Keyframe((float) 15/150, () -> {     //Startup Star Piercers
                     PlayerEntity player = MinecraftClient.getInstance().player;
                     if (player != null) {
                         for (StarPiercerEntity entity : clientWorld.getEntitiesByClass(
@@ -111,7 +112,7 @@ public class SupernovaRenderTimer extends ExplosionRenderTimer {
                     flashFrame = flashFrame == 0 ? 1 : 0;
                 }),
 
-                new Keyframe((float) 121/300, () -> {     //Fire StarPiercers
+                new Keyframe((float) 121/300, () -> {     //Fire Star Piercers
                     SustainedCameraShakeInstance shakeInstance = new SustainedCameraShakeInstance(
                             0.8f,
                             280,
@@ -156,6 +157,7 @@ public class SupernovaRenderTimer extends ExplosionRenderTimer {
                             )
                     );
                 }, (globalTime, localTime) -> {
+                    destructionDistance = 300 - (int) (((globalTime - 0.94) / 0.035)*300);
 
                     implodeTimer.setPrevTimer();
                     flashTimer.setPrevTimer();
