@@ -22,6 +22,12 @@ float opSmoothUnion( float d1, float d2, float k ) {
     return mix( d2, d1, h ) - k*h*(1.0-h);
 }
 
+float sdPlane( vec3 p, vec3 n, float h )
+{
+    // n must be normalized
+    return dot(p,n) + h;
+}
+
 float sdSphere(vec3 p, float s){
     return length(p)-s;
 }

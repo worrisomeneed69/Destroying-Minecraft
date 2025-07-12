@@ -33,6 +33,7 @@ float easeInExpo(float x) {
 }
 
 const vec3 SkyColor = vec3(0.3,0.55,1.4);
+//const vec3 SkyColor = vec3(0.0,0.0,0.0);
 
 const int ITERATIONS = 75;
 const float CONTRAST = 5;
@@ -205,13 +206,15 @@ void main() {
         color += vec3(light * 10);
 
 
-
+//        color = texture(StarsTexture, viewDirFromUv(texCoord).yz).rgb*2;
         if (flashTimer > 0.0){
 //            fragColor = vec4(max(dot(rd, sunDir), 0.1) * mix(vec3(10.0), color + rayMarchSupernova(), min(flashTimer, 1.0)), 1.0);
             fragColor = vec4(mix(vec3(10.0), color + rayMarchSupernova(), min(flashTimer, 1.0)), 1.0);
         } else {
-            fragColor = vec4(color, 1.0);
+            fragColor = vec4(0, 1,0, 1.0);
         }
+
+
 
     } else {
         fragColor = vec4(color, 1.0);
