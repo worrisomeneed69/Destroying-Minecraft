@@ -61,34 +61,12 @@ float map(vec3 rayPos) {
 
     float mainPlanetBody = sdSphere(p, 19000);
 
-//    float noiseDetail = fbm(p * 0.004, 5);
-//    vec3 innerPlanetConePosition = p - CONE_OFFSET;
-//    innerPlanetConePosition.xy *= rot2D(45);
-
-//    float innerPlanetCone = sdCappedCone(innerPlanetConePosition, 5000, 9000, 100)+noiseDetail*400;
-
     vec3 sphereNormal = normalize(vec3(rayPos - PLANET_POS));
 //    float craters = getSphereTexture(p*0.3, sphereNormal, PebbleDepth).r * 500;
     float cracks = (getSphereTexture(p*0.2, sphereNormal, PlanetCracks).r) * 500;
 
-//    float planet = opSubtraction(innerPlanetCone, mainPlanetBody) - cracks;
     float planet = mainPlanetBody - cracks;
 
-//    vec3 planePos = p;
-//    planePos.yz *= rot2D(120);
-//    planePos.xy *= rot2D(20);
-//    float plane = sdPlane(planePos, normalize(vec3(0,1,0)), fbm(p * 0.001, 6)*4000);
-//
-//    float planetChunk1 = opSubtraction(plane, planet);
-//
-//    plane = sdPlane(planePos, normalize(vec3(0,-1,0)),  fbm(p * 0.001, 6)*4000);
-//
-//    float planetChunk2 = opSubtraction(plane, planet);
-
-//    vec3 debrisFieldOffset = vec3(0, -10600, 0);
-//    float debris = mapDebrisField(p - debrisFieldOffset, 500, 10, noiseDetail);
-
-//    return min(planetChunk1, planetChunk2);
     return planet;
 
 }
@@ -96,30 +74,9 @@ float map(vec3 rayPos) {
 float lowQualityMap(vec3 rayPos) {
     vec3 p = rayPos - PLANET_POS;
 
-    float mainPlanetBody = sdSphere(p, 19000);
+    float planet = sdSphere(p, 19000);
 
-    vec3 innerPlanetConePosition = p - CONE_OFFSET;
-    innerPlanetConePosition.xy *= rot2D(45);
-    float innerPlanetCone = sdCappedCone(innerPlanetConePosition, 5000, 9000, 100);
-
-    float planet = opSubtraction(innerPlanetCone, mainPlanetBody);
-
-    vec3 planePos = p;
-    planePos.yz *= rot2D(120);
-    planePos.xy *= rot2D(20);
-    float plane = sdPlane(planePos, normalize(vec3(0,-1,0)), 0);
-
-    float planetChunk1 = opSubtraction(plane, planet);
-
-    plane = sdPlane(planePos, normalize(vec3(0,1,0)), 0);
-
-    float planetChunk2 = opSubtraction(plane, planet);
-
-//    vec3 debrisFieldOffset = vec3(0, -10600, 0);
-//    float debris = mapDebrisField(p - debrisFieldOffset, 500, 10, 0);
-
-//    return min(debris, planet);
-    return planetChunk1;
+    return planet;
 }
 
 vec3 getRaymarchNormal(in vec3 point) {
