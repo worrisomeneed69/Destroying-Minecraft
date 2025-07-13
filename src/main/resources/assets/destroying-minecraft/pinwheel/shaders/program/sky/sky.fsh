@@ -211,7 +211,7 @@ void main() {
 //            fragColor = vec4(max(dot(rd, sunDir), 0.1) * mix(vec3(10.0), color + rayMarchSupernova(), min(flashTimer, 1.0)), 1.0);
             fragColor = vec4(mix(vec3(10.0), color + rayMarchSupernova(), min(flashTimer, 1.0)), 1.0);
         } else {
-            fragColor = vec4(0, 1,0, 1.0);
+            fragColor = vec4(color, 1.0);
         }
 
 
