@@ -58,5 +58,10 @@
     "sounds": [
       "destroying-minecraft:supernova_explosion"
     ]
+  },
+  "planet_ambience": {
+    "sounds": [
+      "destroying-minecraft:planet_ambience"
+    ]
   }
 }

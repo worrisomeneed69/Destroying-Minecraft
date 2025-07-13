@@ -9,11 +9,6 @@ uniform isampler2D MaterialSampler;
 uniform sampler2D PlanetColor;
 uniform sampler2D PebbleDepth;
 
-uniform sampler2D NoiseTexture;
-
-uniform sampler2D PlanetCracks;
-uniform sampler2D PlanetSmallCracks;
-
 uniform float GameTime;
 uniform float planetFallTimer;
 
@@ -22,11 +17,11 @@ out vec4 fragColor;
 
 const float TEXTURE_ZOOM = 0.001;
 const float NOISE_ZOOM = 0.0015;
-const vec3 LIGHT_DIR = normalize(vec3(-0.1,-0.2,1));
+const vec3 LIGHT_DIR = normalize(vec3(-0.5,-0.2,1));
 const vec3 CONE_OFFSET = vec3(0, -19000, 0);
-const vec3 CRACK_DIR = normalize(vec3(-1, -1.2, 0));
+const vec3 CRACK_DIR = normalize(vec3(-1, -1.1, -0.03));
 
-//vec3 PLANET_POS = vec3(VeilCamera.CameraPosition.x+15000, 25000 - (sin(GameTime * 1000)*0.5+0.5)*7000, VeilCamera.CameraPosition.z);
+//vec3 PLANET_POS = vec3(VeilCamera.CameraPosition.x+20000, 20000 - (sin(GameTime * 1000)*0.5+0.5)*1000, VeilCamera.CameraPosition.z);
 vec3 PLANET_POS = vec3(VeilCamera.CameraPosition.x+20000, 20000, VeilCamera.CameraPosition.z);
 
 struct Ray {
@@ -43,21 +38,45 @@ vec3 getSphereTexture(in vec3 rayPos, in vec3 normal, sampler2D textureSampler) 
     (texture(textureSampler, rayPos.yz * TEXTURE_ZOOM).rgb * normal.x);
 }
 
-float map(vec3 rayPos) {
+float mapAsteroidField(vec3 rayPos) {
+    float noise = fbm(rayPos*0.005, 4)*200;
+    float debrisFieldArea = sdSphere((rayPos - PLANET_POS) - CRACK_DIR*6000, 14000) - noise*10;
+    float asteroids = 99999999;
+
+    for (int i = 0; i < 3; i++) {
+        float repetition = 3200 - i*1050;
+
+        vec3 id = floor(rayPos / repetition);
+        vec3 offsetPosition = hash44(vec4(id*1.523, 1.0)).rgb;
+
+        rayPos += offsetPosition * 800;
+        vec3 asteroidPos = mod(rayPos, repetition) - repetition / 2;
+
+
+
+        asteroids = min(sdSphere(asteroidPos, offsetPosition.r * 1000/(3*i+1)) - noise, asteroids);
+    }
+
+    return opSmoothIntersection(debrisFieldArea, asteroids, 200);
+}
+
+vec2 map(vec3 rayPos) {
     vec3 p = rayPos - PLANET_POS;
 
     vec3 sphereNormal = normalize(vec3(rayPos - PLANET_POS));
-    float cracks = getSphereTexture(p*0.3, sphereNormal, PebbleDepth).r * 50;
+    float craters = getSphereTexture(p*0.3, sphereNormal, PebbleDepth).r * 50;
 
-    float planet = sdSphere(p, 19000) - cracks;
+    float planet = sdSphere(p, 19000) - craters;
+    float asteroid = mapAsteroidField(rayPos);
 
-    return planet;
+    return vec2(min(planet, asteroid), planet < asteroid ? 1.0 : 0.0);
+//    return vec2(planet, 1.0);
 }
 
 vec3 getRaymarchNormal(in vec3 point) {
     vec2 e = vec2(0.1, 0.0);
-    float d = map(point);
-    return normalize(vec3(map(point + e.xyy), map(point + e.yxy), map(point + e.yyx)) - d);
+    float d = map(point).x;
+    return normalize(vec3(map(point + e.xyy).x, map(point + e.yxy).x, map(point + e.yyx).x) - d);
 }
 
 float getNoise(vec3 pos) {
@@ -67,9 +86,17 @@ float getNoise(vec3 pos) {
     return min(max(noise, noise2), 1);
 }
 
-void displaceObject(in out vec3 outColor, int iterations, in out Ray ray) {
+float lowQualityMap(vec3 rayPos) {
+    vec3 p = rayPos - PLANET_POS;
+
+    float planet = sdSphere(p, 19000);
+    float asteroid = sdSphere((rayPos - PLANET_POS) - CRACK_DIR*6000, 15200);
+
+    return min(planet, asteroid);
+}
+
+void displacePlanet(in out vec3 outColor, int iterations, in out Ray ray) {
     vec3 step = ray.direction * 20;
-    vec3 origin = ray.rayPos;
     float depth = 0.0;
     bool inHole = false;
     vec3 surfacePoint;
@@ -77,30 +104,52 @@ void displaceObject(in out vec3 outColor, int iterations, in out Ray ray) {
     for (int i = 0; i < iterations; i++) {
         ray.rayPos += step;
 
-        depth = distance(origin, ray.rayPos);
-
         vec3 dirToCenter = ray.rayPos - PLANET_POS;
         float distToCenter = length(dirToCenter);
         dirToCenter = normalize(dirToCenter);
         surfacePoint = (ray.rayPos + dirToCenter * (19000 - distToCenter)) - PLANET_POS;
 
-        float pointOfCracking = 1.0 - smoothstep(0.94, 1.0, dot(normalize(surfacePoint - PLANET_POS), CRACK_DIR)*0.5+0.5);
+        vec3 sphereNormal = normalize(surfacePoint - PLANET_POS);
 
-        float noise = getNoise(surfacePoint) + pointOfCracking;
+        float pointOfCracking = smoothstep(0.99, 1.0, dot(sphereNormal, CRACK_DIR)*0.5+0.5);
 
+        float noise = clamp((0.15 - getNoise(surfacePoint)) * pointOfCracking*20, 0.0, 1.0);
 
-        if (noise > 0.2) {
-//                outColor = vec3(noise);
-//            outColor = vec3(depth/1000);
+        depth = (19000 - distToCenter) / 200;
 
+        if (noise < depth) {
             break;
         }
+
         //If it wasn't in the hole, it would break immediately
         inHole = true;
     }
-    vec3 planetWallColor = getSphereTexture(surfacePoint * 0.1, ray.normal, PlanetColor) + 0.5;
-    vec3 crackWallColor = (1.0 - vec3(depth/1000)) * dot(normalize(ray.rayPos - PLANET_POS), LIGHT_DIR);
-    outColor = inHole ? crackWallColor * planetWallColor : outColor;
+    vec3 planetWallColor = getSphereTexture(surfacePoint*0.1, abs(ray.normal), PlanetColor);
+    vec3 crackWallColor = (vec3(depth)) * dot(normalize(ray.rayPos - PLANET_POS), LIGHT_DIR);
+    outColor = inHole ? crackWallColor * vec3(1, 0.5, 0.2)*5 : outColor;
+}
+
+void rayMarchShadows(in out vec3 outColor, int iterations, in out Ray ray) {
+    ray.origin = ray.rayPos + ray.normal *20;
+    ray.direction = LIGHT_DIR;
+    float dist = 0;
+
+    for (int i = 0; i < iterations; i++) {
+        ray.rayPos = ray.origin + ray.direction * dist;
+
+        float d = map(ray.rayPos).x;
+
+        dist += d;
+
+        //Hit Something. In shadow
+        if (d < 10) {
+            outColor *= 0.0;
+            break;
+        } else if (dist > 10000) {
+            break;
+        }
+    }
+
 }
 
 void rayMarch(in out vec3 outColor, int iterations, in out Ray ray) {
@@ -109,22 +158,36 @@ void rayMarch(in out vec3 outColor, int iterations, in out Ray ray) {
     for (int i = 0; i < iterations; i++) {
         ray.rayPos = ray.origin + ray.direction * dist;
 
-        float d = map(ray.rayPos);
+        vec2 d = vec2(lowQualityMap(ray.rayPos), 0.0);
+        if (d.x < 100) {
+            d = map(ray.rayPos);
+        }
 
-        dist += d;
+        dist += d.x;
 
-        //Hit
-        if (d < 10) {
+        //Hit Something
+        if (d.x < 10) {
             ray.normal = getRaymarchNormal(ray.rayPos);
             ray.hit = true;
             float light = clamp(dot(ray.normal, LIGHT_DIR), 0.0, 1.0);
-            outColor = getSphereTexture(ray.rayPos, abs(ray.normal), PlanetColor) * light;
-//            outColor = vec3(getNoise(ray.rayPos));
-            displaceObject(outColor, 40, ray);
+
+            //Hit planet
+            if (d.y == 1.0) {
+                outColor = getSphereTexture(ray.rayPos - PLANET_POS, abs(ray.normal), PlanetColor) * light;
+                displacePlanet(outColor, 40, ray);
+            }
+            //Hit Asteroid
+            else {
+                outColor = vec3(0.4) * light;
+                if (light > 0.01) {
+                    rayMarchShadows(outColor, 20, ray);
+                }
+            }
+
             break;
         }
         //Miss
-        else if (d > 30000) {
+        else if (dist > 30000) {
             ray.hit = false;
             break;
         }
@@ -144,7 +207,7 @@ void main() {
 
     if (depth >= 1.0) {
         Ray ray;
-        ray.origin = VeilCamera.CameraPosition;
+        ray.origin = VeilCamera.CameraPosition + VeilCamera.CameraBobOffset;
         ray.direction = viewDirFromUv(texCoord);
 
         rayMarch(fragColor.rgb, 70, ray);
