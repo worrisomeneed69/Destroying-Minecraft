@@ -30,7 +30,6 @@ public abstract class RenderLyingDownPlayerMixin<T extends LivingEntity> {
         if (entity instanceof LayingDownPlayerEntity layingDownPlayerEntity) {
             if (layingDownPlayerEntity.isLayingDown()) {
                 float delta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(true);
-                System.out.println(getYawCopy(layingDownPlayerEntity.getLayingDownDirection()));
                 float yawRot = entity.getYaw(delta) - getYawCopy(layingDownPlayerEntity.getLayingDownDirection());
                 return yawRot - 90;
             }

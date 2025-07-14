@@ -4,8 +4,9 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.sp.DestroyingMinecraft;
 import com.sp.networking.S2C.InvokeDestructionPacket;
-import com.sp.world.BlackHoleDestruction;
+import com.sp.world.destructionevent.custom.BlackHoleDestruction;
 import com.sp.world.spinningblockexplosion.custom.DirectionalSBE;
 import com.sp.world.spinningblockexplosion.custom.PointSBE;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -30,8 +31,8 @@ public class DestructionCommand {
     //Correlates to the switch statement in the InvokeDestructionPacket
     final static int nukeType = 0;
     final static int orbitalLaserType = 1;
-    final static int supernovaType = 2;
-    final static int planetType = 3;
+    final static int planetType = 2;
+    final static int supernovaType = 3;
     final static int blackHoleType = 4;
 
     public static void register(CommandDispatcher<ServerCommandSource> serverCommandSourceCommandDispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
@@ -136,20 +137,8 @@ public class DestructionCommand {
         }
 
         switch (type) {
-            case supernovaType -> {
-                ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-
-                executorService.schedule(() -> {
-//                    for(ServerPlayerEntity player : playerList) {
-//                        ServerPlayNetworking.send(player, new InvokeDestructionPacket.DestructionPayload(start, type));
-//                    }
-
-                    DirectionalSBE explosion = new DirectionalSBE(50, 50, -90, 0.5f, new Vec3d(-1720, 74, 1595));
-                    explosion.beginExplosion();
-                    executorService.shutdown();
-                }, 144000, TimeUnit.MILLISECONDS);
-                break;
-            }
+            case planetType -> DestroyingMinecraft.planetServerDestruction.setActive(start);
+            case supernovaType -> DestroyingMinecraft.supernovaServerDestruction.setActive(start);
         }
         return 1;
     }

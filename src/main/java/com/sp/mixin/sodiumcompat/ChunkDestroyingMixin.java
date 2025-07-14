@@ -1,14 +1,12 @@
 package com.sp.mixin.sodiumcompat;
 
-import com.sp.render.rendertimers.SupernovaRenderTimer;
+import com.sp.destruction.client.custom.SupernovaDestructionClient;
 import net.caffeinemc.mods.sodium.client.render.chunk.RenderSection;
 import net.caffeinemc.mods.sodium.client.render.chunk.occlusion.OcclusionCuller;
 import net.caffeinemc.mods.sodium.client.render.viewport.Viewport;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -21,7 +19,7 @@ public class ChunkDestroyingMixin {
         PlayerEntity player = MinecraftClient.getInstance().player;
         if (player != null) {
             int distToPlayer = section.getCenterX() - player.getBlockX();
-            boolean bl = distToPlayer <= SupernovaRenderTimer.destructionDistance;
+            boolean bl = distToPlayer <= SupernovaDestructionClient.destructionDistance;
             cir.setReturnValue(cir.getReturnValue() && bl);
         }
 

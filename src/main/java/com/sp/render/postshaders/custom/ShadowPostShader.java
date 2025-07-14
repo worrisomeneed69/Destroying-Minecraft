@@ -23,7 +23,7 @@ public class ShadowPostShader extends PostShader {
     public void setUniformsForShader(ShaderProgram shaderProgram, float tickDelta, MinecraftClient client, World clientWorld) {
         ShadowMapRenderer.setShadowUniforms(shaderProgram);
         if (DestroyingMinecraftConfig.shaderType == ShaderType.SUPERNOVA) {
-            DestroyingMinecraftClient.supernovaPostShader.getRenderTimer().setUniforms(shaderProgram, tickDelta);
+            DestroyingMinecraftClient.supernovaPostShader.getDestructionEvent().setUniforms(shaderProgram, tickDelta);
         }
     }
 }

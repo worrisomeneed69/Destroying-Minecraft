@@ -45,23 +45,23 @@ public class Keyframe {
         this.action = action;
     }
 
-    public KeyframeAction getAction() {
+    protected KeyframeAction getAction() {
         return this.action;
     }
 
-    public Runnable getInitAction() {
+    protected Runnable getInitAction() {
         return this.initAction;
     }
 
-    public float getKeyframeTime() {
+    protected float getKeyframeTime() {
         return this.keyframeTime;
     }
 
-    public boolean isInitialized() {
+    protected boolean isInitialized() {
         return this.initialized;
     }
 
-    public void setInitialized(boolean initialized) {
+    protected void setInitialized(boolean initialized) {
         this.initialized = initialized;
     }
 

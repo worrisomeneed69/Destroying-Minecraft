@@ -5,7 +5,7 @@ import java.util.List;
 
 public class KeyframeAnimation {
     private final List<Keyframe> keyframeList;
-    private int currentKeyframeindex = 0;
+    private int currentKeyframeIndex = 0;
 
     public KeyframeAnimation(Keyframe... keyframes) {
         if (keyframes.length == 0) throw new RuntimeException("Cannot make a keyframe animation with zero keyframes");
@@ -18,19 +18,23 @@ public class KeyframeAnimation {
         }).toList();
     }
 
+    /**
+     * Call this method in an update loop to play the keyframe animation
+     * @param time The time (0 -> 1) the animation should be played on
+     */
     public void updateKeyframeAnimation(float time) {
         if (time >= 1.0) {
             this.resetAnimation();
             return;
         }
 
-        Keyframe currentKeyframe = keyframeList.get(currentKeyframeindex);
-        Keyframe nextKeyframe = currentKeyframeindex + 1 <= keyframeList.size() - 1 ? keyframeList.get(currentKeyframeindex + 1) : null;
+        Keyframe currentKeyframe = keyframeList.get(currentKeyframeIndex);
+        Keyframe nextKeyframe = currentKeyframeIndex + 1 <= keyframeList.size() - 1 ? keyframeList.get(currentKeyframeIndex + 1) : null;
 
         if (nextKeyframe != null && nextKeyframe.getKeyframeTime() <= time ) {
             currentKeyframe = nextKeyframe;
-            currentKeyframeindex++;
-            nextKeyframe = currentKeyframeindex + 1 < keyframeList.size() - 1 ? keyframeList.get(currentKeyframeindex + 1) : null;
+            currentKeyframeIndex++;
+            nextKeyframe = currentKeyframeIndex + 1 < keyframeList.size() - 1 ? keyframeList.get(currentKeyframeIndex + 1) : null;
         }
 
         if (!currentKeyframe.isInitialized()) {
@@ -44,8 +48,11 @@ public class KeyframeAnimation {
         currentKeyframe.getAction().run(time, (time - currentKeyframeTime) / (nextKeyframeTime - currentKeyframeTime));
     }
 
+    /**
+     * If the timer doesn't reach 1.0, and you want to restart the animation, call this first
+     */
     public void resetAnimation() {
-        currentKeyframeindex = 0;
+        currentKeyframeIndex = 0;
         for (Keyframe keyframe : keyframeList) {
             keyframe.setInitialized(false);
         }

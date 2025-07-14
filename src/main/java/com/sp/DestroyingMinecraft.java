@@ -5,12 +5,14 @@ import com.sp.block.entity.ModBlockEntities;
 import com.sp.command.DestructionCommand;
 import com.sp.command.RipPlatformOutCommand;
 import com.sp.config.DestroyingMinecraftConfig;
+import com.sp.destruction.server.custom.PlanetDestructionServer;
+import com.sp.destruction.server.custom.SupernovaDestructionServer;
 import com.sp.entity.ModEntities;
 import com.sp.item.ModItemGroups;
 import com.sp.item.ModItems;
 import com.sp.networking.InitializePackets;
 import com.sp.sounds.ModSounds;
-import com.sp.world.BlackHoleDestruction;
+import com.sp.world.destructionevent.custom.BlackHoleDestruction;
 import com.sp.world.spinningblockexplosion.SpinningBlockExplosion;
 import eu.midnightdust.lib.config.MidnightConfig;
 import net.fabricmc.api.ModInitializer;
@@ -23,9 +25,9 @@ import org.slf4j.LoggerFactory;
 
 public class DestroyingMinecraft implements ModInitializer {
 	public static final String MOD_ID = "destroying-minecraft";
-
-
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+	public static final PlanetDestructionServer planetServerDestruction = new PlanetDestructionServer();
+	public static final SupernovaDestructionServer supernovaServerDestruction = new SupernovaDestructionServer();
 
 	@Override
 	public void onInitialize() {

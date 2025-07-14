@@ -34,7 +34,8 @@
 	"custom": {
 		"cardinal-components": [
 			"destroying-minecraft:spin_block",
-			"destroying-minecraft:phys_block"
+			"destroying-minecraft:phys_block",
+			"destroying-minecraft:events"
 		],
 		"loom:injected_interfaces": {
 			"foundry/veil/api/client/render/shader/program/ShaderProgram": ["com/sp/mixin/BetterUniformsMixin"]

@@ -40,14 +40,15 @@ public class InvokeDestructionPacket {
                 }
 
                 case 2: {
-                    DestroyingMinecraftClient.supernovaPostShader.getRenderTimer().toggleExplosion(on);
-                    if (on) DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.SUPERNOVA_ANIMATION);
+                    DestroyingMinecraftClient.planetPostShader.getDestructionEvent().setActive(on);
+                    if (on) DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.PLANET_ANIMATION);
+
                     break;
                 }
 
                 case 3: {
-//                    DestroyingMinecraftClient.planetPostShader.getRenderTimer().toggleExplosion(on);
-                    if (on) DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.PLANET_ANIMATION);
+                    DestroyingMinecraftClient.supernovaPostShader.getDestructionEvent().setActive(on);
+                    if (on) DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.SUPERNOVA_ANIMATION);
                     break;
                 }
 

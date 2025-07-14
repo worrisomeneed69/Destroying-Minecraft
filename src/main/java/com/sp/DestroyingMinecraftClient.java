@@ -1,9 +1,10 @@
 package com.sp;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.block.entity.ModBlockEntities;
 import com.sp.block.entity.client.PhysicsDoorBlockRenderer;
 import com.sp.config.DestroyingMinecraftConfig;
+import com.sp.destruction.DestructionEvent;
+import com.sp.destruction.client.ClientDestructionEvent;
 import com.sp.entity.ModEntities;
 import com.sp.entity.client.model.StarPiercerModel;
 import com.sp.entity.client.renderer.BlockPhysicsEntityRenderer;
@@ -21,7 +22,7 @@ import com.sp.render.postshaders.PostShader;
 import com.sp.render.postshaders.custom.*;
 import com.sp.render.BlockInstanceRenderer;
 import com.sp.util.tickinstances.client.ClientTickInstances;
-import com.sp.world.BlackHoleDestruction;
+import com.sp.world.destructionevent.custom.BlackHoleDestruction;
 import foundry.veil.Veil;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.dynamicbuffer.DynamicBufferType;
@@ -124,6 +125,27 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 		}));
 
+		//Reload RenderTimer Animations because I can't hotswap them
+//		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
+//			@Override
+//			public Identifier getFabricId() {
+//				return DestroyingMinecraft.idOf("after_resources");
+//			}
+//
+//			@Override
+//			public void reload(ResourceManager manager) {
+//				ClientWorld clientWorld = MinecraftClient.getInstance().world;
+//
+//				if (clientWorld != null) {
+//					for(PostShader postShader : PostShader.getAllInstances()) {
+//						if(postShader.getRenderTimer() == null) continue;
+//
+//						postShader.getRenderTimer().initAnimations(clientWorld);
+//					}
+//				}
+//			}
+//		});
+
 		//Set the uniforms for all the post shaders
 		VeilEventPlatform.INSTANCE.preVeilPostProcessing((name, pipeline, context) -> {
 			MinecraftClient client = MinecraftClient.getInstance();
@@ -159,11 +181,11 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 		//Update every render timer
 		ClientTickEvents.END_WORLD_TICK.register(clientWorld -> {
-			for(PostShader postShader : PostShader.getAllInstances()) {
-				if(postShader.getRenderTimer() != null){
-					postShader.getRenderTimer().updateTimer(clientWorld);
-				}
-			}
+//			for(PostShader postShader : PostShader.getAllInstances()) {
+//				if(postShader.getRenderTimer() != null){
+//					postShader.getRenderTimer().updateTimer(clientWorld);
+//				}
+//			}
 
 			SelectionHandler.tickClientWorld(clientWorld);
 		});

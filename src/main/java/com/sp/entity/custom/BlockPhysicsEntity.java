@@ -1,7 +1,7 @@
 package com.sp.entity.custom;
 
 import com.sp.cca.InitializeComponents;
-import com.sp.cca.custom.PhysicsBlockComponent;
+import com.sp.cca.custom.entity.PhysicsBlockComponent;
 import com.sp.collision.BlockOBB;
 import com.sp.entity.ModEntities;
 import net.minecraft.block.Block;

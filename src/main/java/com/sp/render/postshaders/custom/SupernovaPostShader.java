@@ -1,9 +1,9 @@
 package com.sp.render.postshaders.custom;
 
 import com.sp.DestroyingMinecraft;
+import com.sp.destruction.client.custom.SupernovaDestructionClient;
 import com.sp.render.ShadowMapRenderer;
 import com.sp.render.postshaders.PostShader;
-import com.sp.render.rendertimers.SupernovaRenderTimer;
 import com.sp.util.BetterUniforms;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import net.minecraft.client.MinecraftClient;
@@ -18,7 +18,7 @@ public class SupernovaPostShader extends PostShader {
     public static final Identifier SUPERNOVA_SHADER = DestroyingMinecraft.idOf("sky/sky");
 
     public SupernovaPostShader() {
-        super(SUPERNOVA_POST, SUPERNOVA_SHADER, new SupernovaRenderTimer(3000));
+        super(SUPERNOVA_POST, SUPERNOVA_SHADER, new SupernovaDestructionClient());
     }
 
     @Override

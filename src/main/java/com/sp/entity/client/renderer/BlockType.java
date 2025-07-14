@@ -1,14 +1,12 @@
 package com.sp.entity.client.renderer;
 
-import com.sp.cca.InitializeComponents;
-import com.sp.cca.custom.SpinningBlockComponent;
+import com.sp.cca.custom.entity.SpinningBlockComponent;
 import com.sp.entity.custom.SpinningBlockEntity;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.ChickenEntity;
 import net.minecraft.entity.passive.CowEntity;

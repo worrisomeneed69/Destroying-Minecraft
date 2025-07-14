@@ -2,7 +2,7 @@ package com.sp.entity.client.renderer;
 
 import com.sp.DestroyingMinecraftClient;
 import com.sp.cca.InitializeComponents;
-import com.sp.cca.custom.PhysicsBlockComponent;
+import com.sp.cca.custom.entity.PhysicsBlockComponent;
 import com.sp.collision.BlockOBB;
 import com.sp.entity.custom.BlockPhysicsEntity;
 import com.sp.util.MathUtil;

@@ -1,4 +1,4 @@
-package com.sp.cca.custom;
+package com.sp.cca.custom.entity;
 
 import com.sp.cca.InitializeComponents;
 import com.sp.entity.client.renderer.BlockType;

@@ -1,8 +1,5 @@
 package com.sp.world.spinningblockexplosion.custom;
 
-import com.sp.cca.InitializeComponents;
-import com.sp.cca.custom.SpinningBlockComponent;
-import com.sp.entity.ModEntities;
 import com.sp.entity.custom.SpinningBlockEntity;
 import com.sp.world.spinningblockexplosion.SpinningBlockExplosion;
 import net.minecraft.block.Blocks;

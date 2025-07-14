@@ -1,4 +1,4 @@
-package com.sp.world;
+package com.sp.world.destructionevent.custom;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.entity.custom.BlockPhysicsEntity;
@@ -33,6 +33,10 @@ public class BlackHoleDestruction {
     private static boolean startDestruction;
     private static int breakOffCooldown;
     private static final Random random = Random.create();
+
+    public BlackHoleDestruction() {
+        super();
+    }
 
     //TODO: Update selection again after a set amount of time
     public static void tick(World world) {

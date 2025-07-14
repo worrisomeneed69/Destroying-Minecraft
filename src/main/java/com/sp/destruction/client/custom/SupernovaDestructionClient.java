@@ -1,5 +1,6 @@
-package com.sp.render.rendertimers;
+package com.sp.destruction.client.custom;
 
+import com.sp.destruction.client.ClientDestructionEvent;
 import com.sp.entity.custom.StarPiercerEntity;
 import com.sp.render.camerashake.CameraShakeManager;
 import com.sp.render.camerashake.custom.CameraShakeInstance;
@@ -11,57 +12,40 @@ import com.sp.util.keyframes.Keyframe;
 import com.sp.util.keyframes.KeyframeAnimation;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.client.util.Easing;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SupernovaRenderTimer extends ExplosionRenderTimer {
+@Environment(EnvType.CLIENT)
+public class SupernovaDestructionClient extends ClientDestructionEvent {
     private static final ShaderTimer implodeTimer = new ShaderTimer();
     private static final ShaderTimer flashTimer = new ShaderTimer();
     private static final ShaderTimer explosionTimer = new ShaderTimer();
     private static float laserLength;
     private static final List<StarPiercerEntity> starPiercers = new ArrayList<>();
-    private static KeyframeAnimation supernovaAnimation;
-    private static boolean initAnimation;
     private static int flashFrame = -1;
     public static int destructionDistance = Integer.MAX_VALUE;
 
-    public SupernovaRenderTimer(int duration) {
-        super(duration);
+    public SupernovaDestructionClient() {
+        super(3000);
     }
 
     @Override
-    public void updateTimer(ClientWorld clientWorld) {
-        if (!initAnimation) {
-            initAnimation(clientWorld);
-            initAnimation = true;
-        }
-
-        if(this.enable) {
-            this.progress++;
-
-            supernovaAnimation.updateKeyframeAnimation(this.progress / this.duration);
-
-        } else {
-            supernovaAnimation.resetAnimation();
-            this.resetExplosionTimer();
-        }
-    }
-
-    @Override
-    public void resetExplosionTimer() {
+    public void resetEvent() {
         implodeTimer.reset();
         flashTimer.reset();
         explosionTimer.reset();
         laserLength = 0;
         starPiercers.forEach(StarPiercerEntity::reset);
         destructionDistance = Integer.MAX_VALUE;
-        super.resetExplosionTimer();
+        super.resetEvent();
     }
 
     @Override
@@ -73,14 +57,17 @@ public class SupernovaRenderTimer extends ExplosionRenderTimer {
         BetterUniforms.setInt(shaderProgram, "flashFrame", flashFrame);
     }
 
-    private static void initAnimation(ClientWorld clientWorld) {
-        supernovaAnimation = new KeyframeAnimation(
-                new Keyframe(0.0f),                      //Pause
+    @Override
+    protected KeyframeAnimation initAnimations(World world) {
+        return new KeyframeAnimation(
+                //*Pause
+                new Keyframe(0.0f),
 
-                new Keyframe((float) 15/150, () -> {     //Startup Star Piercers
+                //*Startup Star Piercers
+                new Keyframe((float) 15/150, () -> {
                     PlayerEntity player = MinecraftClient.getInstance().player;
                     if (player != null) {
-                        for (StarPiercerEntity entity : clientWorld.getEntitiesByClass(
+                        for (StarPiercerEntity entity : world.getEntitiesByClass(
                                 StarPiercerEntity.class,
                                 player.getBoundingBox().expand(100),
                                 Entity::isAlive)
@@ -100,7 +87,8 @@ public class SupernovaRenderTimer extends ExplosionRenderTimer {
                     );
                 }),
 
-                new Keyframe((float) 60/150, () -> {     //Pause
+                //*Pause
+                new Keyframe((float) 60/150, () -> {
                     MinecraftClient.getInstance().getSoundManager().play(
                             PositionedSoundInstance.master(
                                     ModSounds.LASER_PAUSE,
@@ -112,7 +100,8 @@ public class SupernovaRenderTimer extends ExplosionRenderTimer {
                     flashFrame = flashFrame == 0 ? 1 : 0;
                 }),
 
-                new Keyframe((float) 121/300, () -> {     //Fire Star Piercers
+                //*Fire Star Piercers
+                new Keyframe((float) 121/300, () -> {
                     SustainedCameraShakeInstance shakeInstance = new SustainedCameraShakeInstance(
                             0.8f,
                             280,
@@ -132,7 +121,8 @@ public class SupernovaRenderTimer extends ExplosionRenderTimer {
                     laserLength = localTime;
                 }),
 
-                new Keyframe((float) 75/150, () -> {     //Stop firing / Power down
+                //*Stop firing / Power down
+                new Keyframe((float) 75/150, () -> {
                     for (StarPiercerEntity entity : starPiercers) {
                         entity.powerDown();
                     }
@@ -146,9 +136,11 @@ public class SupernovaRenderTimer extends ExplosionRenderTimer {
                     );
                 }),
 
-                new Keyframe((float) 100/150),           //Pause
+                //*Pause
+                new Keyframe((float) 100/150),
 
-                new Keyframe((float) 115/150, () -> {    //Supernova Explosion
+                //*Supernova Explosion
+                new Keyframe((float) 115/150, () -> {
                     MinecraftClient.getInstance().getSoundManager().play(
                             PositionedSoundInstance.master(
                                     ModSounds.SUPERNOVA_EXPLOSION,

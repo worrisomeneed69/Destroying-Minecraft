@@ -1,6 +1,6 @@
 package com.sp.entity.client.renderer;
 
-import com.sp.cca.custom.SpinningBlockComponent;
+import com.sp.cca.custom.entity.SpinningBlockComponent;
 import com.sp.entity.custom.SpinningBlockEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.BlockRenderManager;

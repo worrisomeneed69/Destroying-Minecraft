@@ -1,7 +1,7 @@
 package com.sp.entity.custom;
 
 import com.sp.cca.InitializeComponents;
-import com.sp.cca.custom.SpinningBlockComponent;
+import com.sp.cca.custom.entity.SpinningBlockComponent;
 import com.sp.entity.ModEntities;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;

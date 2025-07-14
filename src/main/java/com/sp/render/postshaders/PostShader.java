@@ -1,6 +1,6 @@
 package com.sp.render.postshaders;
 
-import com.sp.render.rendertimers.ExplosionRenderTimer;
+import com.sp.destruction.client.ClientDestructionEvent;
 import foundry.veil.api.client.render.post.PostPipeline;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import net.minecraft.client.MinecraftClient;
@@ -17,13 +17,13 @@ import java.util.Vector;
 public abstract class PostShader {
     protected final Identifier POST;
     protected final Identifier SHADER;
-    protected final ExplosionRenderTimer renderTimer;
+    protected final ClientDestructionEvent clientDestructionEvent;
     private static final Vector<PostShader> allInstances = new Vector<>();
 
-    public PostShader(Identifier post, Identifier shader, @Nullable ExplosionRenderTimer renderTimer){
+    public PostShader(Identifier post, Identifier shader, @Nullable ClientDestructionEvent clientDestructionEvent){
         this.POST = post;
         this.SHADER = shader;
-        this.renderTimer = renderTimer;
+        this.clientDestructionEvent = clientDestructionEvent;
         allInstances.add(this);
     }
 
@@ -35,12 +35,12 @@ public abstract class PostShader {
     }
 
     /**
-     * Most of the time the shaders will have a render timer that already sets the uniforms.<br><br>
-     * If a shader doesn't have a render timer, you can override this method and add any uniforms you want
+     * Most of the time the shaders will have a destruction event that already sets the uniforms.<br><br>
+     * If a shader doesn't have a destruction event, you can override this method and add any uniforms you want
      */
     public void setUniformsForShader(ShaderProgram shaderProgram, float tickDelta, MinecraftClient client, World clientWorld) {
-        if(this.renderTimer != null) {
-            this.renderTimer.setUniforms(shaderProgram, tickDelta);
+        if(this.clientDestructionEvent != null) {
+            this.clientDestructionEvent.setUniforms(shaderProgram, tickDelta);
         }
     }
 
@@ -50,8 +50,8 @@ public abstract class PostShader {
     public Identifier getPost() {
         return POST;
     }
-    public ExplosionRenderTimer getRenderTimer() {
-        return renderTimer;
+    public ClientDestructionEvent getDestructionEvent() {
+        return clientDestructionEvent;
     }
 
     public static synchronized Vector<PostShader> getAllInstances() {
