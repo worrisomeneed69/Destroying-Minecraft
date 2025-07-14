@@ -1,4 +1,5 @@
 #include veil:space_helper
+#include veil:blend
 #include destroying-minecraft:ray_march
 #include destroying-minecraft:noise
 #veil:buffer veil:camera VeilCamera
@@ -173,12 +174,12 @@ void rayMarch(in out vec3 outColor, int iterations, in out Ray ray) {
 
             //Hit planet
             if (d.y == 1.0) {
-                outColor = getSphereTexture(ray.rayPos - PLANET_POS, abs(ray.normal), PlanetColor) * light;
+                outColor = getSphereTexture(ray.rayPos - PLANET_POS, abs(ray.normal), PlanetColor) * light*2;
                 displacePlanet(outColor, 40, ray);
             }
             //Hit Asteroid
             else {
-                outColor = vec3(0.4) * light;
+                outColor = vec3(0.4) * light*2;
                 if (light > 0.01) {
                     rayMarchShadows(outColor, 20, ray);
                 }
@@ -203,7 +204,7 @@ void main() {
     vec3 playerSpace = screenToLocalSpace(texCoord, depth).xyz;
     float worldDepth = length(playerSpace);
 
-    fragColor = mainTexture;
+
 
     if (depth >= 1.0) {
         Ray ray;
@@ -211,6 +212,10 @@ void main() {
         ray.direction = viewDirFromUv(texCoord);
 
         rayMarch(fragColor.rgb, 70, ray);
+
+        fragColor.rgb = blendGlint(mainTexture, fragColor);
+    } else {
+        fragColor = mainTexture;
     }
 
     if (material == 5) {

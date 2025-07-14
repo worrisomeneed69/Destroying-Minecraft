@@ -14,8 +14,12 @@ import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
+import org.lwjgl.opengl.GL11;
 
 import java.util.Optional;
+
+import static org.lwjgl.opengl.GL11C.GL_BACK;
+import static org.lwjgl.opengl.GL11C.GL_FRONT;
 
 /**
  * Taken from my backrooms mod
@@ -34,6 +38,7 @@ public class ShadowMapRenderer {
 
         AdvancedFbo shadowMap = VeilRenderSystem.renderer().getFramebufferManager().getFramebuffer(DestroyingMinecraft.idOf("shadowmap"));
         if(shadowMap != null) {
+            GL11.glCullFace(GL_FRONT);
             PerspectiveRenderer.render(
                     shadowMap,
                     shadowModelView.peek().getPositionMatrix(),
@@ -44,6 +49,7 @@ public class ShadowMapRenderer {
                     client.getRenderTickCounter(),
                     true
             );
+            GL11.glCullFace(GL_BACK);
         }
     }
 

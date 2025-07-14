@@ -89,15 +89,13 @@ void main() {
 
 
     vec3 localSpace = screenToLocalSpace(texCoord, depth).xyz;
-    vec3 adjustedLocalSpace = localSpace + 0.02 * worldNormal * length(viewPos);
+    vec3 adjustedLocalSpace = localSpace + 0.02 * worldNormal;
     vec3 shadowViewSpace = (shadowViewMatrix * vec4(adjustedLocalSpace, 1.0)).xyz;
 
     vec3 shadowNDCPos = distort(projectAndDivide(shadowProjMat, shadowViewSpace));
 
     vec3 shadowScreenPos = shadowNDCPos * 0.5 + 0.5;
     float shadowDepth = shadowScreenPos.z;
-//    shadowScreenPos.z -= 0.0001;
-    float initialShadowSampler = texture(ShadowMap, shadowScreenPos.xy).r;
 
     vec2 lightUV = texture(LightUVSampler, texCoord).rg;
 

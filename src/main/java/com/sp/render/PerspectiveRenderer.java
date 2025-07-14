@@ -121,7 +121,7 @@ public class PerspectiveRenderer {
         CameraMatrices matrices = VeilRenderSystem.renderer().getCameraMatrices();
         matrices.backup(BACKUP_CAMERA_MATRICES);
 
-        RenderSystem.disableCull();
+//        RenderSystem.disableCull();
 
         try {
             levelRenderer.setupFrustum(new Vec3d(cameraPosition.x(), cameraPosition.y(), cameraPosition.z()), poseStack.peek().getPositionMatrix(), TRANSFORM);
@@ -140,7 +140,7 @@ public class PerspectiveRenderer {
                 }
             }
         } finally {
-            RenderSystem.enableCull();
+//            RenderSystem.enableCull();
 
             matrices.restore(BACKUP_CAMERA_MATRICES);
 
