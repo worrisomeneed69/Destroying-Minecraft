@@ -30,6 +30,8 @@ public class PointSBE extends SpinningBlockExplosion {
                         if(this.random.nextFloat() < this.density) {
                             SpinningBlockEntity spinningBlockEntity = SpinningBlockEntity.spawnFromBlock(world, mutable, world.getBlockState(mutable));
 
+                            spinningBlockEntity.getComponent().setLifeTime(random.nextBetween(60, 120));
+                            world.spawnEntity(spinningBlockEntity);
                             spinningBlockEntity.setVelocity(mutable.toCenterPos().subtract(this.position).normalize());
                             spinningBlockEntity.addVelocityInternal(new Vec3d(0, 1, 0));
                         }

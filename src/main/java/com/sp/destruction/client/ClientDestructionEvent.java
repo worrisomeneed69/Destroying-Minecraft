@@ -10,7 +10,6 @@ import java.util.Vector;
 /**
  * Handles all destruction events client side, including passing uniforms to the shaders
  */
-@Environment(EnvType.CLIENT)
 public abstract class ClientDestructionEvent extends DestructionEvent {
     private static final Vector<DestructionEvent> clientInstances = new Vector<>();
 

@@ -1,6 +1,8 @@
 package com.sp.render.camerashake;
 
 import com.sp.render.camerashake.custom.CameraShakeInstance;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.util.math.noise.PerlinNoiseSampler;
@@ -9,6 +11,7 @@ import net.minecraft.util.math.random.Random;
 import java.util.ArrayList;
 import java.util.List;
 
+@Environment(EnvType.CLIENT)
 public class CameraShakeManager {
     private static final List<AbstractCameraShakeInstance> INSTANCES = new ArrayList<>();
     private static final PerlinNoiseSampler noiseSampler = new PerlinNoiseSampler(Random.create());

@@ -27,6 +27,7 @@ public class SpinningBlockComponent implements AutoSyncedComponent, ClientTickin
     private float prevYaw;
     private Vec3d acceleration;
     private boolean applyGravity;
+    private int lifeTime;
 
     private float accelerationFactor;
     private float scale;
@@ -61,6 +62,7 @@ public class SpinningBlockComponent implements AutoSyncedComponent, ClientTickin
         this.blockType = BlockType.SINGLE;
         this.acceleration = Vec3d.ZERO;
         this.applyGravity = true;
+        this.lifeTime = 100;
     }
 
 
@@ -94,6 +96,14 @@ public class SpinningBlockComponent implements AutoSyncedComponent, ClientTickin
     public void setApplyGravity(boolean applyGravity) {
         this.applyGravity = applyGravity;
     }
+
+    public int getLifeTime() {
+        return lifeTime;
+    }
+    public void setLifeTime(int lifeTime) {
+        this.lifeTime = lifeTime;
+    }
+
     public Vec3d getAcceleration() {
         return acceleration;
     }

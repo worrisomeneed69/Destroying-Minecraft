@@ -5,6 +5,9 @@ import net.minecraft.world.World;
 
 import java.util.Vector;
 
+/**
+ * Handles all the destruction events server side, including spawning entities and destroying blocks
+ */
 public abstract class ServerDestructionEvent extends DestructionEvent {
     private static final Vector<DestructionEvent> serverInstances = new Vector<>();
 

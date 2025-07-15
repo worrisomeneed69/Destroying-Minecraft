@@ -5,16 +5,16 @@ import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.render.postshaders.PostShader;
 import com.sp.util.BetterUniforms;
 import com.sp.util.MathUtil;
-import foundry.veil.api.client.render.CameraMatrices;
-import foundry.veil.api.client.render.VeilRenderSystem;
-import foundry.veil.api.client.render.VeilRenderer;
 import foundry.veil.api.client.render.post.PostPipeline;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.world.World;
 
+@Environment(EnvType.CLIENT)
 public class PostProcessingPostShader extends PostShader {
     public static final Identifier POST = DestroyingMinecraft.idOf("post");
     public static final Identifier SHADER = DestroyingMinecraft.idOf("post/post");

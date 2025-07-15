@@ -1,5 +1,9 @@
 package com.sp.render.camerashake;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
+@Environment(EnvType.CLIENT)
 public abstract class AbstractCameraShakeInstance {
     protected float trauma;
     protected int progress;

@@ -1,14 +1,15 @@
 package com.sp.render.postshaders.custom;
 
 import com.sp.DestroyingMinecraft;
-import com.sp.render.PrevUniforms;
 import com.sp.render.postshaders.PostShader;
-import com.sp.util.BetterUniforms;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
+@Environment(EnvType.CLIENT)
 public class CracksPostShader extends PostShader {
     public static final Identifier CRACKS_HOLE_POST = DestroyingMinecraft.idOf("cracks");
     public static final Identifier CRACKS_HOLE_SHADER = DestroyingMinecraft.idOf("cracks/cracks");

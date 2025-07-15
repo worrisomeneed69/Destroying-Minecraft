@@ -5,10 +5,13 @@ import com.sp.render.PrevUniforms;
 import com.sp.render.postshaders.PostShader;
 import com.sp.util.BetterUniforms;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
+@Environment(EnvType.CLIENT)
 public class BlackHolePostShader extends PostShader {
     public static final Identifier BLACK_HOLE_POST = DestroyingMinecraft.idOf("black_hole");
     public static final Identifier BLACK_HOLE_SHADER = DestroyingMinecraft.idOf("blackhole/black_hole");

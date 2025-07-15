@@ -24,6 +24,9 @@ public class ModSounds {
 
     public static final SoundEvent SUPERNOVA_EXPLOSION = registerSoundEvent("supernova_explosion");
 
+    public static final SoundEvent METEOR_WHISTLE = registerSoundEvent("meteor_whistle");
+    public static final SoundEvent METEOR_IMPACT = registerSoundEvent("meteor_impact");
+
 
     private static SoundEvent registerSoundEvent(String name) {
         Identifier id = DestroyingMinecraft.idOf(name);

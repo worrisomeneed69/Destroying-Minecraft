@@ -1,14 +1,18 @@
 package com.sp.entity.custom;
 
+import com.sp.sounds.ModSounds;
+import com.sp.util.MathUtil;
 import com.sp.world.spinningblockexplosion.custom.PointSBE;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 public class MeteorEntity extends PersistentProjectileEntity {
@@ -22,15 +26,32 @@ public class MeteorEntity extends PersistentProjectileEntity {
     public void tick() {
         super.tick();
 
+
         if(!this.inGround && !this.isOnGround()) {
 
-            this.setVelocity(new Vec3d(-1, -1, 0));
+            this.setVelocity(new Vec3d(-1.5, -1.5, 0));
             this.move(MovementType.SELF, this.getVelocity());
         }
 
         if (!this.getWorld().isClient) {
-            if (this.age > 200) {
+            BlockHitResult hitResult = this.getWorld().raycast(
+                    new RaycastContext(
+                            this.getPos(),
+                            this.getPos().add(0, -100, 0),
+                            RaycastContext.ShapeType.COLLIDER,
+                            RaycastContext.FluidHandling.NONE,
+                            ShapeContext.absent()
+                    )
+            );
+
+            float distanceToGround = (float) hitResult.getBlockPos().toCenterPos().squaredDistanceTo(this.getPos());
+            if (this.age > 200 || distanceToGround < 5.0f) {
                 this.onBlockHit(null);
+            }
+
+        } else {
+            if (this.age == 1) { //As soon as it spawns
+                this.getWorld().playSoundFromEntity(this, ModSounds.METEOR_WHISTLE, SoundCategory.AMBIENT, 5.0f, MathUtil.nextBetween(0.6f, 1.2f));
             }
 
         }
@@ -39,14 +60,14 @@ public class MeteorEntity extends PersistentProjectileEntity {
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
-        this.playSound(SoundEvents.ENTITY_GENERIC_EXPLODE.value(), 100.0F, 1.2F / (this.random.nextFloat() * 0.2F + 0.9F));
-        PointSBE explosion = new PointSBE(5, 0.5f, this.getPos());
+        this.playSound(ModSounds.METEOR_IMPACT, 100.0F, 1.2F / (this.random.nextFloat() * 0.2F + 0.9F));
+        PointSBE explosion = new PointSBE(this.random.nextBetween(3, 7), 0.35f, this.getPos());
         explosion.beginExplosion();
         discard();
     }
 
     @Override
     protected ItemStack getDefaultItemStack() {
-        return new ItemStack(Items.ARROW);
+        return new ItemStack(Items.FIRE_CHARGE);
     }
 }

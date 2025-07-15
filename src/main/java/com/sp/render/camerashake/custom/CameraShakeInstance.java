@@ -2,7 +2,10 @@ package com.sp.render.camerashake.custom;
 
 import com.sp.render.camerashake.AbstractCameraShakeInstance;
 import foundry.veil.api.client.util.Easing;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
+@Environment(EnvType.CLIENT)
 public class CameraShakeInstance extends AbstractCameraShakeInstance {
     private final float strength;
     private final Easing easing;

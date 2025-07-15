@@ -3,6 +3,8 @@ package com.sp.render.postshaders;
 import com.sp.destruction.client.ClientDestructionEvent;
 import foundry.veil.api.client.render.post.PostPipeline;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -14,6 +16,7 @@ import java.util.Vector;
  * This class is used to keep all the shaders and their uniforms organized<br><br>
  * If a shader doesn't need any uniforms to be set then there really is no point in instantiating a new Post Shader
  */
+@Environment(EnvType.CLIENT)
 public abstract class PostShader {
     protected final Identifier POST;
     protected final Identifier SHADER;

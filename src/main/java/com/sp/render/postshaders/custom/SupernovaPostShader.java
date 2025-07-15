@@ -6,6 +6,8 @@ import com.sp.render.ShadowMapRenderer;
 import com.sp.render.postshaders.PostShader;
 import com.sp.util.BetterUniforms;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -13,6 +15,7 @@ import org.joml.Matrix4f;
 
 import java.util.Optional;
 
+@Environment(EnvType.CLIENT)
 public class SupernovaPostShader extends PostShader {
     public static final Identifier SUPERNOVA_POST = DestroyingMinecraft.idOf("sky");
     public static final Identifier SUPERNOVA_SHADER = DestroyingMinecraft.idOf("sky/sky");

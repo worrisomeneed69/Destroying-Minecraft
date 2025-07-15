@@ -63,5 +63,27 @@
     "sounds": [
       "destroying-minecraft:planet_ambience"
     ]
+  },
+  "meteor_whistle": {
+    "sounds": [
+      "destroying-minecraft:meteor/whistle/meteor_whistle1",
+      "destroying-minecraft:meteor/whistle/meteor_whistle2",
+      "destroying-minecraft:meteor/whistle/meteor_whistle3",
+      "destroying-minecraft:meteor/whistle/meteor_whistle4"
+    ]
+  },
+  "meteor_impact": {
+    "sounds": [
+      "destroying-minecraft:meteor/impact/meteor_impact1",
+      "destroying-minecraft:meteor/impact/meteor_impact2",
+      "destroying-minecraft:meteor/impact/meteor_impact3",
+      "destroying-minecraft:meteor/impact/meteor_impact4",
+      "destroying-minecraft:meteor/impact/meteor_impact5",
+      "destroying-minecraft:meteor/impact/meteor_impact6",
+      "destroying-minecraft:meteor/impact/meteor_impact7",
+      "destroying-minecraft:meteor/impact/meteor_impact8",
+      "destroying-minecraft:meteor/impact/meteor_impact9",
+      "destroying-minecraft:meteor/impact/meteor_impact10"
+    ]
   }
 }

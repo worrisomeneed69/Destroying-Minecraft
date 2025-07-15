@@ -7,10 +7,13 @@ import com.sp.render.ShaderType;
 import com.sp.render.ShadowMapRenderer;
 import com.sp.render.postshaders.PostShader;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
+@Environment(EnvType.CLIENT)
 public class ShadowPostShader extends PostShader {
     public static final Identifier SHADOWS_POST = DestroyingMinecraft.idOf("shadows");
     public static final Identifier SHADOWS_SHADER = DestroyingMinecraft.idOf("shadows/shadows");
