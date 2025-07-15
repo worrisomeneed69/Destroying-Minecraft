@@ -36,6 +36,7 @@ public class CustomRenderLayersAndVertexFormats {
      */
     public static final VertexFormat POSITION_POSITION = VertexFormat.builder()
             .add("Position", VertexFormatElement.POSITION)
+            .add("Color", VertexFormatElement.COLOR)
             .add("Entity_Position", ENTITY_POSITION)
             .build();
 

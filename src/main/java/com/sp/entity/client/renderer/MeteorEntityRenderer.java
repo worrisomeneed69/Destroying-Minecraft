@@ -1,6 +1,5 @@
 package com.sp.entity.client.renderer;
 
-import com.sp.DestroyingMinecraft;
 import com.sp.entity.custom.MeteorEntity;
 import com.sp.mixininterfaces.BufferBuilderPosition;
 import com.sp.render.PerspectiveRenderer;
@@ -12,12 +11,10 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 public class MeteorEntityRenderer extends EntityRenderer<MeteorEntity> {
-    private static final Identifier RENDER_TYPE = DestroyingMinecraft.idOf("meteor");
-    private static final Identifier METEOR_SHADER = DestroyingMinecraft.idOf("meteor/meteor");
-
-
     public MeteorEntityRenderer(EntityRendererFactory.Context context) {
         super(context);
     }
@@ -44,7 +41,7 @@ public class MeteorEntityRenderer extends EntityRenderer<MeteorEntity> {
 
         matrices.push();
         Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
-        matrices.multiply(camera.getRotation());
+        matrices.multiply(new Quaternionf().rotateTo(new Vector3f(0, 0, 1), camera.getPos().toVector3f().sub(entity.getPos().toVector3f()).normalize()));
 
         matrices.translate(0.0f, 0.5f, 3f);
         matrices.scale(scale, scale, scale);
@@ -55,16 +52,16 @@ public class MeteorEntityRenderer extends EntityRenderer<MeteorEntity> {
         Vec3d entityPos = entity.getLerpedPos(tickDelta).add(0, 0.5, 0);
         float id = entity.getId();
 
-        bufferBuilder.vertex(entry, pMinX, pMaxY, pMaxZ);
+        bufferBuilder.vertex(entry, pMinX, pMaxY, pMaxZ).color(1.0f, 1.0f, 1.0f, Math.min((float) entity.age / 30, 1.0f));
         this.putPosition(bufferBuilder, entityPos, id);
 
-        bufferBuilder.vertex(entry, pMinX, pMinY, pMaxZ);
+        bufferBuilder.vertex(entry, pMinX, pMinY, pMaxZ).color(1.0f, 1.0f, 1.0f, Math.min((float) entity.age / 30, 1.0f));
         this.putPosition(bufferBuilder, entityPos, id);
 
-        bufferBuilder.vertex(entry, pMaxX, pMinY, pMaxZ);
+        bufferBuilder.vertex(entry, pMaxX, pMinY, pMaxZ).color(1.0f, 1.0f, 1.0f, Math.min((float) entity.age / 30, 1.0f));
         this.putPosition(bufferBuilder, entityPos, id);
 
-        bufferBuilder.vertex(entry, pMaxX, pMaxY, pMaxZ);
+        bufferBuilder.vertex(entry, pMaxX, pMaxY, pMaxZ).color(1.0f, 1.0f, 1.0f, Math.min((float) entity.age / 30, 1.0f));
         this.putPosition(bufferBuilder, entityPos, id);
 
 

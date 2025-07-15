@@ -11,6 +11,7 @@ uniform float random;
 
 in vec4 entityPos;
 in vec3 worldPos;
+in float opacity;
 
 out vec4 fragColor;
 layout (location = 1) out vec4 Albedo;
@@ -41,14 +42,16 @@ vec2 map(vec3 p) {
     meteorPos.xz *= rot2D(rand(entityPos.w*12)*360 + GameTime*300000);
     vec3 sphereNormal = getPlanetNormal(meteorPos);
     float displacement1 = getSphereTexture(meteorPos*0.1, sphereNormal, PebbleDepth).r;
-    float displacement2 = getSphereTexture(meteorPos*0.8, sphereNormal, PebbleDepth).r;
-    float totalDisplacement = (displacement1 * 0.4) - (displacement2 * 0.1);
+    float totalDisplacement = (displacement1 * 0.4);
 
-    float meteor = sdEllipsoid(meteorPos, vec3(1.5 * rand(entityPos.w*4)+0.2, 1.0 * rand(entityPos.w*2)+0.2, 1.0 * rand(entityPos.w*6)+0.2)) - totalDisplacement;
+    float meteor = sdEllipsoid(meteorPos, vec3(2.5 * rand(entityPos.w*4)+0.5, 2.0 * rand(entityPos.w*2)+0.5, 2.0 * rand(entityPos.w*6)+0.5)*opacity) - totalDisplacement;
 
-    vec3 trailPos = pos - vec3(0, 3.25, 3.25);
-    trailPos.yz *= rot2D(-45.0);
-    float trail = sdCappedCone(trailPos - vec3(0, 1, 0), 5, 0.1 * rand(entityPos.w*4)+0.2, 0) - fbm(trailPos - vec3(0, vec2(GameTime*7000)), 7) * 0.9;
+    vec3 trailPos = pos - vec3(5.25, 5.25, 0);
+    trailPos.xy *= rot2D(45.0);
+    float trailMaxWidth = 0.6 * rand(entityPos.w*4)+0.2;
+    float trailDisplacement = fbm((trailPos*3) - vec3(vec2(GameTime*19000), 0), 3) * 0.9;
+
+    float trail = sdCappedCone(trailPos - vec3(0, 1, 0), 8 * opacity, trailMaxWidth, 0) - trailDisplacement * opacity;
 
     float shape = min(meteor, trail);
     float type = 0.0;
@@ -84,7 +87,7 @@ void rayMarch(in out vec3 color, out vec3 normal, vec2 screenUv, in out bool hit
         if (d.x < 0.001) {
             hit = true;
             normal = getNormal(rayPos);
-            color = d.y == 0.0 ? vec3(1, 0.6, 0.2) * max(dot(normal, normalize(lightDir)), 0.2) : vec3(0.05 * (3.5 - pow(distance(rayPos, entityPos.xyz), 0.5)));
+            color = d.y == 0.0 ? vec3(1, 0.6, 0.2) * max(dot(normal, normalize(lightDir)), 0.2) : vec3(0.05 * (3.5 - pow(distance(rayPos, entityPos.xyz), 0.45)));
             break;
         } else if (dist > MAX_DIST){
             break;
