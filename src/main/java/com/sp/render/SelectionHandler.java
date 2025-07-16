@@ -117,7 +117,6 @@ public class SelectionHandler {
 
 
     @FunctionalInterface
-    @Environment(EnvType.CLIENT)
     public interface SelectionFunction {
         void runFunction(BlockPos corner1, BlockPos corner2);
     }

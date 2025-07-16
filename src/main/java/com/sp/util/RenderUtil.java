@@ -70,16 +70,20 @@ public class RenderUtil {
 
     private static List<Box> getEdges(Box box, double thickness) {
         List<Box> edges = new ArrayList<>();
+
+        //Edges along X Axis
         edges.add(Box.of(new Vec3d((box.minX + box.maxX) / 2, box.minY, box.minZ), box.minX - box.maxX - thickness, thickness, thickness));
         edges.add(Box.of(new Vec3d((box.minX + box.maxX) / 2, box.maxY, box.minZ), box.minX - box.maxX - thickness, thickness, thickness));
         edges.add(Box.of(new Vec3d((box.minX + box.maxX) / 2, box.minY, box.maxZ), box.minX - box.maxX - thickness, thickness, thickness));
         edges.add(Box.of(new Vec3d((box.minX + box.maxX) / 2, box.maxY, box.maxZ), box.minX - box.maxX - thickness, thickness, thickness));
 
+        //Edges along Y Axis
         edges.add(Box.of(new Vec3d(box.minX, (box.minY + box.maxY) / 2, box.minZ), thickness, box.minY - box.maxY - thickness, thickness));
         edges.add(Box.of(new Vec3d(box.maxX, (box.minY + box.maxY) / 2, box.minZ), thickness, box.minY - box.maxY - thickness, thickness));
         edges.add(Box.of(new Vec3d(box.minX, (box.minY + box.maxY) / 2, box.maxZ), thickness, box.minY - box.maxY - thickness, thickness));
         edges.add(Box.of(new Vec3d(box.maxX, (box.minY + box.maxY) / 2, box.maxZ), thickness, box.minY - box.maxY - thickness, thickness));
 
+        //Edges along Z Axis
         edges.add(Box.of(new Vec3d(box.minX, box.minY, (box.minZ + box.maxZ) / 2), thickness, thickness, box.minZ - box.maxZ - thickness));
         edges.add(Box.of(new Vec3d(box.maxX, box.minY, (box.minZ + box.maxZ) / 2), thickness, thickness, box.minZ - box.maxZ - thickness));
         edges.add(Box.of(new Vec3d(box.minX, box.maxY, (box.minZ + box.maxZ) / 2), thickness, thickness, box.minZ - box.maxZ - thickness));

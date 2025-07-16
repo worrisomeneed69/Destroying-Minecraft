@@ -1,9 +1,7 @@
 package com.sp.render.camerashake;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import java.util.Optional;
 
-@Environment(EnvType.CLIENT)
 public abstract class AbstractCameraShakeInstance {
     protected float trauma;
     protected int progress;
@@ -24,5 +22,27 @@ public abstract class AbstractCameraShakeInstance {
 
     public boolean isFinished() {
         return this.progress >= this.duration;
+    }
+
+    public enum Type {
+        NORMAL(1),
+        POINT(2),
+        SUSTAINED(3);
+        private final int id;
+
+        Type(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public Optional<Type> getFromId(int id) {
+            if (id <= 0 || id > Type.values().length) return Optional.empty();
+
+            Type[] types = Type.values();
+            return Optional.of(types[id]);
+        }
     }
 }

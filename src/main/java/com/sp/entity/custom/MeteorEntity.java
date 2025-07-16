@@ -1,8 +1,11 @@
 package com.sp.entity.custom;
 
+import com.sp.render.camerashake.CameraShakeManager;
+import com.sp.render.camerashake.custom.PointCameraShake;
 import com.sp.sounds.ModSounds;
 import com.sp.util.MathUtil;
 import com.sp.world.spinningblockexplosion.custom.PointSBE;
+import foundry.veil.api.client.util.Easing;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
@@ -51,17 +54,31 @@ public class MeteorEntity extends PersistentProjectileEntity {
 
         } else {
             if (this.age == 1) { //As soon as it spawns
-                this.getWorld().playSoundFromEntity(this, ModSounds.METEOR_WHISTLE, SoundCategory.AMBIENT, 5.0f, MathUtil.nextBetween(0.6f, 1.2f));
+                this.getWorld().playSoundFromEntity(
+                        this,
+                        ModSounds.METEOR_WHISTLE,
+                        SoundCategory.AMBIENT,
+                        10.0f,
+                        MathUtil.nextBetween(0.6f, 1.2f)
+                );
             }
-
         }
 
     }
 
     @Override
+    public void onRemoved() {
+//        if (this.getWorld().isClient) {
+//            PointCameraShake cameraShake = new PointCameraShake(this.pos, 7, 60, Easing.LINEAR);
+//            CameraShakeManager.addCameraShake();
+//        }
+        super.onRemoved();
+    }
+
+    @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
         this.playSound(ModSounds.METEOR_IMPACT, 100.0F, 1.2F / (this.random.nextFloat() * 0.2F + 0.9F));
-        PointSBE explosion = new PointSBE(this.random.nextBetween(3, 7), 0.35f, this.getPos());
+        PointSBE explosion = new PointSBE(this.random.nextBetween(4, 7), 0.35f, this.getPos());
         explosion.beginExplosion();
         discard();
     }

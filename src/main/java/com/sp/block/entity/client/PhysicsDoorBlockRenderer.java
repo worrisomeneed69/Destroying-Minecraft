@@ -18,10 +18,10 @@ public class PhysicsDoorBlockRenderer implements BlockEntityRenderer<PhysicsDoor
         if (entity.shouldShowSelection()) {
             boolean bl = entity.isSettingSelection();
             int[] colors = new int[4];
-            colors[0] = bl ? 255 : 100;
-            colors[1] = bl ? 100 : 255;
-            colors[2] = 100;
-            colors[3] = 100;
+            colors[0] = bl ? 255 : 100;  //RED
+            colors[1] = bl ? 100 : 255;  //GREEN
+            colors[2] = 100;             //BLUE
+            colors[3] = 100;             //ALPHA
 
             matrices.translate(-entity.getPos().getX(), -entity.getPos().getY(), -entity.getPos().getZ());
             RenderUtil.drawBlocksFromCorners(

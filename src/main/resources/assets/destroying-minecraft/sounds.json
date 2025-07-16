@@ -61,29 +61,34 @@
   },
   "planet_ambience": {
     "sounds": [
-      "destroying-minecraft:planet_ambience"
+      "destroying-minecraft:planet/planet_ambience"
+    ]
+  },
+  "planet_rumble": {
+    "sounds": [
+      "destroying-minecraft:planet/planet_rumble"
     ]
   },
   "meteor_whistle": {
     "sounds": [
-      "destroying-minecraft:meteor/whistle/meteor_whistle1",
-      "destroying-minecraft:meteor/whistle/meteor_whistle2",
-      "destroying-minecraft:meteor/whistle/meteor_whistle3",
-      "destroying-minecraft:meteor/whistle/meteor_whistle4"
+      "destroying-minecraft:planet/meteor/whistle/meteor_whistle1",
+      "destroying-minecraft:planet/meteor/whistle/meteor_whistle2",
+      "destroying-minecraft:planet/meteor/whistle/meteor_whistle3",
+      "destroying-minecraft:planet/meteor/whistle/meteor_whistle4"
     ]
   },
   "meteor_impact": {
     "sounds": [
-      "destroying-minecraft:meteor/impact/meteor_impact1",
-      "destroying-minecraft:meteor/impact/meteor_impact2",
-      "destroying-minecraft:meteor/impact/meteor_impact3",
-      "destroying-minecraft:meteor/impact/meteor_impact4",
-      "destroying-minecraft:meteor/impact/meteor_impact5",
-      "destroying-minecraft:meteor/impact/meteor_impact6",
-      "destroying-minecraft:meteor/impact/meteor_impact7",
-      "destroying-minecraft:meteor/impact/meteor_impact8",
-      "destroying-minecraft:meteor/impact/meteor_impact9",
-      "destroying-minecraft:meteor/impact/meteor_impact10"
+      "destroying-minecraft:planet/meteor/impact/meteor_impact1",
+      "destroying-minecraft:planet/meteor/impact/meteor_impact2",
+      "destroying-minecraft:planet/meteor/impact/meteor_impact3",
+      "destroying-minecraft:planet/meteor/impact/meteor_impact4",
+      "destroying-minecraft:planet/meteor/impact/meteor_impact5",
+      "destroying-minecraft:planet/meteor/impact/meteor_impact6",
+      "destroying-minecraft:planet/meteor/impact/meteor_impact7",
+      "destroying-minecraft:planet/meteor/impact/meteor_impact8",
+      "destroying-minecraft:planet/meteor/impact/meteor_impact9",
+      "destroying-minecraft:planet/meteor/impact/meteor_impact10"
     ]
   }
 }

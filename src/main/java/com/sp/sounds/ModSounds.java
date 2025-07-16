@@ -17,6 +17,9 @@ public class ModSounds {
     public static final SoundEvent SUPERNOVA_INITIALIZE = registerSoundEvent("sn_initialize");
     public static final SoundEvent BLACK_HOLE_INITIALIZE = registerSoundEvent("bh_initialize");
 
+    public static final SoundEvent PLANET_AMBIENCE = registerSoundEvent("planet_ambience");
+    public static final SoundEvent PLANET_RUMBLE = registerSoundEvent("planet_rumble");
+
     public static final SoundEvent LASER_CHARGE = registerSoundEvent("laser_charge");
     public static final SoundEvent LASER_FIRE = registerSoundEvent("laser_fire");
     public static final SoundEvent LASER_POWER_DOWN = registerSoundEvent("laser_power_down");

@@ -11,6 +11,9 @@ import com.sp.entity.ModEntities;
 import com.sp.item.ModItemGroups;
 import com.sp.item.ModItems;
 import com.sp.networking.InitializePackets;
+import com.sp.networking.S2C.InvokeDestructionPacket;
+import com.sp.networking.S2C.PointSBEPacket;
+import com.sp.render.camerashake.AbstractCameraShakeInstance;
 import com.sp.sounds.ModSounds;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
 import com.sp.world.spinningblockexplosion.SpinningBlockExplosion;
@@ -19,7 +22,11 @@ import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,8 +62,8 @@ public class DestroyingMinecraft implements ModInitializer {
 		});
 	}
 
-	public void sendPlaySoundInstancePacket() {
-
+	public static void sendPointSBEPacket(PlayerEntity player, Vec3d position, int radius) {
+		ServerPlayNetworking.send((ServerPlayerEntity) player, new PointSBEPacket.SBEPayload(position.toVector3f(), radius));
 	}
 
 	public static Identifier idOf(String path){

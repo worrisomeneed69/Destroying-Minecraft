@@ -1,6 +1,5 @@
 package com.sp.render.camerashake;
 
-import com.sp.render.camerashake.custom.CameraShakeInstance;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;

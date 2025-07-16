@@ -42,7 +42,6 @@ public class InvokeDestructionPacket {
                 case 2: {
                     DestroyingMinecraftClient.planetPostShader.getDestructionEvent().setActive(on);
                     if (on) DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.PLANET_ANIMATION);
-
                     break;
                 }
 

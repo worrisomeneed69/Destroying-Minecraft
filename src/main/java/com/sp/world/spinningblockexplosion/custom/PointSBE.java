@@ -1,11 +1,20 @@
 package com.sp.world.spinningblockexplosion.custom;
 
+import com.sp.DestroyingMinecraft;
 import com.sp.entity.custom.SpinningBlockEntity;
 import com.sp.world.spinningblockexplosion.SpinningBlockExplosion;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageSources;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+
+import java.util.List;
 
 public class PointSBE extends SpinningBlockExplosion {
     private final int radius;
@@ -41,6 +50,35 @@ public class PointSBE extends SpinningBlockExplosion {
 
                 }
             }
+        }
+
+        int affectedRadius = Math.max(radius*3, 10);
+        System.out.println(affectedRadius);
+        List<LivingEntity> nearbyEntitiesList = world.getEntitiesByType(
+                TypeFilter.instanceOf(LivingEntity.class),
+                new Box(
+                        this.position.subtract(affectedRadius, affectedRadius, affectedRadius),
+                        this.position.add(affectedRadius, affectedRadius, affectedRadius)
+                ),
+                LivingEntity::isAlive
+        );
+
+        for (LivingEntity entity : nearbyEntitiesList) {
+            if (!entity.canTakeDamage()) continue;
+            System.out.println("WORKED");
+            double distanceFromCenter = Math.sqrt(entity.squaredDistanceTo(this.position)) / affectedRadius;
+            if (distanceFromCenter > 1.3) continue;  //Also affect players a little bit outside the actual destruction
+
+            Vec3d knockbackVelocity = entity.pos.subtract(this.position).add(0, 0.75, 0).normalize();
+            entity.addVelocityInternal(knockbackVelocity.multiply((1.3 - distanceFromCenter) * 2.0f));
+
+            entity.damage(world.getDamageSources().explosion(null), (float) (1.3 - distanceFromCenter) * this.radius);
+
+            if (entity instanceof PlayerEntity player) {
+
+                DestroyingMinecraft.sendPointSBEPacket(player, this.position, affectedRadius/2);
+            }
+
         }
 
         this.explode = false;

@@ -16,6 +16,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.sound.SoundManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
@@ -59,6 +60,8 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
 
     @Override
     protected KeyframeAnimation initAnimations(World world) {
+        SoundManager soundManager = MinecraftClient.getInstance().getSoundManager();
+
         return new KeyframeAnimation(
                 //*Pause
                 new Keyframe(0.0f),
@@ -79,7 +82,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                         }
                     }
 
-                    MinecraftClient.getInstance().getSoundManager().play(
+                    soundManager.play(
                             PositionedSoundInstance.master(
                                     ModSounds.LASER_CHARGE,
                                     1.0f,
@@ -89,7 +92,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
 
                 //*Pause
                 new Keyframe((float) 60/150, () -> {
-                    MinecraftClient.getInstance().getSoundManager().play(
+                    soundManager.play(
                             PositionedSoundInstance.master(
                                     ModSounds.LASER_PAUSE,
                                     1.0f,
@@ -109,7 +112,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                             Easing.LINEAR
                     );
                     CameraShakeManager.addCameraShake(shakeInstance);
-                    MinecraftClient.getInstance().getSoundManager().play(
+                    soundManager.play(
                             PositionedSoundInstance.master(
                                     ModSounds.LASER_FIRE,
                                     1.0f,
@@ -127,7 +130,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                         entity.powerDown();
                     }
                     laserLength = 0.0f;
-                    MinecraftClient.getInstance().getSoundManager().play(
+                    soundManager.play(
                             PositionedSoundInstance.master(
                                     ModSounds.LASER_POWER_DOWN,
                                     1.0f,
@@ -141,7 +144,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
 
                 //*Supernova Explosion
                 new Keyframe((float) 115/150, () -> {
-                    MinecraftClient.getInstance().getSoundManager().play(
+                    soundManager.play(
                             PositionedSoundInstance.master(
                                     ModSounds.SUPERNOVA_EXPLOSION,
                                     1.0f,
