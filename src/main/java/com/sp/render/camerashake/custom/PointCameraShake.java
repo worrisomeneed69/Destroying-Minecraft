@@ -36,7 +36,6 @@ public class PointCameraShake extends AbstractCameraShakeInstance {
         if (this.player != null) {
             float distToCenter = 1.0f - ((float) Math.sqrt(this.player.getPos().squaredDistanceTo(this.position)) / (this.strength));
             float temp = this.strength * (1.0f - this.easing.ease((float) this.progress / this.duration));
-            System.out.println(distToCenter);
             this.trauma = Math.max(temp * distToCenter, 0.0f);
         }
     }

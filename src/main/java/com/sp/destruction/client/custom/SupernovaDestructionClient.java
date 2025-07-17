@@ -170,7 +170,8 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
 
                     if (globalTime >= 0.969) {
                         CameraShakeInstance shakeInstance = new CameraShakeInstance(
-                                1f,
+                                1.0f,
+                                0.0f,
                                 20,
                                 Easing.LINEAR
                         );

@@ -25,6 +25,7 @@ public abstract class DestructionEvent {
         if(animation != null) {
             if (this.isActive()) {
                 this.progress++;
+//                this.progress = 2100;
                 animation.updateKeyframeAnimation((float) this.progress / this.duration);
 
             } else {
@@ -39,6 +40,7 @@ public abstract class DestructionEvent {
     }
 
     protected void resetEvent() {
+        this.active = false;
         this.progress = 0;
     }
 

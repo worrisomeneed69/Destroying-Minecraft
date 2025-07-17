@@ -12,6 +12,7 @@ uniform sampler2D PebbleDepth;
 
 uniform float GameTime;
 uniform float planetFallTimer;
+uniform float flashTimer;
 
 in vec2 texCoord;
 out vec4 fragColor;
@@ -23,7 +24,7 @@ const vec3 CONE_OFFSET = vec3(0, -19000, 0);
 const vec3 CRACK_DIR = normalize(vec3(-1, -1.1, -0.03));
 
 //vec3 PLANET_POS = vec3(VeilCamera.CameraPosition.x+20000, 20000 - (sin(GameTime * 1000)*0.5+0.5)*1000, VeilCamera.CameraPosition.z);
-vec3 PLANET_POS = vec3(VeilCamera.CameraPosition.x+20000, 20000, VeilCamera.CameraPosition.z);
+vec3 PLANET_POS = vec3(VeilCamera.CameraPosition.x+20000, 20000 - 4000*planetFallTimer, VeilCamera.CameraPosition.z);
 
 struct Ray {
     vec3 rayPos;
@@ -127,7 +128,8 @@ void displacePlanet(in out vec3 outColor, int iterations, in out Ray ray) {
     }
     vec3 planetWallColor = getSphereTexture(surfacePoint*0.1, abs(ray.normal), PlanetColor);
     vec3 crackWallColor = (vec3(depth)) * dot(normalize(ray.rayPos - PLANET_POS), LIGHT_DIR);
-    outColor = inHole ? crackWallColor * vec3(1, 0.5, 0.2)*5 : outColor;
+    vec3 laveColor = vec3(1, 0.5, 0.2) * (5 + 7*flashTimer);
+    outColor = inHole ? crackWallColor * laveColor : outColor;
 }
 
 void rayMarchShadows(in out vec3 outColor, int iterations, in out Ray ray) {

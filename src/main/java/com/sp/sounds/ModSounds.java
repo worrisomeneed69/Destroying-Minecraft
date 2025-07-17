@@ -19,6 +19,8 @@ public class ModSounds {
 
     public static final SoundEvent PLANET_AMBIENCE = registerSoundEvent("planet_ambience");
     public static final SoundEvent PLANET_RUMBLE = registerSoundEvent("planet_rumble");
+    public static final SoundEvent PLANET_IMPACT_INITIAL = registerSoundEvent("planet_impact_initial");
+    public static final SoundEvent PLANET_IMPACT = registerSoundEvent("planet_impact");
 
     public static final SoundEvent LASER_CHARGE = registerSoundEvent("laser_charge");
     public static final SoundEvent LASER_FIRE = registerSoundEvent("laser_fire");

@@ -78,7 +78,7 @@ public class MeteorEntity extends PersistentProjectileEntity {
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
         this.playSound(ModSounds.METEOR_IMPACT, 100.0F, 1.2F / (this.random.nextFloat() * 0.2F + 0.9F));
-        PointSBE explosion = new PointSBE(this.random.nextBetween(4, 7), 0.35f, this.getPos());
+        PointSBE explosion = new PointSBE(this.random.nextBetween(4, 7), 0.2f, this.getPos());
         explosion.beginExplosion();
         discard();
     }

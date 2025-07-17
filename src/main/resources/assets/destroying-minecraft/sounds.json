@@ -90,5 +90,15 @@
       "destroying-minecraft:planet/meteor/impact/meteor_impact9",
       "destroying-minecraft:planet/meteor/impact/meteor_impact10"
     ]
+  },
+  "planet_impact_initial": {
+    "sounds": [
+      "destroying-minecraft:planet/impact/planet_impact_initial"
+    ]
+  },
+  "planet_impact": {
+    "sounds": [
+      "destroying-minecraft:planet/impact/planet_impact"
+    ]
   }
 }

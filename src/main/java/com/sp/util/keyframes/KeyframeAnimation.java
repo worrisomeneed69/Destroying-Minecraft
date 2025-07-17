@@ -6,8 +6,13 @@ import java.util.List;
 public class KeyframeAnimation {
     private final List<Keyframe> keyframeList;
     private int currentKeyframeIndex = 0;
+    private final Keyframe.KeyframeAction globalAction;
 
     public KeyframeAnimation(Keyframe... keyframes) {
+        this((globalTime, localTime) -> {}, keyframes);
+    }
+
+    public KeyframeAnimation(Keyframe.KeyframeAction globalAction, Keyframe... keyframes) {
         if (keyframes.length == 0) throw new RuntimeException("Cannot make a keyframe animation with zero keyframes");
 
         this.keyframeList = Arrays.stream(keyframes).sorted((o1, o2) -> {
@@ -16,6 +21,8 @@ public class KeyframeAnimation {
 
             return comp;
         }).toList();
+
+        this.globalAction = globalAction;
     }
 
     /**
@@ -45,7 +52,10 @@ public class KeyframeAnimation {
         float currentKeyframeTime = currentKeyframe.getKeyframeTime();
         float nextKeyframeTime = nextKeyframe != null ? nextKeyframe.getKeyframeTime() : 1.0f;
 
-        currentKeyframe.getAction().run(time, (time - currentKeyframeTime) / (nextKeyframeTime - currentKeyframeTime));
+        float localTime = (time - currentKeyframeTime) / (nextKeyframeTime - currentKeyframeTime);
+        currentKeyframe.getAction().run(time, localTime);
+
+        globalAction.run(time, time);
     }
 
     /**

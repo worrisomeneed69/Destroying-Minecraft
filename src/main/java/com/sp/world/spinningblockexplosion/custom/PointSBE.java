@@ -5,8 +5,6 @@ import com.sp.entity.custom.SpinningBlockEntity;
 import com.sp.world.spinningblockexplosion.SpinningBlockExplosion;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockPos;
@@ -53,7 +51,6 @@ public class PointSBE extends SpinningBlockExplosion {
         }
 
         int affectedRadius = Math.max(radius*3, 10);
-        System.out.println(affectedRadius);
         List<LivingEntity> nearbyEntitiesList = world.getEntitiesByType(
                 TypeFilter.instanceOf(LivingEntity.class),
                 new Box(
@@ -65,7 +62,6 @@ public class PointSBE extends SpinningBlockExplosion {
 
         for (LivingEntity entity : nearbyEntitiesList) {
             if (!entity.canTakeDamage()) continue;
-            System.out.println("WORKED");
             double distanceFromCenter = Math.sqrt(entity.squaredDistanceTo(this.position)) / affectedRadius;
             if (distanceFromCenter > 1.3) continue;  //Also affect players a little bit outside the actual destruction
 
@@ -75,7 +71,6 @@ public class PointSBE extends SpinningBlockExplosion {
             entity.damage(world.getDamageSources().explosion(null), (float) (1.3 - distanceFromCenter) * this.radius);
 
             if (entity instanceof PlayerEntity player) {
-
                 DestroyingMinecraft.sendPointSBEPacket(player, this.position, affectedRadius/2);
             }
 

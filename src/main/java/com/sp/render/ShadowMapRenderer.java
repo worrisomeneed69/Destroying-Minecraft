@@ -96,6 +96,10 @@ public class ShadowMapRenderer {
                     shadowModelView.rotate(RotationAxis.POSITIVE_Z.rotationDegrees(-(client.world.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
                 }
             }
+            case PLANET -> {
+                shadowModelView.rotate(RotationAxis.POSITIVE_X.rotationDegrees(25.0f));
+                shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(20.0f));
+            }
             default -> {
                 shadowModelView.rotate(RotationAxis.POSITIVE_X.rotationDegrees(20.0f));
                 shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-45.0f));

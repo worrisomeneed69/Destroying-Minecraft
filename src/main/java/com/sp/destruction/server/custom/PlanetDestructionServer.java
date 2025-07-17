@@ -5,6 +5,7 @@ import com.sp.entity.ModEntities;
 import com.sp.entity.custom.MeteorEntity;
 import com.sp.util.keyframes.Keyframe;
 import com.sp.util.keyframes.KeyframeAnimation;
+import com.sp.world.spinningblockexplosion.custom.DirectionalSBE;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
@@ -20,7 +21,7 @@ public class PlanetDestructionServer extends ServerDestructionEvent {
     private final Vec3d centerBlock = new Vec3d(-1503, 65, 1196);
 
     public PlanetDestructionServer() {
-        super(1800);
+        super(2400);
     }
 
     @Override
@@ -28,7 +29,8 @@ public class PlanetDestructionServer extends ServerDestructionEvent {
         return new KeyframeAnimation(
                 new Keyframe(0.0f),
 
-                new Keyframe((float) 320/1800, (globalTime, localTime) -> {
+                new Keyframe(320.0f/this.duration, (globalTime, localTime) -> {
+
                     trackingMeteorCooldown--;
                     if (meteorCooldown-- >= 0) return;
 
@@ -52,12 +54,34 @@ public class PlanetDestructionServer extends ServerDestructionEvent {
                                 world.spawnEntity(trackingMeteor);
                             }
                         }
-                        System.out.println("SPAWNED TRACKING METEOR");
                         trackingMeteorCooldown = random.nextBetween(200, 300);
                     }
 
 
                     meteorCooldown = random.nextBetween(2, 5);
+                }),
+
+                new Keyframe(1800.0f / this.duration),
+
+                new Keyframe(2350.0f/this.duration, () -> {
+                    System.out.println("EXPLODING");
+                    Vec3d averagePlayerPos = Vec3d.ZERO;
+                    List<PlayerEntity> players = (List<PlayerEntity>) world.getPlayers();
+                    int numOfTargetedPlayers = 0;
+
+                    for (PlayerEntity player : players) {
+                        System.out.println("WORKING1");
+                        if (!player.canTakeDamage()) continue;
+
+                        averagePlayerPos = averagePlayerPos.add(player.getPos());
+                        numOfTargetedPlayers++;
+                    }
+
+                    averagePlayerPos.multiply(1.0f / numOfTargetedPlayers);
+
+
+                    DirectionalSBE directionalSBE = new DirectionalSBE(50, 50, -90, 0.5f, new Vec3d(averagePlayerPos.x, 65, averagePlayerPos.z));
+                    directionalSBE.explode(world);
                 })
         );
     }
