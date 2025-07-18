@@ -32,6 +32,7 @@ public class ModSounds {
     public static final SoundEvent METEOR_WHISTLE = registerSoundEvent("meteor_whistle");
     public static final SoundEvent METEOR_IMPACT = registerSoundEvent("meteor_impact");
 
+    public static final SoundEvent BLACK_HOLE_AMBIENCE = registerSoundEvent("black_hole_ambience");
 
     private static SoundEvent registerSoundEvent(String name) {
         Identifier id = DestroyingMinecraft.idOf(name);

@@ -1,6 +1,7 @@
 package com.sp.render.postshaders.custom;
 
 import com.sp.DestroyingMinecraft;
+import com.sp.destruction.client.custom.BlackHoleDestructionClient;
 import com.sp.render.PrevUniforms;
 import com.sp.render.postshaders.PostShader;
 import com.sp.util.BetterUniforms;
@@ -17,11 +18,12 @@ public class BlackHolePostShader extends PostShader {
     public static final Identifier BLACK_HOLE_SHADER = DestroyingMinecraft.idOf("blackhole/black_hole");
 
     public BlackHolePostShader() {
-        super(BLACK_HOLE_POST, BLACK_HOLE_SHADER, null);
+        super(BLACK_HOLE_POST, BLACK_HOLE_SHADER, new BlackHoleDestructionClient());
     }
 
     @Override
     public void setUniformsForShader(ShaderProgram shaderProgram, float tickDelta, MinecraftClient client, World clientWorld) {
+        super.setUniformsForShader(shaderProgram, tickDelta, client, clientWorld);
         if (PrevUniforms.isInitialized()) {
             BetterUniforms.setMatrix(shaderProgram, "prevProjMat", PrevUniforms.getPrevProjMat());
             BetterUniforms.setMatrix(shaderProgram, "prevViewMat", PrevUniforms.getPrevModelViewMat());

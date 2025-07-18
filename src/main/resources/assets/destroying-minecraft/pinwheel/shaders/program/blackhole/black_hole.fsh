@@ -15,6 +15,7 @@ uniform sampler2D StarsTexture;
 
 uniform vec4 ColorModulator;
 uniform float GameTime;
+uniform float flashTimer;
 
 uniform mat4 prevProjMat;
 uniform mat4 prevViewMat;
@@ -38,8 +39,8 @@ float mapDisk(vec3 rayPos, vec3 spherePos) {
     rotatedRayPos.xy *= rot2D(-9);
     rotatedRayPos.yz *= rot2D(-21);
 
-    float centerHole = sdCylinder(rotatedRayPos, 0.03, BH_SIZE + 0.45);
-    float disk = sdCylinder(rotatedRayPos, 0.025, DISK_RADIUS);
+    float centerHole = sdCylinder(rotatedRayPos, 0.035, BH_SIZE + 0.45);
+    float disk = sdCylinder(rotatedRayPos, 0.03, DISK_RADIUS);
 //    float centerDisk = sdRoundedCylinder();
 
     return opSubtraction(centerHole, disk);
@@ -55,7 +56,7 @@ void warpSpace(inout vec3 rayPos, inout vec3 rayDir, vec3 BH_POS, in float stepD
     float dstToCenter = distance(BH_POS, rayPos);
 
     float force = 1 / (pow(dstToCenter, 2.0));
-    rayDir = normalize(mix(rayDir, dirToCenter, force * 3.0 / float(ITERATIONS)));
+    rayDir = normalize(mix(rayDir, dirToCenter, force * 5.0 / float(ITERATIONS)));
 }
 
 //Attenuation formula https://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula
@@ -67,15 +68,12 @@ void raymarchAccretionDisk(vec3 rayPos, float diskDist, vec3 BH_POS, inout vec4 
     float radius = distance(rayPos, BH_POS);
     vec3 diskPos = rayPos - BH_POS;
     float angle = atan2(diskPos.x, diskPos.z) + GameTime * 500;
-    float attenuate = attenuation(radius / 2.5, 0, 4) * (1.0 - diskDist);
-//    attenuate *= attenuate;
+    float attenuate = attenuation(radius / 2.5, 0, 3) * (1.0 - diskDist);
 
     float cloud = clamp(fbm(vec3(radius * 15, angle * 5, diskPos.y * attenuate * attenuate), 8), 0.0, 1.0);
     color.rgb += vec3(cloud * attenuate) * mix(OutDiskColor, InDiskColor, attenuate * attenuate);
-//    color.rgb *= texture(RandNoise, vec2(radius, angle) * 2).r;
     color.rgb *= attenuate * attenuate;
     color.a += attenuate * 0.8;
-//    color.a += 1.0;
 }
 
 vec3 projectAndDivide(mat4 projMat, vec3 position){
@@ -85,10 +83,9 @@ vec3 projectAndDivide(mat4 projMat, vec3 position){
 
 void main() {
     vec3 cameraPos = VeilCamera.CameraPosition;
-    vec3 BH_POS = cameraPos + vec3(0.0, 1.0, -3.2);
+    vec3 BH_POS = cameraPos + vec3(0.0, 1.0, -2.9);
 //    vec3 BH_POS = vec3(-96, 80, 156);
 
-//    vec4 color = texture(DiffuseSampler, texCoord) * ColorModulator;
     float depth = texture(DiffuseDepthSampler, texCoord).r;
     float handDepth = texture(HandDepth, texCoord).r;
 
@@ -134,23 +131,35 @@ void main() {
                     break;
                 }
             }
+            if (distance(rayPos, BH_POS) < BH_SIZE) {
+                hit = true;
+                break;
+            }
 
         }
 
         if(hit) {
             BHcolor.rgb *= 30;
-            fragColor = vec4(blend(color, BHcolor), 1.0);
+            BHcolor.rgb = clamp(BHcolor.rgb, vec3(0.0), vec3(400.0));
+            color = vec4(blend(color, BHcolor), 1.0);
         } else {
-            color = texture(StarsTexture, viewDirFromUv(texCoord).xy*1);
-            fragColor = color;
+            color = texture(StarsTexture, viewDirFromUv(texCoord).xy*1)*2;
         }
+        //SkyFlash
+//        color =     mix(color, vec4(vec3(5.0), 1.0), flashTimer);
+        fragColor = mix(vec4(vec3(5.0), 1.0), color, flashTimer);
+
+
 
 
         if(prevTexcoord.x >= 0.0 && prevTexcoord.x <= 1.0 && prevTexcoord.y >= 0.0 && prevTexcoord.y <= 1.0) {
             if(prevDepth >= 1.0){
-                fragColor = mix(fragColor, texture(PrevSampler, prevTexcoord), 0.9);
+                fragColor = mix(fragColor, texture(PrevSampler, prevTexcoord), min(flashTimer, 0.9));
             }
         }
+
+
+
 
     } else {
         fragColor = texture(DiffuseSampler, texCoord);

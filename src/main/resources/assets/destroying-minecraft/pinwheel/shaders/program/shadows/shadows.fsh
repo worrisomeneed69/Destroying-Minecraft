@@ -78,7 +78,8 @@ void main() {
     float handDepth = texture(HandDepth, texCoord).r;
 
 
-    vec3 flash = flashTimer > 0 ? vec3(0.6) * (1.0-min(flashTimer, 1.0)) : vec3(0.0);
+    vec3 flash = flashTimer > 0 ? vec3(0.6) * (1.0 - min(flashTimer, 1.0)) : vec3(0.0);
+//    vec3 flash = vec3(0.6);
     if(depth >= 1.0) {
         fragColor = color;
         gl_FragDepth = depth;
@@ -122,11 +123,11 @@ void main() {
         shadowSum /= pow(2.0 * SHADOW_SAMPLES + 1.0, 2.0);
     }
 
-//    vec3 ambientLight = (blockLight + 0.2*skyLight) * clamp(dot(worldNormal, worldNormal), 0.0, 1.0);
-    vec3 outputColor;
+    vec3 outputColor = albedoColor.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH));
     if (flashTimer > 0.0) {
-        outputColor = albedoColor.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)) + flash;
-    } else {
+        outputColor += flash*lightUV.y;
+    }
+    else {
         outputColor = albedoColor.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)*(1.0 - supernovaTimer));
     }
 
@@ -138,9 +139,8 @@ void main() {
 
 
     float height = viewDirFromUv(texCoord).y;
-    fragColor = linear_fog(vec4(outputColor, 1.0), length(viewPos), FogEnd - 30, FogEnd, vec4(vec3(SkyColor - height * 0.7), 1.0));
-//    fragColor = linear_fog(vec4(outputColor, 1.0), length(viewPos), FogEnd - 30, FogEnd, vec4(vec3(0.0), 1.0));
-//    fragColor.rgb = vec3(FogEnd);
+    fragColor = vec4(outputColor, 1.0);
+//    fragColor = linear_fog(vec4(outputColor, 1.0), length(viewPos), FogEnd - 30, FogEnd, vec4(vec3(SkyColor - height * 0.7), 1.0));
     gl_FragDepth = depth;
 
 

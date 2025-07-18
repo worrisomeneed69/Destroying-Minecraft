@@ -53,6 +53,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
     public void setUniforms(ShaderProgram shaderProgram, float tickDelta) {
         BetterUniforms.setFloat(shaderProgram, "supernovaTimer", implodeTimer.getTimer(tickDelta));
         BetterUniforms.setFloat(shaderProgram, "flashTimer", flashTimer.getTimer(tickDelta));
+        System.out.println(flashTimer.getTimer(tickDelta));
         BetterUniforms.setFloat(shaderProgram, "explosionTimer", explosionTimer.getTimer(tickDelta));
         BetterUniforms.setFloat(shaderProgram, "laserLength", laserLength);
         BetterUniforms.setInt(shaderProgram, "flashFrame", flashFrame);
@@ -164,7 +165,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                     } else {
                         //Flash, then fade to supernova
                         implodeTimer.maxTimer();
-                        flashTimer.setTimer(Easing.EASE_IN_OUT_CUBIC.ease((localTime - 0.3f) / 0.35f));
+                        flashTimer.setTimer(Math.clamp(Easing.EASE_IN_OUT_CUBIC.ease((localTime - 0.3f) / 0.35f), 0.0f, 1.0f));
                         explosionTimer.setTimer((localTime - 0.3f) / (0.7f));
                     }
 

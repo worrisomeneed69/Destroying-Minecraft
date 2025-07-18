@@ -25,8 +25,9 @@ public class ShadowPostShader extends PostShader {
     @Override
     public void setUniformsForShader(ShaderProgram shaderProgram, float tickDelta, MinecraftClient client, World clientWorld) {
         ShadowMapRenderer.setShadowUniforms(shaderProgram);
-        if (DestroyingMinecraftConfig.shaderType == ShaderType.SUPERNOVA) {
-            DestroyingMinecraftClient.supernovaPostShader.getDestructionEvent().setUniforms(shaderProgram, tickDelta);
+        switch (DestroyingMinecraftConfig.shaderType) {
+            case SUPERNOVA -> DestroyingMinecraftClient.supernovaPostShader.getDestructionEvent().setUniforms(shaderProgram, tickDelta);
+            case BLACK_HOLE -> DestroyingMinecraftClient.blackHolePostShader.getDestructionEvent().setUniforms(shaderProgram, tickDelta);
         }
     }
 }

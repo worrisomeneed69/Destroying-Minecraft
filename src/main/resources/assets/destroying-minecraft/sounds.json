@@ -100,5 +100,10 @@
     "sounds": [
       "destroying-minecraft:planet/impact/planet_impact"
     ]
+  },
+  "black_hole_ambience": {
+    "sounds": [
+      "destroying-minecraft:black_hole_ambience"
+    ]
   }
 }
