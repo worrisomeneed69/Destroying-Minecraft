@@ -100,7 +100,7 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
     }
 
     public void tick(World world, BlockPos pos, BlockState state) {
-        if (!world.isClient && doorMoving) {
+        if (!world.isClient && doorMoving && this.currentDoor != null) {
             Vec3d offset = new Vec3d(this.movementDirection.getOffsetX(), this.movementDirection.getOffsetY(), this.movementDirection.getOffsetZ());
             if (this.currentDoor.getPos().add(offset.subtract(offset).subtract(offset).multiply(numOfBlocks)).distanceTo(this.startingPos) <= 0.02) {
                 this.currentDoor.setDown();

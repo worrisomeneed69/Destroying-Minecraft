@@ -115,9 +115,12 @@ public class BlockPhysicsEntity extends Entity {
         for (BlockData block : this.component.getBlocks()) {
             BlockOBB obb = new BlockOBB(this.component.getRotation(), block);
 
-            BlockOBB.CollisionData collisionData = obb.getMinCollisionWith(aabb.offset(new Vec3d(0, bestOffset, 0)), this);
-            if (collisionData.collides() && collisionData.overLapp() > 0) {
-                bestOffset += collisionData.overLapp();
+            //TODO Don't do this yeye as collision check with everything. Just fix the y axis check
+            if (obb.collidesWith(aabb, this)) {
+                BlockOBB.CollisionData collisionData = obb.getMinCollisionWith(aabb.offset(new Vec3d(0, bestOffset, 0)), this);
+                if (collisionData.collides() && collisionData.overLapp() > 0) {
+                    bestOffset += collisionData.overLapp();
+                }
             }
         }
 
@@ -131,17 +134,20 @@ public class BlockPhysicsEntity extends Entity {
             BlockOBB obb = new BlockOBB(this.component.getRotation(), block);
 
             //getStepHeight()
-            BlockOBB.CollisionData collisionData = obb.getMinCollisionWith(aabb.offset(offset), this);
-            if (collisionData.collides()) {
-                Vec3d resolveAxis = collisionData.axis();
+            // TODO Don't do this yeye as collision check with everything. Just fix the Offest check to not hallucinate blocks.
+            if (obb.collidesWith(aabb.offset(offset), this)) {
+                BlockOBB.CollisionData collisionData = obb.getMinCollisionWith(aabb.offset(offset), this);
+                if (collisionData.collides()) {
+                    Vec3d resolveAxis = collisionData.axis();
 
-                // Ensure the axis points away from collision
-                double dot = movement.dotProduct(resolveAxis);
-                if (dot > 0) {
-                    resolveAxis = resolveAxis.negate();
+                    // Ensure the axis points away from collision
+                    double dot = movement.dotProduct(resolveAxis);
+                    if (dot > 0) {
+                        resolveAxis = resolveAxis.negate();
+                    }
+
+                    offset = offset.add(resolveAxis.multiply(collisionData.overLapp()));
                 }
-
-                offset = offset.add(resolveAxis.multiply(collisionData.overLapp()));
             }
         }
 

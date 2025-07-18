@@ -147,7 +147,7 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
         for (int i = 0; i < aabbCorners.size(); i++) {
             Vec3d aabbCorner = aabbCorners.get(i);
 
-            RenderUtil.drawEntityBox(matrices, vertexConsumers, aabbCorner.add(0.5, 0.5, 0.5), 0.2, entity, 0, 0, 255, 255);
+            //RenderUtil.drawEntityBox(matrices, vertexConsumers, aabbCorner.add(0.5, 0.5, 0.5), 0.2, entity, 0, 0, 255, 255);
         }
 
         for (BlockPhysicsEntity.BlockData block : entity.component.getBlocks()) {
@@ -157,16 +157,18 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
 
             Vec3d globalPos = MathUtil.toVec3d(obb.rotation.transform(MathUtil.toVector3d(Vec3d.of(obb.blockData.offset)))).add(entity.getPos());
 
-        for (Vec3d normalAxi : obb.getNormalAxis()) {
-            Vec3d sideStart = globalPos.add(normalAxi.multiply(0.5));
+            for (Vec3d normalAxi : obb.getNormalAxis()) {
+                Vec3d sideStart = globalPos.add(normalAxi.multiply(0.5));
 
-            RenderUtil.drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideStart.add(normalAxi), 0, 0, 255, 255);
-        }
+                //RenderUtil.drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideStart.add(normalAxi), 0, 0, 255, 255);
+            }
 
-        for (Vec3d globalCorner : obb.getGlobalCorners(entity)) {
-            RenderUtil.drawEntityBox(matrices, vertexConsumers, globalCorner.add(0.5, 0.5, 0.5), 0.2, entity, 255, 0, 0, 255);
-        }
+            for (Vec3d globalCorner : obb.getGlobalCorners(entity)) {
+                boolean collides = obb.collidesWith(MinecraftClient.getInstance().player.getBoundingBox(), entity);
+                RenderUtil.drawEntityBox(matrices, vertexConsumers, globalCorner.add(0.5, 0.5, 0.5), 0.2, entity, collides ? 255 : 0,  collides ? 0 : 255, 0, 255);
+            }
 
+        /*
             List<Vec3d> allAxis = obb.getAABBNormalAxis();
             allAxis.addAll(obb.getNormalAxis());
 //            allAxis.addAll(obb.getCrossProductAxis(obb.getNormalAxis(), obb.getAABBNormalAxis()));
@@ -193,11 +195,13 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
                 }
 
                 if (obbMax < aabbMin || obbMin > aabbMax) {
-                    RenderUtil.drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideEnd, 0, 255, 0, 255);
+                    // RenderUtil.drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideEnd, 0, 255, 0, 255);
                 } else {
-                    RenderUtil.drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideEnd, 255, 0, 0, 255);
+                    // RenderUtil.drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideEnd, 255, 0, 0, 255);
                 }
             }
+
+         */
         }
     }
 }
