@@ -103,7 +103,27 @@
   },
   "black_hole_ambience": {
     "sounds": [
-      "destroying-minecraft:black_hole_ambience"
+      "destroying-minecraft:black_hole/black_hole_ambience"
+    ]
+  },
+  "black_hole_destruction_ambience": {
+    "sounds": [
+      "destroying-minecraft:black_hole/black_hole_destruction_ambience"
+    ]
+  },
+  "snap_snap": {
+    "sounds": [
+      "destroying-minecraft:black_hole/snap_snap"
+    ]
+  },
+  "snap_snap_rumble": {
+    "sounds": [
+      "destroying-minecraft:black_hole/snap_snap_rumble"
+    ]
+  },
+  "snap_snap_break_off": {
+    "sounds": [
+      "destroying-minecraft:black_hole/snap_snap_break_off"
     ]
   }
 }

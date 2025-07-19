@@ -19,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
+import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -120,13 +121,18 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
             matrices.translate(blockData.offset.getX(), blockData.offset.getY(), blockData.offset.getZ());
 
             BlockState blockState = blockData.blockState;
-            BlockPos blockPos = entity.getBlockPos().add(blockData.offset);
+            BlockPos entityPos = entity.getBlockPos();
+            Vec3d offsetPos = blockData.offset;
+            Vector3f rotatedPos = component.getRotation().transform(offsetPos.toVector3f());
+
+
+//            System.out.println(entity.getPos());
 
             blockModelRenderer.getModelRenderer().render(
                     world,
                     blockModelRenderer.getModel(blockState),
                     blockState,
-                    blockPos,
+                    entityPos.add(BlockPos.ofFloored(MathUtil.toVec3d(rotatedPos))),
                     matrices,
                     vertexConsumers.getBuffer(RenderLayers.getMovingBlockLayer(blockState)),
                     false,

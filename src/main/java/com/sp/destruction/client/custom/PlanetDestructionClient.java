@@ -84,9 +84,7 @@ public class PlanetDestructionClient extends ClientDestructionEvent {
                     CameraShakeManager.addCameraShake(cameraShakeInstance);
                 }),
 
-                new Keyframe(1800.0f /this.duration, () -> {
-                    System.out.println("PAUSE");
-                }),
+                new Keyframe(1800.0f /this.duration),
 
                 new Keyframe(2170.0f /this.duration, () -> {
                     ambientSound.fadeOut();

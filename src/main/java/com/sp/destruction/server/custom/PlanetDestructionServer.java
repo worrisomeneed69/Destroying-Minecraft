@@ -64,13 +64,11 @@ public class PlanetDestructionServer extends ServerDestructionEvent {
                 new Keyframe(1800.0f / this.duration),
 
                 new Keyframe(2350.0f/this.duration, () -> {
-                    System.out.println("EXPLODING");
                     Vec3d averagePlayerPos = Vec3d.ZERO;
                     List<PlayerEntity> players = (List<PlayerEntity>) world.getPlayers();
                     int numOfTargetedPlayers = 0;
 
                     for (PlayerEntity player : players) {
-                        System.out.println("WORKING1");
                         if (!player.canTakeDamage()) continue;
 
                         averagePlayerPos = averagePlayerPos.add(player.getPos());

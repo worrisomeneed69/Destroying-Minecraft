@@ -1,6 +1,5 @@
-package com.sp.destruction.client.custom;
+package com.sp.destruction.client.custom.blackhole;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.destruction.client.ClientDestructionEvent;
 import com.sp.sounds.ModSounds;
 import com.sp.sounds.instances.FadingSoundInstance;
@@ -9,7 +8,6 @@ import com.sp.util.ShaderTimer;
 import com.sp.util.keyframes.Keyframe;
 import com.sp.util.keyframes.KeyframeAnimation;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
-import foundry.veil.api.client.util.Easing;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -17,12 +15,12 @@ import net.minecraft.client.sound.SoundManager;
 import net.minecraft.world.World;
 
 @Environment(EnvType.CLIENT)
-public class BlackHoleDestructionClient extends ClientDestructionEvent {
+public class BlackHoleDestructionClientPart1 extends ClientDestructionEvent {
     private static final ShaderTimer flashTimer = new ShaderTimer();
     private static FadingSoundInstance blackHoleAmbience;
 
-    public BlackHoleDestructionClient() {
-        super(1000);
+    public BlackHoleDestructionClientPart1() {
+        super(540);
     }
 
     @Override

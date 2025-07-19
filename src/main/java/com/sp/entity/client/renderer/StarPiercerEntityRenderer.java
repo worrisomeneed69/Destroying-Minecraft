@@ -53,16 +53,12 @@ public class StarPiercerEntityRenderer extends EntityRenderer<StarPiercerEntity>
 
         if (!MinecraftClient.getInstance().isPaused()) {
             if (entity.isStartingUp()) {
-//                this.speed = 0;
-//                this.model.barrel.roll = 0;
-
                 this.speed += 0.000032222f * MinecraftClient.getInstance().getRenderTickCounter().getLastFrameDuration();
                 this.speed = Math.min(this.speed, 0.07f);
                 this.model.barrel.roll += this.speed;
             } else if (entity.isPoweringDown()) {
                 this.speed -= 0.000032222f * MinecraftClient.getInstance().getRenderTickCounter().getLastFrameDuration();
                 this.speed = Math.max(this.speed, 0.00f);
-//                System.out.println(this.speed);
                 this.model.barrel.roll += this.speed;
             } else {
                 this.speed = 0.0f;

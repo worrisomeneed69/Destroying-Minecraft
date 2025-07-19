@@ -54,6 +54,12 @@ public class InvokeDestructionPacket {
                 case 4: {
                     DestroyingMinecraftClient.blackHolePostShader.getDestructionEvent().setActive(on);
                     if (on) DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.BLACK_HOLE_ANIMATION);
+                    break;
+                }
+
+                case 5: {
+                    DestroyingMinecraftClient.blackHolePostShader.destruction2.setActive(on);
+                    break;
                 }
             }
 

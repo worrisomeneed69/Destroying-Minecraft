@@ -154,7 +154,7 @@ void main() {
 
         if(prevTexcoord.x >= 0.0 && prevTexcoord.x <= 1.0 && prevTexcoord.y >= 0.0 && prevTexcoord.y <= 1.0) {
             if(prevDepth >= 1.0){
-                fragColor = mix(fragColor, texture(PrevSampler, prevTexcoord), min(flashTimer, 0.9));
+                fragColor = mix(fragColor, texture(PrevSampler, prevTexcoord), min(flashTimer, 0.5));
             }
         }
 

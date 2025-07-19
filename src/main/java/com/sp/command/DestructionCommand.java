@@ -21,9 +21,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static net.minecraft.server.command.CommandManager.argument;
 
@@ -33,7 +30,8 @@ public class DestructionCommand {
     final static int orbitalLaserType = 1;
     final static int planetType = 2;
     final static int supernovaType = 3;
-    final static int blackHoleType = 4;
+    final static int blackHolePart1Type = 4;
+    final static int blackHolePart2Type = 5;
 
     public static void register(CommandDispatcher<ServerCommandSource> serverCommandSourceCommandDispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
         serverCommandSourceCommandDispatcher.register(
@@ -75,10 +73,15 @@ public class DestructionCommand {
                                         )
                                 )
                                 .then(CommandManager.literal("start")
-                                        .executes(commandContext -> blackHoleExecute(commandContext, true))
+                                        .then(CommandManager.literal("part1")
+                                                .executes(commandContext -> blackHoleExecute(commandContext, true, 4))
+                                        )
+                                        .then(CommandManager.literal("part2")
+                                                .executes(commandContext -> blackHoleExecute(commandContext, true, 5))
+                                        )
                                 )
                                 .then(CommandManager.literal("reset")
-                                        .executes(commandContext -> blackHoleExecute(commandContext, false))
+                                        .executes(commandContext -> blackHoleExecute(commandContext, false, 0))
                                 )
                         )
 
@@ -149,16 +152,25 @@ public class DestructionCommand {
         return 1;
     }
 
-    private  static int blackHoleExecute(CommandContext<ServerCommandSource> context, boolean start) {
-//        if (start) {
-//            BlackHoleDestruction.setStartDestruction(true);
-//        } else {
-//            BlackHoleDestruction.setStartDestruction(false);
-//            BlackHoleDestruction.reset(context.getSource().getWorld());
-//        }
+    private  static int blackHoleExecute(CommandContext<ServerCommandSource> context, boolean start, int part) {
+        if (start) {
+            switch (part){
+                case blackHolePart1Type -> DestroyingMinecraft.blackHoleDestructionPart1.setActive(true);
+                case blackHolePart2Type -> DestroyingMinecraft.blackHoleDestructionPart2.setActive(true);
+            }
+        } else {
+            DestroyingMinecraft.blackHoleDestructionPart1.setActive(false);
+            DestroyingMinecraft.blackHoleDestructionPart2.setActive(false);
+        }
 
         for(ServerPlayerEntity player : context.getSource().getWorld().getPlayers()) {
-            ServerPlayNetworking.send(player, new InvokeDestructionPacket.DestructionPayload(start, blackHoleType));
+            if (start) {
+                ServerPlayNetworking.send(player, new InvokeDestructionPacket.DestructionPayload(true, part));
+            } else {
+                ServerPlayNetworking.send(player, new InvokeDestructionPacket.DestructionPayload(false, blackHolePart1Type));
+                ServerPlayNetworking.send(player, new InvokeDestructionPacket.DestructionPayload(false, blackHolePart2Type));
+            }
+
         }
 
         return 1;

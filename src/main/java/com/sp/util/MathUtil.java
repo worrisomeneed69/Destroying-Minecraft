@@ -1,5 +1,6 @@
 package com.sp.util;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
@@ -36,6 +37,25 @@ public class MathUtil {
      */
     public static float Lerp(float source, float destination, float smoothingFactor, float delta) {
         return MathHelper.lerp(1.0f - (float) Math.pow(smoothingFactor, delta), source, destination);
+    }
+
+    public static Vec3d getCenterPos(List<BlockPos> blocks) {
+        double sumX = 0;
+        double sumY = 0;
+        double sumZ = 0;
+
+        for (BlockPos blockPos : blocks) {
+            sumX += blockPos.getX();
+            sumY += blockPos.getY();
+            sumZ += blockPos.getZ();
+        }
+        int count = blocks.size();
+
+        sumX /= count;
+        sumY /= count;
+        sumZ /= count;
+
+        return new Vec3d(sumX + 0.5, sumY + 0.5, sumZ + 0.5);
     }
 
     public static Vector3d toVector3d(Vec3d vec) {

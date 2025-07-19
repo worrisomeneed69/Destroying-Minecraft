@@ -7,6 +7,8 @@ import com.sp.command.RipPlatformOutCommand;
 import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.destruction.server.custom.PlanetDestructionServer;
 import com.sp.destruction.server.custom.SupernovaDestructionServer;
+import com.sp.destruction.server.custom.blackhole.BlackHoleDestructionServerPart1;
+import com.sp.destruction.server.custom.blackhole.BlackHoleDestructionServerPart2;
 import com.sp.entity.ModEntities;
 import com.sp.item.ModItemGroups;
 import com.sp.item.ModItems;
@@ -35,6 +37,9 @@ public class DestroyingMinecraft implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static final PlanetDestructionServer planetServerDestruction = new PlanetDestructionServer();
 	public static final SupernovaDestructionServer supernovaServerDestruction = new SupernovaDestructionServer();
+
+	public static final BlackHoleDestructionServerPart1 blackHoleDestructionPart1 = new BlackHoleDestructionServerPart1();
+	public static final BlackHoleDestructionServerPart2 blackHoleDestructionPart2 = new BlackHoleDestructionServerPart2();
 
 	@Override
 	public void onInitialize() {

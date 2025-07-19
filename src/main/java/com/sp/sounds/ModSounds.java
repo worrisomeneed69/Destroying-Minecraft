@@ -33,6 +33,11 @@ public class ModSounds {
     public static final SoundEvent METEOR_IMPACT = registerSoundEvent("meteor_impact");
 
     public static final SoundEvent BLACK_HOLE_AMBIENCE = registerSoundEvent("black_hole_ambience");
+    public static final SoundEvent BLACK_HOLE_DESTRUCTION_AMBIENCE = registerSoundEvent("black_hole_destruction_ambience");
+
+    public static final SoundEvent SNAP_SNAP = registerSoundEvent("snap_snap");
+    public static final SoundEvent SNAP_SNAP_RUMBLE = registerSoundEvent("snap_snap_rumble");
+    public static final SoundEvent SNAP_SNAP_BREAK_OFF = registerSoundEvent("snap_snap_break_off");
 
     private static SoundEvent registerSoundEvent(String name) {
         Identifier id = DestroyingMinecraft.idOf(name);

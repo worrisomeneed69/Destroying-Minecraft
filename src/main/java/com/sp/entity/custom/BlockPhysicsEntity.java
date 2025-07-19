@@ -4,6 +4,7 @@ import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.entity.PhysicsBlockComponent;
 import com.sp.collision.BlockOBB;
 import com.sp.entity.ModEntities;
+import com.sp.util.MathUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -36,7 +37,7 @@ public class BlockPhysicsEntity extends Entity {
 
     public static BlockPhysicsEntity ofBlocks(World world, BlockPos corner1, BlockPos corner2) {
         List<BlockPos> positions = new ArrayList<>();
-        BlockPos.stream(corner2, corner1).forEachOrdered(blockPos -> {
+        BlockPos.stream(corner2, corner1).forEach(blockPos -> {
             positions.add(blockPos.mutableCopy());
         });
 
@@ -45,13 +46,13 @@ public class BlockPhysicsEntity extends Entity {
 
     public static BlockPhysicsEntity ofBlocks(World world, List<BlockPos> blocks) {
         BlockPhysicsEntity entity = new BlockPhysicsEntity(ModEntities.BLOCK_PHYSICS_ENTITY, world);
-        PhysicsBlockComponent component = InitializeComponents.PHYSICS_BLOCK.get(entity);
-        Vec3d pos = blocks.getFirst().toCenterPos();
+        PhysicsBlockComponent component = entity.component;
+        Vec3d pos = MathUtil.getCenterPos(blocks);
         entity.setPosition(pos);
 
         for (BlockPos blockPos : blocks) {
             BlockState state = world.getBlockState(blockPos);
-            BlockPos relativePos = blockPos.subtract(blocks.getFirst());
+            Vec3d relativePos = Vec3d.of(blockPos).subtract(pos).add(0.5, 0.5, 0.5 );
 
             if (!state.isAir()) {
                 component.addBlock(new BlockPhysicsEntity.BlockData(state, relativePos));
@@ -68,7 +69,7 @@ public class BlockPhysicsEntity extends Entity {
         PhysicsBlockComponent component = InitializeComponents.PHYSICS_BLOCK.get(this);
 
         for (BlockPhysicsEntity.BlockData blockData : component.getBlocks()) {
-            this.getWorld().setBlockState(this.getBlockPos().add(blockData.offset), blockData.blockState);
+            this.getWorld().setBlockState(this.getBlockPos().add(BlockPos.ofFloored(blockData.offset)), blockData.blockState);
         }
     }
 
@@ -86,9 +87,11 @@ public class BlockPhysicsEntity extends Entity {
                 if(this.age - this.startDiscardAge >= 2) this.discard();
             }
         }
+//        this.setVelocity(0, 0, 0);
+//        this.setVelocity(0, 0.03, -0.1);
 
         this.setBoundingBox(this.calculateBoundingBox());
-//        this.component.getRotation().rotateLocalY((float) Math.toRadians(1f));
+//        this.component.getRotation().rotateLocalX((float) Math.toRadians(0.5f));
 //        this.component.setRotation(new Quaternionf(0, 0, 0, 0).rotationXYZ(0, 0, (float) Math.toRadians(0f)));
         this.move();
     }
@@ -251,11 +254,11 @@ public class BlockPhysicsEntity extends Entity {
 
     public static class BlockData {
         public BlockState blockState;
-        public BlockPos offset;
+        public Vec3d offset;
 
         public PacketByteBuf buf;
 
-        public BlockData(BlockState blockState, BlockPos offset) {
+        public BlockData(BlockState blockState, Vec3d offset) {
             this.blockState = blockState;
             this.offset = offset;
         }
@@ -267,9 +270,9 @@ public class BlockPhysicsEntity extends Entity {
         public NbtCompound asNBT() {
             NbtCompound nbt = new NbtCompound();
             nbt.put("block", NbtHelper.fromBlockState(this.blockState));
-            nbt.putInt("offsetX", offset.getX());
-            nbt.putInt("offsetY", offset.getY());
-            nbt.putInt("offsetZ", offset.getZ());
+            nbt.putDouble("offsetX", offset.getX());
+            nbt.putDouble("offsetY", offset.getY());
+            nbt.putDouble("offsetZ", offset.getZ());
             return nbt;
         }
 
@@ -279,7 +282,7 @@ public class BlockPhysicsEntity extends Entity {
 
             BlockState blockState1 = NbtHelper.toBlockState(wrapper.orElse(Registries.BLOCK.getReadOnlyWrapper()), blockStateCompound);
 
-            BlockPos offset = new BlockPos(nbt.getInt("offsetX"), nbt.getInt("offsetY"), nbt.getInt("offsetZ"));
+            Vec3d offset = new Vec3d(nbt.getDouble("offsetX"), nbt.getDouble("offsetY"), nbt.getDouble("offsetZ"));
             return new BlockData(blockState1, offset);
         }
     }

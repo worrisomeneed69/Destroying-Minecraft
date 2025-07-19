@@ -1,7 +1,8 @@
 package com.sp.render.postshaders.custom;
 
 import com.sp.DestroyingMinecraft;
-import com.sp.destruction.client.custom.BlackHoleDestructionClient;
+import com.sp.destruction.client.custom.blackhole.BlackHoleDestructionClientPart1;
+import com.sp.destruction.client.custom.blackhole.BlackHoleDestructionClientPart2;
 import com.sp.render.PrevUniforms;
 import com.sp.render.postshaders.PostShader;
 import com.sp.util.BetterUniforms;
@@ -16,9 +17,10 @@ import net.minecraft.world.World;
 public class BlackHolePostShader extends PostShader {
     public static final Identifier BLACK_HOLE_POST = DestroyingMinecraft.idOf("black_hole");
     public static final Identifier BLACK_HOLE_SHADER = DestroyingMinecraft.idOf("blackhole/black_hole");
+    public final BlackHoleDestructionClientPart2 destruction2 = new BlackHoleDestructionClientPart2();
 
     public BlackHolePostShader() {
-        super(BLACK_HOLE_POST, BLACK_HOLE_SHADER, new BlackHoleDestructionClient());
+        super(BLACK_HOLE_POST, BLACK_HOLE_SHADER, new BlackHoleDestructionClientPart1());
     }
 
     @Override
