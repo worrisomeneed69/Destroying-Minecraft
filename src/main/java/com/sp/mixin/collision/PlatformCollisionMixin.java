@@ -32,12 +32,12 @@ public abstract class PlatformCollisionMixin {
         Box entityBoundingBox = entity.getBoundingBox();
 
         if (entity != null) {
-            List<BlockPhysicsEntity> blockPhysicsEntities = world.getEntitiesByType(ModEntities.BLOCK_PHYSICS_ENTITY, entityBoundingBox.stretch(movement), (entity1) -> true);
+            List<BlockPhysicsEntity> blockPhysicsEntities = world.getEntitiesByType(ModEntities.BLOCK_PHYSICS_ENTITY, entityBoundingBox.stretch(movement).expand(3), (entity1) -> true);
 
             if (!blockPhysicsEntities.isEmpty()) {
                 Vec3d adjustedMovement = movement;
 
-                for (BlockPhysicsEntity blockPhysicsEntity : blockPhysicsEntities) {
+                 for (BlockPhysicsEntity blockPhysicsEntity : blockPhysicsEntities) {
                     if (blockPhysicsEntity != null) {
 
                         if (movement.y != 0) {

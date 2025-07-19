@@ -153,15 +153,15 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
         for (BlockPhysicsEntity.BlockData block : entity.component.getBlocks()) {
             BlockOBB obb = new BlockOBB(entity.component.getRotation(), block);
 
-            List<Vec3d> obbCorners = obb.getGlobalCorners(entity);
-
-            Vec3d globalPos = MathUtil.toVec3d(obb.rotation.transform(MathUtil.toVector3d(Vec3d.of(obb.blockData.offset)))).add(entity.getPos());
-
-            for (Vec3d normalAxi : obb.getNormalAxis()) {
-                Vec3d sideStart = globalPos.add(normalAxi.multiply(0.5));
-
-                //RenderUtil.drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideStart.add(normalAxi), 0, 0, 255, 255);
-            }
+//            List<Vec3d> obbCorners = obb.getGlobalCorners(entity);
+//
+//            Vec3d globalPos = MathUtil.toVec3d(obb.rotation.transform(MathUtil.toVector3d(Vec3d.of(obb.blockData.offset)))).add(entity.getPos());
+//
+//            for (Vec3d normalAxi : obb.getNormalAxis()) {
+//                Vec3d sideStart = globalPos.add(normalAxi.multiply(0.5));
+//
+//                RenderUtil.drawLine(matrices, vertexConsumers, entity.getPos(), sideStart, sideStart.add(normalAxi), 0, 0, 255, 255);
+//            }
 
             for (Vec3d globalCorner : obb.getGlobalCorners(entity)) {
                 boolean collides = obb.collidesWith(MinecraftClient.getInstance().player.getBoundingBox(), entity);
