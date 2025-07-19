@@ -295,7 +295,7 @@ public class BlockOBB {
 
         List<Vec3d> allAxis = getAABBNormalAxis();
         allAxis.addAll(this.getNormalAxis());
-//        allAxis.addAll(this.getCrossProductAxis(this.getNormalAxis(), getAABBNormalAxis()));
+        allAxis.addAll(this.getCrossProductAxis(this.getNormalAxis(), getAABBNormalAxis()));
 
         double minOverlap = Double.MAX_VALUE;
         Vec3d minAxis = null;
