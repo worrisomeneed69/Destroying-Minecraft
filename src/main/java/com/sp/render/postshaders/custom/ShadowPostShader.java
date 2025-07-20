@@ -3,9 +3,9 @@ package com.sp.render.postshaders.custom;
 import com.sp.DestroyingMinecraft;
 import com.sp.DestroyingMinecraftClient;
 import com.sp.config.DestroyingMinecraftConfig;
-import com.sp.render.ShaderType;
 import com.sp.render.ShadowMapRenderer;
 import com.sp.render.postshaders.PostShader;
+import com.sp.util.BetterUniforms;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -28,6 +28,7 @@ public class ShadowPostShader extends PostShader {
         switch (DestroyingMinecraftConfig.shaderType) {
             case SUPERNOVA -> DestroyingMinecraftClient.supernovaPostShader.getDestructionEvent().setUniforms(shaderProgram, tickDelta);
             case BLACK_HOLE -> DestroyingMinecraftClient.blackHolePostShader.getDestructionEvent().setUniforms(shaderProgram, tickDelta);
+            default -> BetterUniforms.setFloat(shaderProgram, "flashTimer", 1.0f);
         }
     }
 }

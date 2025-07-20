@@ -20,9 +20,11 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,16 +85,23 @@ public class BlockPhysicsEntity extends Entity {
     public void tick() {
         super.tick();
         if (!this.getWorld().isClient) {
+            //Don't have to check every tick
+            if(this.age % 100 == 0) {
+                if(!this.getBlockPos().isWithinDistance(new Vec3i(-1152, 66, 303), 200)) {
+                    this.discard();
+                }
+            }
+
             if (this.markForDiscard) {
                 if(this.age - this.startDiscardAge >= 2) this.discard();
             }
         }
-//        this.setVelocity(0, 0, 0);
-//        this.setVelocity(0, 0.03, -0.1);
 
         this.setBoundingBox(this.calculateBoundingBox());
-//        this.component.getRotation().rotateLocalX((float) Math.toRadians(0.5f));
-//        this.component.setRotation(new Quaternionf(0, 0, 0, 0).rotationXYZ(0, 0, (float) Math.toRadians(0f)));
+        Vector3f rotationSpeed = component.getRotationSpeed();
+        this.component.getRotation().rotateLocalX((float) Math.toRadians(rotationSpeed.x));
+        this.component.getRotation().rotateLocalY((float) Math.toRadians(rotationSpeed.y));
+        this.component.getRotation().rotateLocalZ((float) Math.toRadians(rotationSpeed.z));
         this.move();
     }
 

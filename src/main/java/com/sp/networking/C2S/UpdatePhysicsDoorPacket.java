@@ -23,7 +23,9 @@ public class UpdatePhysicsDoorPacket {
             physicsDoorBlockEntity.setCorner2(payload.corner2);
             physicsDoorBlockEntity.setMovementDirection(payload.direction);
             physicsDoorBlockEntity.setNumOfBlocks(payload.numOfBlocks);
+            physicsDoorBlockEntity.setSpeed(payload.speed);
             physicsDoorBlockEntity.setShowSelection(payload.showSelection);
+            physicsDoorBlockEntity.setPlaySound(payload.playSound);
             physicsDoorBlockEntity.markDirty();
             context.player().getWorld().updateListeners(payload.blockEntityPos, blockState, blockState, Block.NOTIFY_ALL);
         }
@@ -31,17 +33,44 @@ public class UpdatePhysicsDoorPacket {
 
 
 
-    public record UpdatePhysicsDoorBlock(BlockPos blockEntityPos, BlockPos corner1, BlockPos corner2, Direction direction, int numOfBlocks, boolean showSelection) implements CustomPayload {
+    public record UpdatePhysicsDoorBlock(
+            BlockPos blockEntityPos,
+            BlockPos corner1,
+            BlockPos corner2,
+            Direction direction,
+            int numOfBlocks,
+            int speed,
+            boolean showSelection,
+            boolean playSound
+    ) implements CustomPayload {
         public static final CustomPayload.Id<UpdatePhysicsDoorBlock> ID = new CustomPayload.Id<>(DestroyingMinecraft.idOf("updatephysdoorblk"));
 
-        public static final PacketCodec<RegistryByteBuf, UpdatePhysicsDoorBlock> CODEC = PacketCodec.tuple(
-                BlockPos.PACKET_CODEC, UpdatePhysicsDoorBlock::blockEntityPos,
-                BlockPos.PACKET_CODEC, UpdatePhysicsDoorBlock::corner1,
-                BlockPos.PACKET_CODEC, UpdatePhysicsDoorBlock::corner2,
-                Direction.PACKET_CODEC, UpdatePhysicsDoorBlock::direction,
-                PacketCodecs.INTEGER, UpdatePhysicsDoorBlock::numOfBlocks,
-                PacketCodecs.BOOL, UpdatePhysicsDoorBlock::showSelection,
-                UpdatePhysicsDoorBlock::new);
+        public static final PacketCodec<RegistryByteBuf, UpdatePhysicsDoorBlock> CODEC = new PacketCodec<>() {
+            @Override
+            public UpdatePhysicsDoorBlock decode(RegistryByteBuf buf) {
+                BlockPos entityPos = BlockPos.PACKET_CODEC.decode(buf);
+                BlockPos corner1 = BlockPos.PACKET_CODEC.decode(buf);
+                BlockPos corner2 = BlockPos.PACKET_CODEC.decode(buf);
+                Direction direction = Direction.PACKET_CODEC.decode(buf);
+                Integer numOfBlocks = PacketCodecs.INTEGER.decode(buf);
+                Integer speed = PacketCodecs.INTEGER.decode(buf);
+                Boolean showSelection = PacketCodecs.BOOL.decode(buf);
+                Boolean playSound = PacketCodecs.BOOL.decode(buf);
+                return new UpdatePhysicsDoorBlock(entityPos, corner1, corner2, direction, numOfBlocks,speed, showSelection, playSound);
+            }
+
+            @Override
+            public void encode(RegistryByteBuf buf, UpdatePhysicsDoorBlock value) {
+                BlockPos.PACKET_CODEC.encode(buf, value.blockEntityPos);
+                BlockPos.PACKET_CODEC.encode(buf, value.corner1);
+                BlockPos.PACKET_CODEC.encode(buf, value.corner2);
+                Direction.PACKET_CODEC.encode(buf, value.direction);
+                PacketCodecs.INTEGER.encode(buf, value.numOfBlocks);
+                PacketCodecs.INTEGER.encode(buf, value.speed);
+                PacketCodecs.BOOL.encode(buf, value.showSelection);
+                PacketCodecs.BOOL.encode(buf, value.playSound);
+            }
+        };
 
 
         @Override

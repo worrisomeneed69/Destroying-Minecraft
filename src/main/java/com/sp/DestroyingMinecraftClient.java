@@ -3,8 +3,6 @@ package com.sp;
 import com.sp.block.entity.ModBlockEntities;
 import com.sp.block.entity.client.PhysicsDoorBlockRenderer;
 import com.sp.config.DestroyingMinecraftConfig;
-import com.sp.destruction.DestructionEvent;
-import com.sp.destruction.client.ClientDestructionEvent;
 import com.sp.entity.ModEntities;
 import com.sp.entity.client.model.StarPiercerModel;
 import com.sp.entity.client.renderer.BlockPhysicsEntityRenderer;
@@ -13,14 +11,11 @@ import com.sp.entity.client.renderer.SpinningBlockEntityRenderer;
 import com.sp.entity.client.renderer.StarPiercerEntityRenderer;
 import com.sp.mixin.PostProcessingManagerAccessor;
 import com.sp.networking.InitializePackets;
-import com.sp.render.SelectionHandler;
-import com.sp.render.ShaderType;
-import com.sp.render.ShadowMapRenderer;
+import com.sp.render.*;
 import com.sp.render.camerashake.CameraShakeManager;
 import com.sp.render.gui.DestructionTitleRenderCallback;
 import com.sp.render.postshaders.PostShader;
 import com.sp.render.postshaders.custom.*;
-import com.sp.render.BlockInstanceRenderer;
 import com.sp.util.tickinstances.client.ClientTickInstances;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
 import foundry.veil.Veil;
@@ -82,7 +77,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 			MinecraftClient client = MinecraftClient.getInstance();
 			World clientWorld = client.world;
 
-			if(clientWorld != null) {
+			if(clientWorld != null && !PerspectiveRenderer.isRenderingPerspective()) {
 				switch (stage) {
 					case AFTER_LEVEL -> {
 						//Only render the shadow map with shaders that need it
@@ -114,7 +109,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 					case AFTER_WEATHER -> {
 						if(shouldRenderDebug) {
-							BlackHoleDestruction.renderSelectionDebug(matrixStack.toPoseStack(), bufferSource, camera);
+							BlackHoleDestruction.renderSelectionDebug(matrixStack.toPoseStack(), bufferSource, camera, frustum);
 						}
 
 						SelectionHandler.renderSelection(matrixStack.toPoseStack(), bufferSource, deltaTracker, camera);

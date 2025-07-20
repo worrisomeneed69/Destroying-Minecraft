@@ -38,6 +38,7 @@ public class ModSounds {
     public static final SoundEvent SNAP_SNAP = registerSoundEvent("snap_snap");
     public static final SoundEvent SNAP_SNAP_RUMBLE = registerSoundEvent("snap_snap_rumble");
     public static final SoundEvent SNAP_SNAP_BREAK_OFF = registerSoundEvent("snap_snap_break_off");
+    public static final SoundEvent BREAK_OFF = registerSoundEvent("break_off");
 
     private static SoundEvent registerSoundEvent(String name) {
         Identifier id = DestroyingMinecraft.idOf(name);

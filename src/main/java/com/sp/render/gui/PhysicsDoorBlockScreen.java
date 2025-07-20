@@ -9,10 +9,13 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.CyclingButtonWidget;
+import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 
 public class PhysicsDoorBlockScreen extends Screen {
     private final PhysicsDoorBlockEntity physicsDoorBlockEntity;
@@ -20,7 +23,8 @@ public class PhysicsDoorBlockScreen extends Screen {
     private static final Text CORNER2_TEXT = Text.literal("Corner 2:");
     private static final Text DIRECTION_TEXT = Text.literal("Direction:");
     private static final Text NUM_OF_BLOCKS_TEXT = Text.literal("Number Of Blocks:");
-    private static final Text SHOW_SELECTION_TEXT = Text.literal("Show Selection:");
+    private static final Text SHOW_SELECTION_TEXT = Text.literal("Selection:");
+    private static final Text PLAY_SOUND_TEXT = Text.literal("Play Sound:");
     private static final Text X_TEXT = Text.literal("X: ");
     private static final Text Y_TEXT = Text.literal("Y: ");
     private static final Text Z_TEXT = Text.literal("Z: ");
@@ -39,9 +43,8 @@ public class PhysicsDoorBlockScreen extends Screen {
 
     private Direction prevDirection;
     private boolean prevShowSelection;
-
-    private SelectionHandler selectionRenderer;
-
+    private boolean prevPlaySound;
+    private int prevSpeed;
 
 
     public PhysicsDoorBlockScreen(PhysicsDoorBlockEntity physicsDoorBlockEntity) {
@@ -57,6 +60,8 @@ public class PhysicsDoorBlockScreen extends Screen {
         //Save the values in case canceled (It's the only one set when the button is pushed)
         this.prevDirection = this.physicsDoorBlockEntity.getMovementDirection();
         this.prevShowSelection = this.physicsDoorBlockEntity.shouldShowSelection();
+        this.prevPlaySound = this.physicsDoorBlockEntity.shouldPlaySound();
+        this.prevSpeed = this.physicsDoorBlockEntity.getSpeed();
 
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Save"), button -> this.done()).dimensions(this.centerWidth - 150, this.centerHeight + 60, 80, 20).build());
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Cancel"), button -> this.cancel()).dimensions(this.centerWidth - 50, this.centerHeight + 60, 80, 20).build());
@@ -71,49 +76,63 @@ public class PhysicsDoorBlockScreen extends Screen {
                         .values(Direction.values())
                         .initially(this.physicsDoorBlockEntity.getMovementDirection())
                         .omitKeyText()
-                        .build(this.centerWidth - 150, this.centerHeight + 30, 50, 20, Text.literal(""), (button, value) -> this.physicsDoorBlockEntity.setMovementDirection(value))
+                        .build(this.centerWidth - 150, this.centerHeight, 50, 20, Text.literal(""), (button, value) -> this.physicsDoorBlockEntity.setMovementDirection(value))
         );
 
         this.addDrawableChild(
                 CyclingButtonWidget.onOffBuilder(this.physicsDoorBlockEntity.shouldShowSelection())
                         .omitKeyText()
-                        .build(this.centerWidth + 50, this.centerHeight + 30, 80, 20, SHOW_SELECTION_TEXT, (button, showSelection) -> this.physicsDoorBlockEntity.setShowSelection(showSelection))
+                        .build(this.centerWidth + 90, this.centerHeight, 40, 20, SHOW_SELECTION_TEXT, (button, showSelection) -> this.physicsDoorBlockEntity.setShowSelection(showSelection))
         );
 
         this.addDrawableChild(
-                CyclingButtonWidget.<Direction>builder(direction -> Text.literal(direction.getName().toUpperCase()))
-                        .values(Direction.values())
-                        .initially(this.physicsDoorBlockEntity.getMovementDirection())
+                CyclingButtonWidget.onOffBuilder(this.physicsDoorBlockEntity.shouldPlaySound())
                         .omitKeyText()
-                        .build(this.centerWidth - 150, this.centerHeight + 30, 50, 20, Text.literal(""), (button, value) -> this.physicsDoorBlockEntity.setMovementDirection(value))
+                        .build(this.centerWidth + 90, this.centerHeight + 30, 40, 20, PLAY_SOUND_TEXT, (button, playSound) -> this.physicsDoorBlockEntity.setPlaySound(playSound))
         );
 
+        this.addDrawableChild(new SliderWidget(this.centerWidth - 150, this.centerHeight + 30, 100, 20, ScreenTexts.EMPTY, 1.0) {
+            {
+                this.value = PhysicsDoorBlockScreen.this.physicsDoorBlockEntity.getSpeed() / 20.0;
+                this.updateMessage();
+            }
 
+            @Override
+            protected void updateMessage() {
+                this.setMessage(Text.literal("Speed: " + PhysicsDoorBlockScreen.this.physicsDoorBlockEntity.getSpeed()));
+            }
+
+            @Override
+            protected void applyValue() {
+                int speed = MathHelper.floor(MathHelper.clampedLerp(1.0, 20.0, this.value));
+                PhysicsDoorBlockScreen.this.physicsDoorBlockEntity.setSpeed(speed);
+            }
+        });
 
 
         BlockPos corner1 = physicsDoorBlockEntity.getCorner1();
-        this.corner1XInput = new TextFieldWidget(this.textRenderer, this.centerWidth - 150, this.centerHeight - 50, 80, 20, Text.literal("Corner 1 X"));
+        this.corner1XInput = new TextFieldWidget(this.textRenderer, this.centerWidth - 150, this.centerHeight - 80, 80, 20, Text.literal("Corner 1 X"));
         this.corner1XInput.setText(Integer.toString(corner1.getX()));
         this.addSelectableChild(this.corner1XInput);
-        this.corner1YInput = new TextFieldWidget(this.textRenderer, this.centerWidth - 40, this.centerHeight - 50, 80, 20, Text.literal("Corner 1 Y"));
+        this.corner1YInput = new TextFieldWidget(this.textRenderer, this.centerWidth - 40, this.centerHeight - 80, 80, 20, Text.literal("Corner 1 Y"));
         this.corner1YInput.setText(Integer.toString(corner1.getY()));
         this.addSelectableChild(this.corner1YInput);
-        this.corner1ZInput = new TextFieldWidget(this.textRenderer, this.centerWidth + 70, this.centerHeight - 50, 80, 20, Text.literal("Corner 1 Z"));
+        this.corner1ZInput = new TextFieldWidget(this.textRenderer, this.centerWidth + 70, this.centerHeight - 80, 80, 20, Text.literal("Corner 1 Z"));
         this.corner1ZInput.setText(Integer.toString(corner1.getZ()));
         this.addSelectableChild(this.corner1ZInput);
 
         BlockPos corner2 = physicsDoorBlockEntity.getCorner2();
-        this.corner2XInput = new TextFieldWidget(this.textRenderer, this.centerWidth - 150, this.height /2 - 10, 80, 20, Text.literal("Corner 2 X"));
+        this.corner2XInput = new TextFieldWidget(this.textRenderer, this.centerWidth - 150, this.height /2 - 40, 80, 20, Text.literal("Corner 2 X"));
         this.corner2XInput.setText(Integer.toString(corner2.getX()));
         this.addSelectableChild(this.corner2XInput);
-        this.corner2YInput = new TextFieldWidget(this.textRenderer, this.centerWidth - 40, this.centerHeight - 10, 80, 20, Text.literal("Corner 2 Y"));
+        this.corner2YInput = new TextFieldWidget(this.textRenderer, this.centerWidth - 40, this.centerHeight - 40, 80, 20, Text.literal("Corner 2 Y"));
         this.corner2YInput.setText(Integer.toString(corner2.getY()));
         this.addSelectableChild(this.corner2YInput);
-        this.corner2ZInput = new TextFieldWidget(this.textRenderer, this.centerWidth + 70, this.centerHeight - 10, 80, 20, Text.literal("Corner 2 Z"));
+        this.corner2ZInput = new TextFieldWidget(this.textRenderer, this.centerWidth + 70, this.centerHeight - 40, 80, 20, Text.literal("Corner 2 Z"));
         this.corner2ZInput.setText(Integer.toString(corner2.getZ()));
         this.addSelectableChild(this.corner2ZInput);
 
-        this.numOfBlocksInput = new TextFieldWidget(this.textRenderer, this.centerWidth - 80, this.centerHeight + 30, 80, 20, Text.literal("Number of Blocks"));
+        this.numOfBlocksInput = new TextFieldWidget(this.textRenderer, this.centerWidth - 80, this.centerHeight, 80, 20, Text.literal("Number of Blocks"));
         this.numOfBlocksInput.setText(Integer.toString(this.physicsDoorBlockEntity.getNumOfBlocks()));
         this.addSelectableChild(this.numOfBlocksInput);
     }
@@ -133,7 +152,9 @@ public class PhysicsDoorBlockScreen extends Screen {
                 corner2,
                 this.physicsDoorBlockEntity.getMovementDirection(),
                 parseInt(this.numOfBlocksInput.getText()),
-                this.physicsDoorBlockEntity.shouldShowSelection()
+                this.physicsDoorBlockEntity.getSpeed(),
+                this.physicsDoorBlockEntity.shouldShowSelection(),
+                this.physicsDoorBlockEntity.shouldPlaySound()
         ));
     }
 
@@ -150,7 +171,7 @@ public class PhysicsDoorBlockScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.centerWidth, 10, 16777215);
 
-        context.drawTextWithShadow(this.textRenderer, CORNER1_TEXT, this.centerWidth - 150, this.centerHeight - 50 - this.textRenderer.fontHeight, 10526880);
+        context.drawTextWithShadow(this.textRenderer, CORNER1_TEXT, this.centerWidth - 150, this.centerHeight - 80 - this.textRenderer.fontHeight, 10526880);
         this.drawLetters(context);
 
         this.corner1XInput.render(context, mouseX, mouseY, delta);
@@ -158,16 +179,18 @@ public class PhysicsDoorBlockScreen extends Screen {
         this.corner1ZInput.render(context, mouseX, mouseY, delta);
 
 
-        context.drawTextWithShadow(this.textRenderer, CORNER2_TEXT, this.centerWidth - 150, this.centerHeight - 10 - this.textRenderer.fontHeight, 10526880);
+        context.drawTextWithShadow(this.textRenderer, CORNER2_TEXT, this.centerWidth - 150, this.centerHeight - 40 - this.textRenderer.fontHeight, 10526880);
         this.corner2XInput.render(context, mouseX, mouseY, delta);
         this.corner2YInput.render(context, mouseX, mouseY, delta);
         this.corner2ZInput.render(context, mouseX, mouseY, delta);
 
-        context.drawTextWithShadow(this.textRenderer, DIRECTION_TEXT, this.centerWidth - 150, this.centerHeight + 30 - this.textRenderer.fontHeight, 10526880);
-        context.drawTextWithShadow(this.textRenderer, NUM_OF_BLOCKS_TEXT, this.centerWidth - 80, this.centerHeight + 30 - this.textRenderer.fontHeight, 10526880);
+        context.drawTextWithShadow(this.textRenderer, DIRECTION_TEXT, this.centerWidth - 150, this.centerHeight - this.textRenderer.fontHeight, 10526880);
+        context.drawTextWithShadow(this.textRenderer, NUM_OF_BLOCKS_TEXT, this.centerWidth - 80, this.centerHeight - this.textRenderer.fontHeight, 10526880);
         this.numOfBlocksInput.render(context, mouseX, mouseY, delta);
 
-        context.drawTextWithShadow(this.textRenderer, SHOW_SELECTION_TEXT, this.centerWidth + 50, this.centerHeight + 30 - this.textRenderer.fontHeight, 10526880);
+        context.drawTextWithShadow(this.textRenderer, SHOW_SELECTION_TEXT, this.centerWidth + 90, this.centerHeight - this.textRenderer.fontHeight, 10526880);
+
+        context.drawTextWithShadow(this.textRenderer, PLAY_SOUND_TEXT, this.centerWidth + 90, this.centerHeight + 30 - this.textRenderer.fontHeight, 10526880);
     }
 
     private void drawLetters(DrawContext context) {
@@ -176,7 +199,7 @@ public class PhysicsDoorBlockScreen extends Screen {
                     this.textRenderer,
                     X_TEXT,
                     this.centerWidth - 150 - this.textRenderer.getWidth(X_TEXT),
-                    this.centerHeight - 40 + (i*40) - this.textRenderer.fontHeight / 2,
+                    this.centerHeight - 70 + (i*40) - this.textRenderer.fontHeight / 2,
                     RenderUtil.getRgb(255, 0, 0)
             );
 
@@ -184,7 +207,7 @@ public class PhysicsDoorBlockScreen extends Screen {
                     this.textRenderer,
                     Y_TEXT,
                     this.centerWidth - 40 - this.textRenderer.getWidth(Y_TEXT),
-                    this.centerHeight - 40 + (i*40) - this.textRenderer.fontHeight / 2,
+                    this.centerHeight - 70 + (i*40) - this.textRenderer.fontHeight / 2,
                     RenderUtil.getRgb(0, 255, 0)
             );
 
@@ -192,7 +215,7 @@ public class PhysicsDoorBlockScreen extends Screen {
                     this.textRenderer,
                     Z_TEXT,
                     this.centerWidth + 70 - this.textRenderer.getWidth(Z_TEXT),
-                    this.centerHeight - 40 + (i*40) - this.textRenderer.fontHeight / 2,
+                    this.centerHeight - 70 + (i*40) - this.textRenderer.fontHeight / 2,
                     RenderUtil.getRgb(0, 0, 255)
             );
         }
@@ -214,6 +237,8 @@ public class PhysicsDoorBlockScreen extends Screen {
         if (this.client != null) {
             this.physicsDoorBlockEntity.setMovementDirection(prevDirection);
             this.physicsDoorBlockEntity.setShowSelection(prevShowSelection);
+            this.physicsDoorBlockEntity.setPlaySound(prevPlaySound);
+            this.physicsDoorBlockEntity.setSpeed(prevSpeed);
             this.client.setScreen(null);
         }
     }

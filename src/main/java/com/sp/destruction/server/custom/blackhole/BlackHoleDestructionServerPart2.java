@@ -2,19 +2,12 @@ package com.sp.destruction.server.custom.blackhole;
 
 import com.sp.destruction.server.ServerDestructionEvent;
 import com.sp.entity.custom.BlockPhysicsEntity;
-import com.sp.render.camerashake.CameraShakeManager;
-import com.sp.render.camerashake.custom.CameraShakeInstance;
-import com.sp.sounds.ModSounds;
 import com.sp.util.keyframes.Keyframe;
 import com.sp.util.keyframes.KeyframeAnimation;
-import foundry.veil.api.client.util.Easing;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.sound.SoundInstance;
-import net.minecraft.sound.SoundCategory;
+import com.sp.world.destructionevent.custom.BlackHoleDestruction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BlackHoleDestructionServerPart2 extends ServerDestructionEvent {
@@ -325,9 +318,15 @@ public class BlackHoleDestructionServerPart2 extends ServerDestructionEvent {
                 new Keyframe(135.0f / this.duration, () -> {
                     System.out.println("SPAWNED");
                     BlockPhysicsEntity entity = BlockPhysicsEntity.ofBlocks(world, initialBPEPositions);
-//                    entity.setVelocity(0, 0.03, -0.1);
-//                    entity.velocityDirty = true;
-//                    entity.velocityModified = true;
+                    entity.setVelocity(0, 0.06, -0.2);
+                    entity.component.setRotationSpeed(0.5f, 0, 0);
+                    entity.component.sync();
+                    entity.velocityDirty = true;
+                    entity.velocityModified = true;
+                }),
+
+                new Keyframe(155.0f / this.duration, () -> {
+                    BlackHoleDestruction.setStartDestruction(true);
                 })
         );
     }

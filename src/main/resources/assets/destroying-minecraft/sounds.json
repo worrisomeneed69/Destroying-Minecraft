@@ -125,5 +125,17 @@
     "sounds": [
       "destroying-minecraft:black_hole/snap_snap_break_off"
     ]
+  },
+  "break_off": {
+    "sounds": [
+      "destroying-minecraft:black_hole/break_off/break_off1",
+      "destroying-minecraft:black_hole/break_off/break_off2",
+      "destroying-minecraft:black_hole/break_off/break_off3",
+      "destroying-minecraft:black_hole/break_off/break_off4",
+      "destroying-minecraft:black_hole/break_off/break_off5",
+      "destroying-minecraft:black_hole/break_off/break_off6",
+      "destroying-minecraft:black_hole/break_off/break_off7",
+      "destroying-minecraft:black_hole/break_off/break_off8"
+    ]
   }
 }

@@ -81,6 +81,12 @@ vec3 projectAndDivide(mat4 projMat, vec3 position){
     return homogeneousPos.xyz / homogeneousPos.w;
 }
 
+vec3 getSphereTexture(in vec3 rayPos, in vec3 normal, sampler2D textureSampler) {
+    return (texture(textureSampler, rayPos.xz).rgb * normal.y) +
+    (texture(textureSampler, rayPos.xy).rgb * normal.z) +
+    (texture(textureSampler, rayPos.yz).rgb * normal.x);
+}
+
 void main() {
     vec3 cameraPos = VeilCamera.CameraPosition;
     vec3 BH_POS = cameraPos + vec3(0.0, 1.0, -2.9);
@@ -143,7 +149,9 @@ void main() {
             BHcolor.rgb = clamp(BHcolor.rgb, vec3(0.0), vec3(400.0));
             color = vec4(blend(color, BHcolor), 1.0);
         } else {
-            color = texture(StarsTexture, viewDirFromUv(texCoord).xy*1)*2;
+            vec3 normal = pow(abs(viewDirFromUv(texCoord).rgb), vec3(2));
+            color.rgb = getSphereTexture(viewDirFromUv(texCoord), normal, StarsTexture)*2;
+
         }
         //SkyFlash
 //        color =     mix(color, vec4(vec3(5.0), 1.0), flashTimer);

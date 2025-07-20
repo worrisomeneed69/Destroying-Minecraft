@@ -161,6 +161,9 @@ public class DestructionCommand {
         } else {
             DestroyingMinecraft.blackHoleDestructionPart1.setActive(false);
             DestroyingMinecraft.blackHoleDestructionPart2.setActive(false);
+
+            BlackHoleDestruction.setStartDestruction(false);
+            BlackHoleDestruction.reset();
         }
 
         for(ServerPlayerEntity player : context.getSource().getWorld().getPlayers()) {

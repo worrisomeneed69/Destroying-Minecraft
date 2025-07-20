@@ -54,7 +54,7 @@ public class BlackHoleDestructionClientPart1 extends ClientDestructionEvent {
                     soundManager.play(blackHoleAmbience);
                 }),
 
-                new Keyframe(280.0f / this.duration, (globalTime, localTime) -> {
+                new Keyframe(220.0f / this.duration, (globalTime, localTime) -> {
                         flashTimer.setPrevTimer();
                         flashTimer.setTimer(localTime);
                     }

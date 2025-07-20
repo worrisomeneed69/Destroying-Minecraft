@@ -28,7 +28,9 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
     private BlockPos corner2 = BlockPos.ORIGIN;
     private Direction movementDirection = Direction.UP;
     private int numOfBlocks = 0;
+    private int speed = 1;
     private boolean showSelection;
+    private boolean useSound = true;
     private boolean settingSelection;
     private boolean open;
     private boolean doorMoving;
@@ -46,7 +48,9 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
         nbt.put("corner2", NbtHelper.fromBlockPos(this.corner2));
         nbt.putInt("direction", this.movementDirection.getId());
         nbt.putInt("numOfBlocks", this.numOfBlocks);
+        nbt.putInt("speed", this.speed);
         nbt.putBoolean("showSelection", this.showSelection);
+        nbt.putBoolean("useSound", this.useSound);
         nbt.putBoolean("doorMoving", this.doorMoving);
     }
 
@@ -56,7 +60,9 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
         this.corner2 = NbtHelper.toBlockPos(nbt, "corner2").orElse(null);
         this.movementDirection = Direction.byId(nbt.getInt("direction"));
         this.numOfBlocks = nbt.getInt("numOfBlocks");
+        this.speed = nbt.getInt("speed");
         this.showSelection = nbt.getBoolean("showSelection");
+        this.useSound = nbt.getBoolean("useSound");
         this.doorMoving = nbt.getBoolean("doorMoving");
     }
 
@@ -89,14 +95,14 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
         BlockPos corner2 = this.corner2;
         this.currentDoor = BlockPhysicsEntity.ofBlocks(world, corner1, corner2);
         this.startingPos = this.currentDoor.getPos();
-        Vec3d velocity = new Vec3d(this.movementDirection.getOffsetX(), this.movementDirection.getOffsetY(), this.movementDirection.getOffsetZ()).multiply(0.015);
+        Vec3d velocity = new Vec3d(this.movementDirection.getOffsetX(), this.movementDirection.getOffsetY(), this.movementDirection.getOffsetZ()).multiply((double) this.speed / 400);
         this.currentDoor.setVelocity(velocity);
         this.currentDoor.velocityDirty = true;
         this.currentDoor.velocityModified = true;
         this.doorMoving = true;
         this.markDirty();
         world.updateListeners(this.getPos(), world.getBlockState(this.getPos()), world.getBlockState(this.getPos()), Block.NOTIFY_ALL);
-        world.playSound(null, this.currentDoor.getBlockPos(), ModSounds.DOOR_OPEN, SoundCategory.AMBIENT, 10, 1);
+        if(useSound) world.playSound(null, this.currentDoor.getBlockPos(), ModSounds.DOOR_OPEN, SoundCategory.AMBIENT, 10, 1);
     }
 
     public void tick(World world, BlockPos pos, BlockState state) {
@@ -108,7 +114,7 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
                 this.doorMoving = false;
                 this.open = !this.open;
 
-                world.playSound(null, this.currentDoor.getBlockPos(), ModSounds.DOOR_CLOSE, SoundCategory.AMBIENT, 10, 1);
+                if(useSound) world.playSound(null, this.currentDoor.getBlockPos(), ModSounds.DOOR_CLOSE, SoundCategory.AMBIENT, 10, 1);
                 this.currentDoor = null;
 
                 this.corner1 = corner1.offset(this.movementDirection, numOfBlocks);
@@ -119,7 +125,7 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
             }
         }
 
-        if (world.isClient) {
+        if (world.isClient && this.shouldPlaySound()) {
             if (doorMoving && doorOpeningSoundInstance == null) {
                 doorOpeningSoundInstance = new DoorOpeningLoopSoundInstance(this.getPos().toCenterPos());
                 MinecraftClient.getInstance().getSoundManager().play(doorOpeningSoundInstance);
@@ -133,21 +139,21 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
     }
 
     public BlockPos getCorner1() {
-        return corner1;
+        return this.corner1;
     }
     public void setCorner1(BlockPos corner1) {
         this.corner1 = corner1;
     }
 
     public BlockPos getCorner2() {
-        return corner2;
+        return this.corner2;
     }
     public void setCorner2(BlockPos pos2) {
         this.corner2 = pos2;
     }
 
     public Direction getMovementDirection() {
-        return movementDirection;
+        return this.movementDirection;
     }
     public void setMovementDirection(Direction movementDirection) {
         this.movementDirection = movementDirection;
@@ -160,21 +166,35 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
         this.numOfBlocks = numOfBlocks;
     }
 
+    public int getSpeed() {
+        return this.speed;
+    }
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
     public boolean isSettingSelection() {
-        return settingSelection;
+        return this.settingSelection;
     }
     public void setSettingSelection(boolean settingSelection) {
         this.settingSelection = settingSelection;
     }
 
     public boolean shouldShowSelection() {
-        return showSelection;
+        return this.showSelection;
     }
     public void setShowSelection(boolean showSelection) {
         this.showSelection = showSelection;
     }
 
+    public boolean shouldPlaySound() {
+        return this.useSound;
+    }
+    public void setPlaySound(boolean useSound) {
+        this.useSound = useSound;
+    }
+
     public boolean isDoorMoving() {
-        return doorMoving;
+        return this.doorMoving;
     }
 }
