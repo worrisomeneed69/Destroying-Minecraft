@@ -53,10 +53,10 @@ public class PlanetDestructionClient extends ClientDestructionEvent {
         return new KeyframeAnimation(
                 (globalTime, localTime) -> {
                     planetFallTimer.setPrevTimer();
-                    planetFallTimer.setTimer(globalTime);
+                    planetFallTimer.setTimer((float) globalTime);
                 },
 
-                new Keyframe(0.0f, () -> {
+                new Keyframe(0.0, () -> {
                     ambientSound = FadingSoundInstance.ambient(
                             ModSounds.PLANET_AMBIENCE,
                             80,
@@ -68,7 +68,7 @@ public class PlanetDestructionClient extends ClientDestructionEvent {
                     soundManager.play(ambientSound);
                 }),
 
-                new Keyframe(300.0f/this.duration, () -> {
+                new Keyframe(300.0/this.duration, () -> {
                     soundManager.play(
                             PositionedSoundInstance.master(
                                     ModSounds.PLANET_RUMBLE,
@@ -84,9 +84,9 @@ public class PlanetDestructionClient extends ClientDestructionEvent {
                     CameraShakeManager.addCameraShake(cameraShakeInstance);
                 }),
 
-                new Keyframe(1800.0f /this.duration),
+                new Keyframe(1800.0 /this.duration),
 
-                new Keyframe(2170.0f /this.duration, () -> {
+                new Keyframe(2170.0 /this.duration, () -> {
                     ambientSound.fadeOut();
                     soundManager.play(
                             PositionedSoundInstance.master(
@@ -104,7 +104,7 @@ public class PlanetDestructionClient extends ClientDestructionEvent {
                     CameraShakeManager.addCameraShake(cameraShakeInstance);
                 }, (globalTime, localTime) -> {
                     flashTimer.setPrevTimer();
-                    flashTimer.setTimer(Math.min(localTime * 2.0f, 1.0f));
+                    flashTimer.setTimer((float) Math.min(localTime * 2.0f, 1.0f));
                 }),
 
                 new Keyframe(2200.0f /this.duration, () -> {

@@ -7,6 +7,9 @@
     "collision.IsGroundedCheckMixin",
     "collision.PlatformCollisionMixin",
     "collision.SneakFixMixinOnPlatforms",
+    "gravity.NoGravityLivingEntityMixin",
+    "gravity.NoGravityEntityMixin",
+    "gravity.SlowLimbMovementsMixin",
     "layingdown.LyingDownPlayerEntityMixin",
     "layingdown.SetLayingDownDirectionMixin",
     "layingdown.SetSleepingPoseMixin"
@@ -27,6 +30,7 @@
     "WorldRendererMixin",
     "camerashake.CameraMixin",
     "camerashake.CameraRollMixin",
+    "gravity.NoGravityParticleMixin",
     "layingdown.RenderLyingDownPlayerMixin",
     "materialsampler.DynamicBufferProcessorMixin",
     "materialsampler.DynamicBufferTypeMixin",

@@ -40,6 +40,11 @@ public class ModSounds {
     public static final SoundEvent SNAP_SNAP_BREAK_OFF = registerSoundEvent("snap_snap_break_off");
     public static final SoundEvent BREAK_OFF = registerSoundEvent("break_off");
 
+    public static final SoundEvent BLACK_HOLE_BRAAM1 = registerSoundEvent("black_hole_braam1");
+    public static final SoundEvent BLACK_HOLE_BRAAM2 = registerSoundEvent("black_hole_braam2");
+    public static final SoundEvent BLACK_HOLE_BRAAM3 = registerSoundEvent("black_hole_braam3");
+    public static final SoundEvent BLACK_HOLE_BRAAM_FINAL = registerSoundEvent("black_hole_braam_final");
+
     private static SoundEvent registerSoundEvent(String name) {
         Identifier id = DestroyingMinecraft.idOf(name);
         return Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));

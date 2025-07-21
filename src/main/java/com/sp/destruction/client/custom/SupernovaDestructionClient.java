@@ -67,7 +67,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                 new Keyframe(0.0f),
 
                 //*Startup Star Piercers
-                new Keyframe((float) 15/150, () -> {
+                new Keyframe(15.0/150, () -> {
                     PlayerEntity player = MinecraftClient.getInstance().player;
                     if (player != null) {
                         for (StarPiercerEntity entity : world.getEntitiesByClass(
@@ -91,7 +91,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                 }),
 
                 //*Pause
-                new Keyframe((float) 60/150, () -> {
+                new Keyframe(60.0/150, () -> {
                     soundManager.play(
                             PositionedSoundInstance.master(
                                     ModSounds.LASER_PAUSE,
@@ -104,7 +104,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                 }),
 
                 //*Fire Star Piercers
-                new Keyframe((float) 121/300, () -> {
+                new Keyframe(121.0/300, () -> {
                     SustainedCameraShakeInstance shakeInstance = new SustainedCameraShakeInstance(
                             0.8f,
                             280,
@@ -121,11 +121,11 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                     );
                     flashFrame = 0;
                 }, (globalTime, localTime) -> {
-                    laserLength = localTime;
+                    laserLength = (float) localTime;
                 }),
 
                 //*Stop firing / Power down
-                new Keyframe((float) 75/150, () -> {
+                new Keyframe(75.0/150, () -> {
                     for (StarPiercerEntity entity : starPiercers) {
                         entity.powerDown();
                     }
@@ -140,10 +140,10 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                 }),
 
                 //*Pause
-                new Keyframe((float) 100/150),
+                new Keyframe(100.0/150),
 
                 //*Supernova Explosion
-                new Keyframe((float) 115/150, () -> {
+                new Keyframe(115.0/150, () -> {
                     soundManager.play(
                             PositionedSoundInstance.master(
                                     ModSounds.SUPERNOVA_EXPLOSION,
@@ -160,12 +160,12 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
 
                     if (localTime < 0.3) {
                         //Sun implosion
-                        implodeTimer.setTimer(Easing.EASE_IN_CUBIC.ease(localTime * 3.3333f));
+                        implodeTimer.setTimer(Easing.EASE_IN_CUBIC.ease((float) (localTime * 3.3333f)));
                     } else {
                         //Flash, then fade to supernova
                         implodeTimer.maxTimer();
-                        flashTimer.setTimer(Math.clamp(Easing.EASE_IN_OUT_CUBIC.ease((localTime - 0.3f) / 0.35f), 0.0f, 1.0f));
-                        explosionTimer.setTimer((localTime - 0.3f) / (0.7f));
+                        flashTimer.setTimer(Math.clamp(Easing.EASE_IN_OUT_CUBIC.ease((float) ((localTime - 0.3f) / 0.35f)), 0.0f, 1.0f));
+                        explosionTimer.setTimer((float) ((localTime - 0.3f) / (0.7f)));
                     }
 
                     if (globalTime >= 0.969) {

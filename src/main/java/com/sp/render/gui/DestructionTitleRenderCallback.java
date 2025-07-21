@@ -142,7 +142,7 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
         ), BLACK_HOLE, 25000L);
     }
 
-    private void renderText(DrawContext drawContext, float localTime) {
+    private void renderText(DrawContext drawContext, double localTime) {
         float alpha = (float) -Math.pow((2*localTime - 1), 6) + 1; // -(2x - 1)^6 + 1
 
         float height = 0.19f;

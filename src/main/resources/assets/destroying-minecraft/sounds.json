@@ -137,5 +137,25 @@
       "destroying-minecraft:black_hole/break_off/break_off7",
       "destroying-minecraft:black_hole/break_off/break_off8"
     ]
+  },
+  "black_hole_braam1": {
+    "sounds": [
+      "destroying-minecraft:black_hole/braam/black_hole_braam1"
+    ]
+  },
+  "black_hole_braam2": {
+    "sounds": [
+      "destroying-minecraft:black_hole/braam/black_hole_braam2"
+    ]
+  },
+  "black_hole_braam3": {
+    "sounds": [
+      "destroying-minecraft:black_hole/braam/black_hole_braam3"
+    ]
+  },
+  "black_hole_braam_final": {
+    "sounds": [
+      "destroying-minecraft:black_hole/braam/black_hole_braam_final"
+    ]
   }
 }

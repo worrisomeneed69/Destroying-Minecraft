@@ -13,8 +13,10 @@ import com.sp.entity.ModEntities;
 import com.sp.item.ModItemGroups;
 import com.sp.item.ModItems;
 import com.sp.networking.InitializePackets;
+import com.sp.networking.S2C.BraamPacket;
 import com.sp.networking.S2C.PointSBEPacket;
 import com.sp.sounds.ModSounds;
+import com.sp.world.ModGameRules;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
 import com.sp.world.spinningblockexplosion.SpinningBlockExplosion;
 import eu.midnightdust.lib.config.MidnightConfig;
@@ -24,6 +26,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import org.slf4j.Logger;
@@ -48,6 +51,7 @@ public class DestroyingMinecraft implements ModInitializer {
 		ModEntities.registerEntities();
 		ModBlockEntities.registerBlockEntities();
 		ModSounds.registerSounds();
+		ModGameRules.registerGameRules();
 		MidnightConfig.init(MOD_ID, DestroyingMinecraftConfig.class);
 
 		CommandRegistrationCallback.EVENT.register(DestructionCommand::register);
@@ -64,8 +68,16 @@ public class DestroyingMinecraft implements ModInitializer {
 		});
 	}
 
+	public static Vec3d getGravityDir() {
+		return new Vec3d(0.0, 0.07, -0.03);
+	}
+
 	public static void sendPointSBEPacket(PlayerEntity player, Vec3d position, int radius) {
 		ServerPlayNetworking.send((ServerPlayerEntity) player, new PointSBEPacket.SBEPayload(position.toVector3f(), radius));
+	}
+
+	public static void sendBraamPacket(PlayerEntity player, SoundEvent soundEvent) {
+		ServerPlayNetworking.send((ServerPlayerEntity) player, new BraamPacket.BraamPayload(soundEvent));
 	}
 
 	public static Identifier idOf(String path){

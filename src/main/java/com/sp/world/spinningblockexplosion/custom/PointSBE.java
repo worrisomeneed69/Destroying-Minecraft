@@ -2,6 +2,7 @@ package com.sp.world.spinningblockexplosion.custom;
 
 import com.sp.DestroyingMinecraft;
 import com.sp.entity.custom.SpinningBlockEntity;
+import com.sp.world.ModGameRules;
 import com.sp.world.spinningblockexplosion.SpinningBlockExplosion;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
@@ -43,7 +44,9 @@ public class PointSBE extends SpinningBlockExplosion {
                             spinningBlockEntity.addVelocityInternal(new Vec3d(0, 1, 0));
                         }
 
-                        world.setBlockState(mutable, Blocks.AIR.getDefaultState());
+                        if (world.getGameRules().getBoolean(ModGameRules.ALLOW_EXPLOSIONS)) {
+                            world.setBlockState(mutable, Blocks.AIR.getDefaultState());
+                        }
                     }
 
                 }

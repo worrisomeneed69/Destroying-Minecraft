@@ -5,6 +5,8 @@ import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.sp.DestroyingMinecraft;
+import com.sp.cca.InitializeComponents;
+import com.sp.cca.custom.world.WorldDestructionEventsComponent;
 import com.sp.networking.S2C.InvokeDestructionPacket;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
 import com.sp.world.spinningblockexplosion.custom.DirectionalSBE;
@@ -164,6 +166,10 @@ public class DestructionCommand {
 
             BlackHoleDestruction.setStartDestruction(false);
             BlackHoleDestruction.reset();
+
+            WorldDestructionEventsComponent component = InitializeComponents.EVENTS.get(context.getSource().getWorld());
+            component.setGravityLerp(0.0);
+            component.sync();
         }
 
         for(ServerPlayerEntity player : context.getSource().getWorld().getPlayers()) {

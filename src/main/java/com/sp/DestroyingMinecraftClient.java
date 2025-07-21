@@ -91,8 +91,6 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 							this.updatePostShader();
 							prevShaderType = DestroyingMinecraftConfig.shaderType;
 						}
-
-						break;
 					}
 					case AFTER_SKY -> {
 						if (this.blockInstanceRenderer == null) {
@@ -103,8 +101,6 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 						if (DestroyingMinecraftConfig.shaderType == ShaderType.BLACK_HOLE) {
 							blockInstanceRenderer.render();
 						}
-
-						break;
 					}
 
 					case AFTER_WEATHER -> {
@@ -113,7 +109,6 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 						}
 
 						SelectionHandler.renderSelection(matrixStack.toPoseStack(), bufferSource, deltaTracker, camera);
-						break;
 					}
 				}
 			}
@@ -174,14 +169,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 			CameraShakeManager.instancesTicks();
 		});
 
-		//Update every render timer
 		ClientTickEvents.END_WORLD_TICK.register(clientWorld -> {
-//			for(PostShader postShader : PostShader.getAllInstances()) {
-//				if(postShader.getRenderTimer() != null){
-//					postShader.getRenderTimer().updateTimer(clientWorld);
-//				}
-//			}
-
 			SelectionHandler.tickClientWorld(clientWorld);
 		});
 
@@ -195,9 +183,9 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 		removedPipelines.clear();
 
 		//Remove all shaders
-		((PostProcessingManagerAccessor)postProcessingManager).getActuallyActivePipelines().forEach(profileEntry -> {
-			removedPipelines.add(profileEntry.getPipeline());
-		});
+		((PostProcessingManagerAccessor)postProcessingManager).getActuallyActivePipelines().forEach(profileEntry ->
+				removedPipelines.add(profileEntry.getPipeline())
+		);
 
 		for (Identifier id : removedPipelines){
 			postProcessingManager.remove(id);
@@ -211,11 +199,6 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 				postProcessingManager.add(enabledPosts);
 			}
 		}
-	}
-
-	private boolean needsShadowMap() {
-		ShaderType type = DestroyingMinecraftConfig.shaderType;
-		return type == ShaderType.BLACK_HOLE || type == ShaderType.SUPERNOVA || type == ShaderType.NUKE;
 	}
 
 	private void enableDynamicBuffers() {

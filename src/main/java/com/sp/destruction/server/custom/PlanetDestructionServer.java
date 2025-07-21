@@ -27,9 +27,9 @@ public class PlanetDestructionServer extends ServerDestructionEvent {
     @Override
     protected KeyframeAnimation initAnimations(World world) {
         return new KeyframeAnimation(
-                new Keyframe(0.0f),
+                new Keyframe(0.0),
 
-                new Keyframe(320.0f/this.duration, (globalTime, localTime) -> {
+                new Keyframe(320.0/this.duration, (globalTime, localTime) -> {
 
                     trackingMeteorCooldown--;
                     if (meteorCooldown-- >= 0) return;
@@ -61,9 +61,9 @@ public class PlanetDestructionServer extends ServerDestructionEvent {
                     meteorCooldown = random.nextBetween(2, 5);
                 }),
 
-                new Keyframe(1800.0f / this.duration),
+                new Keyframe(1800.0 / this.duration),
 
-                new Keyframe(2350.0f/this.duration, () -> {
+                new Keyframe(2350.0/this.duration, () -> {
                     Vec3d averagePlayerPos = Vec3d.ZERO;
                     List<PlayerEntity> players = (List<PlayerEntity>) world.getPlayers();
                     int numOfTargetedPlayers = 0;

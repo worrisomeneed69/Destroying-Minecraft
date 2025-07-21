@@ -1,6 +1,8 @@
 package com.sp.render.postshaders.custom;
 
 import com.sp.DestroyingMinecraft;
+import com.sp.cca.InitializeComponents;
+import com.sp.cca.custom.world.WorldDestructionEventsComponent;
 import com.sp.destruction.client.custom.blackhole.BlackHoleDestructionClientPart1;
 import com.sp.destruction.client.custom.blackhole.BlackHoleDestructionClientPart2;
 import com.sp.render.PrevUniforms;
@@ -12,6 +14,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
+import org.joml.Vector3f;
 
 @Environment(EnvType.CLIENT)
 public class BlackHolePostShader extends PostShader {
@@ -30,8 +33,11 @@ public class BlackHolePostShader extends PostShader {
             BetterUniforms.setMatrix(shaderProgram, "prevProjMat", PrevUniforms.getPrevProjMat());
             BetterUniforms.setMatrix(shaderProgram, "prevViewMat", PrevUniforms.getPrevModelViewMat());
             BetterUniforms.setVector(shaderProgram, "prevCameraPos", PrevUniforms.getPrevCameraPos());
-
         }
+
+        WorldDestructionEventsComponent component = InitializeComponents.EVENTS.get(clientWorld);
+        float redMultiplier = (float) Math.max(1.0f - component.getGravityLerp(), 0.01f);
+        BetterUniforms.setVector(shaderProgram, "redMultiplier", new Vector3f(1.0f, redMultiplier, redMultiplier));
 
         PrevUniforms.update();
     }

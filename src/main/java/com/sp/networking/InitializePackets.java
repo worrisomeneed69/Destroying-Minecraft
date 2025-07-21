@@ -2,6 +2,7 @@ package com.sp.networking;
 
 import com.sp.networking.C2S.UpdatePhysicsDoorPacket;
 import com.sp.networking.S2C.InvokeDestructionPacket;
+import com.sp.networking.S2C.BraamPacket;
 import com.sp.networking.S2C.PointSBEPacket;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -21,6 +22,7 @@ public class InitializePackets {
         //Send to client
         PayloadTypeRegistry.playS2C().register(InvokeDestructionPacket.DestructionPayload.ID, InvokeDestructionPacket.DestructionPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(PointSBEPacket.SBEPayload.ID, PointSBEPacket.SBEPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(BraamPacket.BraamPayload.ID, BraamPacket.BraamPayload.CODEC);
     }
 
 
@@ -28,6 +30,7 @@ public class InitializePackets {
         //Receive from server
         ClientPlayNetworking.registerGlobalReceiver(InvokeDestructionPacket.DestructionPayload.ID, InvokeDestructionPacket::receive);
         ClientPlayNetworking.registerGlobalReceiver(PointSBEPacket.SBEPayload.ID, PointSBEPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(BraamPacket.BraamPayload.ID, BraamPacket::receive);
     }
 
 }

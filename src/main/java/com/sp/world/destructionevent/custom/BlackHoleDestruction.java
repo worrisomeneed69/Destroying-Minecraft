@@ -9,6 +9,7 @@ import foundry.veil.api.client.util.Easing;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -29,37 +30,62 @@ public class BlackHoleDestruction {
     private static final List<BlockPhysicsEntity> resetEntityMap = new ArrayList<>();
     private static boolean startDestruction;
     private static int breakOffCooldown;
+    private static int aggressiveCooldown;
     private static final Random random = Random.create();
     private static final PerlinNoiseSampler noiseSampler = new PerlinNoiseSampler(random);
 
 
-    //TODO: Update selection again after a set amount of time
     public static void tick(World world) {
         if (!startDestruction || surfaceBlocks.isEmpty()) return;
 
         if (breakOffCooldown <= 0) {
-            int randomAlgorithm = random.nextBetween(1, 3);
 
-            List<BlockPos> breakOffList;
-            switch (randomAlgorithm) {
-                case 2 -> breakOffList = getPerlinNoise(world);
-                case 3 -> breakOffList = getIsland(world);
-                default -> breakOffList = getNoodle(world);
+            if (aggressiveCooldown <= 0) {
+                for (PlayerEntity player : world.getPlayers()) {
+                    if (player.isCreative() || player.isSpectator()) continue;
+
+                    BlockPos standingBlockPos = player.isOnGround()
+                        ? player.getBlockPos().down()
+                        : world.raycast(
+                            new RaycastContext(
+                                player.getPos(),
+                                player.getPos().add(0, -50, 0),
+                                RaycastContext.ShapeType.COLLIDER,
+                                RaycastContext.FluidHandling.NONE,
+                                ShapeContext.absent()
+                            )
+                        ).getBlockPos();
+
+                    collectAndBreakOff(world, standingBlockPos);
+                }
+                aggressiveCooldown = random.nextBetween(100, 200);
+            } else {
+                collectAndBreakOff(world, MathUtil.randomValueInList(surfaceBlocks));
             }
 
-            breakOff(world, breakOffList);
-
             breakOffCooldown = random.nextBetween(5, 8);
+//            breakOffCooldown = random.nextBetween(20, 30);
         } else {
             breakOffCooldown--;
+            aggressiveCooldown--;
         }
     }
 
-    private static List<BlockPos> getNoodle(World world) {
+    private static void collectAndBreakOff(World world, BlockPos startingBlockPos) {
+        List<BlockPos> breakOffList;
+        switch (random.nextBetween(1, 2)) {
+            case 2 -> breakOffList = getIsland(world, startingBlockPos);
+            default -> breakOffList = getNoodle(world, startingBlockPos);
+        }
+
+        if (!breakOffList.isEmpty()) breakOff(world, breakOffList);
+    }
+
+    private static List<BlockPos> getNoodle(World world, BlockPos startPos) {
         List<BlockPos> breakOffList = new ArrayList<>();
 
-        BlockPos randomSurfacePos = MathUtil.randomValueInList(surfaceBlocks);
-        BlockPos.Mutable mutable = randomSurfacePos.mutableCopy();
+
+        BlockPos.Mutable mutable = startPos.mutableCopy();
         breakOffList.add(mutable);
 
         int size = random.nextBetween(3, 10);
@@ -80,9 +106,8 @@ public class BlackHoleDestruction {
         return breakOffList;
     }
 
-    private static List<BlockPos> getPerlinNoise(World world) {
+    private static List<BlockPos> getPerlinNoise(World world, BlockPos startPos) {
         List<BlockPos> breakOffList = new ArrayList<>();
-        BlockPos randomSurfacePos = MathUtil.randomValueInList(surfaceBlocks);
 
         int range = random.nextBetween(3, 8);
         for (int i = range; i > 0; i--) {
@@ -90,7 +115,7 @@ public class BlackHoleDestruction {
 
             for (int x = -range; x <= range; x++) {
                 for (int z = -range; z <= range; z++) {
-                    BlockPos selectedPos = randomSurfacePos.add(x, 0, z);
+                    BlockPos selectedPos = startPos.add(x, 0, z);
 
                     Vec3d pos = selectedPos.toCenterPos().multiply(0.2);
                     double noise = (noiseSampler.sample(pos.x, pos.y, pos.z) * 2.0 - 1.0) * 5;
@@ -106,13 +131,12 @@ public class BlackHoleDestruction {
         return breakOffList;
     }
 
-    private static List<BlockPos> getIsland(World world) {
+    private static List<BlockPos> getIsland(World world, BlockPos startPos) {
         List<BlockPos> breakOffList = new ArrayList<>();
-        BlockPos randomSurfacePos = MathUtil.randomValueInList(surfaceBlocks);
 
         int radius = random.nextBetween(1, 3);
         for (int i = radius; i > 0; i--) {
-            BlockPos centerBlockPos = randomSurfacePos.add(0, -(radius - i), 0);
+            BlockPos centerBlockPos = startPos.add(0, -(radius - i), 0);
 
             for (int x = -radius; x <= radius; x++) {
                 for (int z = -radius; z <= radius; z++) {
@@ -149,15 +173,12 @@ public class BlackHoleDestruction {
 
         //Highlight all the selected blocks
         ArrayList<BlockPos> listCopy = new ArrayList<>(surfaceBlocks);
-//        if (surfaceBlocks != null && !settingSelection) {
             for (BlockPos surfaceBlock : listCopy) {
                 if(surfaceBlock == null) continue;
                 Vec3d pos = surfaceBlock.toCenterPos();
                 boolean isVisible = frustum.isVisible(Box.of(pos, 1, 1, 1));
-//                System.out.println(isVisible);
                 if (isVisible) RenderUtil.drawBox(matrices, vertexConsumers, pos, 1, 20, 200, 20, alpha, false);
             }
-//        }
         matrices.pop();
     }
 
@@ -247,7 +268,7 @@ public class BlackHoleDestruction {
 
                     if (blockHitResultDown.getType() == BlockHitResult.Type.BLOCK) {
                         belowPos = blockHitResultDown.getBlockPos();
-                        surfaceBlock = blockHitResultDown.getBlockPos();
+//                        surfaceBlock = blockHitResultDown.getBlockPos();
                     } else {
                         break; //No blocks below
                     }
@@ -271,43 +292,6 @@ public class BlackHoleDestruction {
         return surfaceBlocks.size();
     }
 
-    //PSEUDOCODE FOR ABOVE
-    /*
-        while loop {
-            if (Block above is air) {
-                Cast a ray up
-
-                if (ray hits something) {
-                    save blockPos
-                    loop back to beginning
-                } else {
-                    return saved block pos or no blocks are above
-                }
-
-            } else {
-                Go up by one block
-                Save Block pos
-                Loop back to beginning
-            }
-        }
-
-        if (Nothing above was hit) {
-            if (current block is air) {
-                Cast a ray down
-
-                if (ray hit something) {
-                    That block is the highest
-                } else {
-                    There's really nothing then. Return original block pos
-                }
-            } else {
-                Then the current block is the highest one. use it
-            }
-        }
-
-        iterate below and check if there are more exposed blocks
-     */
-
     public static void reset() {
         resetEntityMap.forEach(blockPhysicsEntity -> {
             if(blockPhysicsEntity != null && !blockPhysicsEntity.isRemoved()){
@@ -318,18 +302,33 @@ public class BlackHoleDestruction {
 
     private static void breakOff(World world, List<BlockPos> blocks) {
         BlockPhysicsEntity entity = BlockPhysicsEntity.ofBlocks(world, blocks);
+        int shouldBeMeteor = random.nextBetween(1, 5);
 
-        entity.setVelocity(0, 0.06, -0.2);
-        entity.component.setRotationSpeed(
-                MathUtil.nextBetween(0.1f, 0.8f),
-                MathUtil.nextBetween(0.1f, 0.8f),
-                MathUtil.nextBetween(0.1f, 0.8f)
-        );
-        entity.component.sync();
-        entity.velocityDirty = true;
-        entity.velocityModified = true;
+        if (shouldBeMeteor > 1) {
+            entity.setVelocity(0, 0.06, -0.2);
+            entity.component.setRotationSpeed(
+                    MathUtil.nextBetween(0.1f, 0.8f),
+                    MathUtil.nextBetween(0.1f, 0.8f),
+                    MathUtil.nextBetween(0.1f, 0.8f)
+            );
+            entity.component.sync();
+            entity.velocityDirty = true;
+            entity.velocityModified = true;
 
-        entity.playSound(ModSounds.BREAK_OFF, 8.0f, MathUtil.nextBetween(0.5f, 1.5f));
+            entity.playSound(ModSounds.BREAK_OFF, 8.0f, MathUtil.nextBetween(0.5f, 1.5f));
+        } else {
+            Vec3d inComingDirection = new Vec3d(-0.5, -0.5, 0.1).normalize();
+            entity.setPosition(entity.getPos().add(inComingDirection.negate().multiply(100)));
+            entity.setVelocity(inComingDirection.multiply(3));
+            entity.component.setMeteorLike(true);
+            entity.component.setRotationSpeed(
+                    MathUtil.nextBetween(0.8f, 1.5f),
+                    MathUtil.nextBetween(0.8f, 1.5f),
+                    MathUtil.nextBetween(0.8f, 1.5f)
+            );
+            entity.component.sync();
+        }
+
         resetEntityMap.add(entity);
     }
 

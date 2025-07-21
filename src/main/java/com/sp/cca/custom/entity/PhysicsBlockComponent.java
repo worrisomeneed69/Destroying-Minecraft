@@ -19,6 +19,7 @@ public class PhysicsBlockComponent implements AutoSyncedComponent {
     private float xRotationSpeed;
     private float yRotationSpeed;
     private float zRotationSpeed;
+    private boolean isMeteorLike;
     private Quaternionf prevRotation = new Quaternionf();
 
     public PhysicsBlockComponent(BlockPhysicsEntity spinningBlock) {
@@ -56,6 +57,13 @@ public class PhysicsBlockComponent implements AutoSyncedComponent {
         this.xRotationSpeed = xRotationSpeed;
         this.yRotationSpeed = yRotationSpeed;
         this.zRotationSpeed = zRotationSpeed;
+    }
+
+    public boolean isMeteorLike() {
+        return this.isMeteorLike;
+    }
+    public void setMeteorLike(boolean meteorLike) {
+        isMeteorLike = meteorLike;
     }
 
     public Quaternionf getLerpedRotation(float tickDelta) {

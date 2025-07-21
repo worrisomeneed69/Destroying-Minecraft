@@ -1,7 +1,9 @@
 package com.sp.entity.custom;
 
+import com.sp.DestroyingMinecraft;
 import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.entity.SpinningBlockComponent;
+import com.sp.cca.custom.world.WorldDestructionEventsComponent;
 import com.sp.entity.ModEntities;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -47,7 +49,10 @@ public class SpinningBlockEntity extends Entity {
             Vec3d acceleration = component.getAcceleration();
             if(!acceleration.equals(Vec3d.ZERO)) this.addVelocity(acceleration);
             if (component.shouldApplyGravity()) {
-                this.addVelocity(0, -0.07, 0);
+                WorldDestructionEventsComponent component = InitializeComponents.EVENTS.get(this.getWorld());
+                Vec3d gravityDir = DestroyingMinecraft.getGravityDir();
+                Vec3d velocity = new Vec3d(0, -0.07, 0).lerp(new Vec3d(0, -0.07 + gravityDir.y, gravityDir.z), component.getGravityLerp());
+                this.addVelocity(velocity);
             }
             this.move(MovementType.SELF, this.getVelocity());
         }

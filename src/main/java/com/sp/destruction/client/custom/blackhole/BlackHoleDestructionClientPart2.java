@@ -26,7 +26,7 @@ public class BlackHoleDestructionClientPart2 extends ClientDestructionEvent {
     private PositionedSoundInstance destructionSoundInstance;
 
     public BlackHoleDestructionClientPart2() {
-        super(2400);
+        super(3400);
     }
 
     @Override
@@ -42,17 +42,17 @@ public class BlackHoleDestructionClientPart2 extends ClientDestructionEvent {
         SoundManager soundManager = MinecraftClient.getInstance().getSoundManager();
 
         return new KeyframeAnimation(
-                new Keyframe(0.0f, () -> {
+                new Keyframe(0.0, () -> {
                     soundManager.play(PositionedSoundInstance.master(ModSounds.SNAP_SNAP, 1.0f, 1.0f));
                 }),
 
-                new Keyframe(22.0f / this.duration, () -> {
+                new Keyframe(22.0 / this.duration, () -> {
                     soundManager.play(PositionedSoundInstance.master(ModSounds.SNAP_SNAP_RUMBLE, 1.0f, 1.0f));
                     SustainedCameraShakeInstance cameraShakeInstance = new SustainedCameraShakeInstance(0.5f, 100, 20, Easing.LINEAR);
                     CameraShakeManager.addCameraShake(cameraShakeInstance);
                 }),
 
-                new Keyframe(135.0f / this.duration, () -> {
+                new Keyframe(135.0 / this.duration, () -> {
                     soundManager.play(PositionedSoundInstance.master(ModSounds.SNAP_SNAP_BREAK_OFF, 1.0f, 1.0f));
                     destructionSoundInstance = new PositionedSoundInstance(
                             ModSounds.BLACK_HOLE_DESTRUCTION_AMBIENCE.getId(),

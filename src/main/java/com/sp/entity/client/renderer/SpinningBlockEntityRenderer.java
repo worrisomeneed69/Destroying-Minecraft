@@ -28,7 +28,7 @@ public class SpinningBlockEntityRenderer extends EntityRenderer<SpinningBlockEnt
     @Override
     public void render(SpinningBlockEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         SpinningBlockComponent component = entity.getComponent();
-        component.getBlockType().render(this.blockRenderManager, this.entityRenderDispatcher, entity, yaw, tickDelta, matrices, vertexConsumers, 14 << 20);
+        component.getBlockType().render(this.blockRenderManager, this.entityRenderDispatcher, entity, yaw, tickDelta, matrices, vertexConsumers, light);
     }
 
 }

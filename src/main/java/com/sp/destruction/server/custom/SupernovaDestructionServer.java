@@ -16,9 +16,9 @@ public class SupernovaDestructionServer extends ServerDestructionEvent {
     @Override
     protected KeyframeAnimation initAnimations(World world) {
         return new KeyframeAnimation(
-                new Keyframe(0.0f),
+                new Keyframe(0.0),
 
-                new Keyframe(0.96f, () -> {
+                new Keyframe(0.96, () -> {
                     DirectionalSBE explosion = new DirectionalSBE(50, 50, -90, 0.5f, new Vec3d(-1720, 74, 1595));
                     explosion.beginExplosion();
                 })

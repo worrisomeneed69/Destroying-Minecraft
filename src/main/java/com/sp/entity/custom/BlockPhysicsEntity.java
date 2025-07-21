@@ -4,7 +4,10 @@ import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.entity.PhysicsBlockComponent;
 import com.sp.collision.BlockOBB;
 import com.sp.entity.ModEntities;
+import com.sp.sounds.ModSounds;
 import com.sp.util.MathUtil;
+import com.sp.world.ModGameRules;
+import com.sp.world.spinningblockexplosion.custom.PointSBE;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -17,6 +20,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -60,7 +64,9 @@ public class BlockPhysicsEntity extends Entity {
                 component.addBlock(new BlockPhysicsEntity.BlockData(state, relativePos));
             }
 
-            world.setBlockState(blockPos, Blocks.AIR.getDefaultState());
+            if (world.getGameRules().getBoolean(ModGameRules.ALLOW_EXPLOSIONS)) {
+                world.setBlockState(blockPos, Blocks.AIR.getDefaultState());
+            }
         }
 
         world.spawnEntity(entity);
@@ -85,10 +91,32 @@ public class BlockPhysicsEntity extends Entity {
     public void tick() {
         super.tick();
         if (!this.getWorld().isClient) {
-            //Don't have to check every tick
-            if(this.age % 100 == 0) {
-                if(!this.getBlockPos().isWithinDistance(new Vec3i(-1152, 66, 303), 200)) {
-                    this.discard();
+
+            if (!component.isMeteorLike()) {
+                //Don't have to check every tick
+                if (this.age % 100 == 0) {
+                    if (!this.getBlockPos().isWithinDistance(new Vec3i(-1152, 66, 303), 200)) {
+                        this.discard();
+                    }
+                }
+
+            } else {
+                if (this.age == 3) {
+                    this.getWorld().playSoundFromEntity(
+                            null,
+                            this,
+                            ModSounds.METEOR_WHISTLE,
+                            SoundCategory.AMBIENT,
+                            10.0f,
+                            MathUtil.nextBetween(0.6f, 1.2f)
+                    );
+                }
+                //Hit A block
+                if (this.getBlockStateAtPos().isSolid()) {
+                    this.playSound(ModSounds.METEOR_IMPACT, 100.0F, 1.2F / (this.random.nextFloat() * 0.2F + 0.9F));
+                    PointSBE explosion = new PointSBE(this.random.nextBetween(4, 7), 0.2f, this.getPos());
+                    explosion.beginExplosion();
+                    discard();
                 }
             }
 
