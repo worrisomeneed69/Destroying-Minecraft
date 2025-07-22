@@ -33,7 +33,7 @@ const int ITERATIONS = 150;
 //const vec3 InDiskColor = vec3(1, 0.9647058823529412, 0.9450980392156862) * 0.5;
 //const vec3 OutDiskColor = vec3(0.1607843137254902, 0.11764705882352941, 0.09411764705882353) * 5;
 
-vec3 InDiskColor = vec3(1, 0.9647058823529412, 0.9450980392156862) * 0.5 * redMultiplier;
+vec3 InDiskColor = vec3(1) * 0.5 * redMultiplier;
 const vec3 OutDiskColor = vec3(0.1607843137254902, 0.11764705882352941, 0.09411764705882353) * 5;
 
 

@@ -7,6 +7,13 @@ float rand(vec2 coord) {
     return fract(sin(dot(coord, vec2(12.9898, 78.223))) * 43758.5453) * 2.0 - 1.0;
 }
 
+vec3 randVec3(float value) {
+    return vec3(rand(value - 289.3254),
+                rand(value + 35663.25),
+                rand(value + 8274.52345)
+    );
+}
+
 float scanLines(vec2 st) {
     return sin(dot(st.xy,
     vec2(0.012,0.0))*
@@ -51,12 +58,6 @@ float fbm(vec3 x, int iterations) {
     }
     return v;
 }
-
-//vec4 mod289(vec4 x) {
-//    return x - floor(x * (1.0 / 289.0)) * 289.0; }
-//
-//float mod289(float x) {
-//    return x - floor(x * (1.0 / 289.0)) * 289.0; }
 
 vec4 permute(vec4 x) {
     return mod289(((x*34.0)+1.0)*x);
