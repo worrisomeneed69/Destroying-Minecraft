@@ -2,7 +2,7 @@ package com.sp.networking.S2C;
 
 import com.sp.DestroyingMinecraft;
 import com.sp.DestroyingMinecraftClient;
-import com.sp.render.gui.DestructionTitleRenderCallback;
+import com.sp.render.gui.hud.DestructionTitleRenderCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;

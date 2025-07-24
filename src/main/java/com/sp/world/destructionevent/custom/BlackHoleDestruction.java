@@ -169,7 +169,7 @@ public class BlackHoleDestruction {
         int alpha = (int) ((Math.sin(RenderSystem.getShaderGameTime()*2000) * 0.5 + 0.5) * 100) + 50;
 
         //Draw center box
-        RenderUtil.drawBox(matrices, vertexConsumers, selection.getCenter(), new Vec3d(1, 2, 1), 0, 0, 255, 150, false);
+        RenderUtil.drawBox(matrices, vertexConsumers, selection.getCenter(), new Vec3d(1, 2, 1), 0, 0, 255, 150, false, false);
 
         //Highlight all the selected blocks
         ArrayList<BlockPos> listCopy = new ArrayList<>(surfaceBlocks);
@@ -177,7 +177,7 @@ public class BlackHoleDestruction {
                 if(surfaceBlock == null) continue;
                 Vec3d pos = surfaceBlock.toCenterPos();
                 boolean isVisible = frustum.isVisible(Box.of(pos, 1, 1, 1));
-                if (isVisible) RenderUtil.drawBox(matrices, vertexConsumers, pos, 1, 20, 200, 20, alpha, false);
+                if (isVisible) RenderUtil.drawBox(matrices, vertexConsumers, pos, 1, 20, 200, 20, alpha, false, false);
             }
         matrices.pop();
     }

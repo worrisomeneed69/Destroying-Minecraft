@@ -34,7 +34,9 @@ public class PhysicsDoorBlockRenderer implements BlockEntityRenderer<PhysicsDoor
                     colors[1],
                     colors[2],
                     colors[3],
-                    true);
+                    true,
+                    false
+            );
         }
     }
 

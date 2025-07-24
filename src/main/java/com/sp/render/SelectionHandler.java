@@ -92,9 +92,9 @@ public class SelectionHandler {
 
         if (corner1 == null) {
             Vec3d blockPos = targetBlock.getBlockPos().toCenterPos();
-            RenderUtil.drawBox(matrices, vertexConsumers, blockPos.subtract(camera.getPos()), 1, 100, 255, 100, alpha, true);
+            RenderUtil.drawBox(matrices, vertexConsumers, blockPos.subtract(camera.getPos()), 1, 100, 255, 100, alpha, true, false);
         } else if(corner2 == null) {
-            RenderUtil.drawBlocksFromCorners(matrices, vertexConsumers, camera, corner1, targetBlock.getBlockPos(), 100, 255, 100, alpha, true);
+            RenderUtil.drawBlocksFromCorners(matrices, vertexConsumers, camera, corner1, targetBlock.getBlockPos(), 100, 255, 100, alpha, true, false);
         }
     }
 

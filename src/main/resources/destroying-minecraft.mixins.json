@@ -4,15 +4,18 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "ForceRenderPlayerMixin",
+    "PlayZoneMixin",
     "collision.IsGroundedCheckMixin",
     "collision.PlatformCollisionMixin",
     "collision.SneakFixMixinOnPlatforms",
-    "gravity.NoGravityLivingEntityMixin",
     "gravity.NoGravityEntityMixin",
+    "gravity.NoGravityLivingEntityMixin",
     "gravity.SlowLimbMovementsMixin",
     "layingdown.LyingDownPlayerEntityMixin",
     "layingdown.SetLayingDownDirectionMixin",
-    "layingdown.SetSleepingPoseMixin"
+    "layingdown.SetSleepingPoseMixin",
+    "multipledeathvariants.DamageTrackerMixin",
+    "multipledeathvariants.DeathMessageTypeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

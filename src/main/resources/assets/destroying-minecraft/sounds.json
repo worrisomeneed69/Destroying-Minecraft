@@ -157,5 +157,15 @@
     "sounds": [
       "destroying-minecraft:black_hole/braam/black_hole_braam_final"
     ]
+  },
+  "walkie_talkie": {
+    "sounds": [
+      "destroying-minecraft:walkie_talkie"
+    ]
+  },
+  "count_down": {
+    "sounds": [
+      "destroying-minecraft:count_down"
+    ]
   }
 }

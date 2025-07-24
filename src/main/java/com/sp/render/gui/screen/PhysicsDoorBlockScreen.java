@@ -1,4 +1,4 @@
-package com.sp.render.gui;
+package com.sp.render.gui.screen;
 
 import com.sp.block.entity.custom.PhysicsDoorBlockEntity;
 import com.sp.networking.C2S.UpdatePhysicsDoorPacket;

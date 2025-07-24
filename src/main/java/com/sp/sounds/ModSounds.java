@@ -8,6 +8,8 @@ import net.minecraft.util.Identifier;
 
 public class ModSounds {
 
+    public static final SoundEvent WALKIE_TALKIE = registerSoundEvent("walkie_talkie");
+
     public static final SoundEvent DOOR_OPEN = registerSoundEvent("door_open");
     public static final SoundEvent DOOR_OPENING_LOOP = registerSoundEvent("door_opening_loop");
     public static final SoundEvent DOOR_CLOSE = registerSoundEvent("door_close");
@@ -44,6 +46,8 @@ public class ModSounds {
     public static final SoundEvent BLACK_HOLE_BRAAM2 = registerSoundEvent("black_hole_braam2");
     public static final SoundEvent BLACK_HOLE_BRAAM3 = registerSoundEvent("black_hole_braam3");
     public static final SoundEvent BLACK_HOLE_BRAAM_FINAL = registerSoundEvent("black_hole_braam_final");
+
+    public static final SoundEvent COUNT_DOWN = registerSoundEvent("count_down");
 
     private static SoundEvent registerSoundEvent(String name) {
         Identifier id = DestroyingMinecraft.idOf(name);

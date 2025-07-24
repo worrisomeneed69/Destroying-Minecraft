@@ -9,15 +9,20 @@ import com.sp.entity.client.renderer.BlockPhysicsEntityRenderer;
 import com.sp.entity.client.renderer.MeteorEntityRenderer;
 import com.sp.entity.client.renderer.SpinningBlockEntityRenderer;
 import com.sp.entity.client.renderer.StarPiercerEntityRenderer;
+import com.sp.item.ModModelPredicates;
 import com.sp.mixin.PostProcessingManagerAccessor;
 import com.sp.networking.InitializePackets;
 import com.sp.render.*;
 import com.sp.render.camerashake.CameraShakeManager;
-import com.sp.render.gui.DestructionTitleRenderCallback;
+import com.sp.render.gui.hud.DestructionTitleRenderCallback;
+import com.sp.render.gui.hud.PlayZoneWarningRenderCallback;
 import com.sp.render.postshaders.PostShader;
 import com.sp.render.postshaders.custom.*;
+import com.sp.util.RenderUtil;
 import com.sp.util.tickinstances.client.ClientTickInstances;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
+import com.sp.world.playzone.PlayZone;
+import com.sp.world.playzone.PlayZoneManager;
 import foundry.veil.Veil;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.dynamicbuffer.DynamicBufferType;
@@ -36,6 +41,7 @@ import net.minecraft.world.World;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Vector;
 
 public class DestroyingMinecraftClient implements ClientModInitializer {
 	public static boolean shouldRenderDebug = false;
@@ -59,9 +65,11 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		HudRenderCallback.EVENT.register(new DestructionTitleRenderCallback());
+		HudRenderCallback.EVENT.register(new PlayZoneWarningRenderCallback());
 
 		InitializePackets.registerClientNetworking();
 		ClientTickInstances.registerAllClientTickInstances();
+		ModModelPredicates.registerModelPredicates();
 
 
 		EntityRendererRegistry.register(ModEntities.SPINNING_BLOCK, SpinningBlockEntityRenderer::new);
@@ -106,6 +114,31 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 					case AFTER_WEATHER -> {
 						if(shouldRenderDebug) {
 							BlackHoleDestruction.renderSelectionDebug(matrixStack.toPoseStack(), bufferSource, camera, frustum);
+
+							Vector<PlayZone> activePlayZones = PlayZoneManager.getActivePlayZones();
+							if (!activePlayZones.isEmpty() && client.player != null) {
+								for (PlayZone playZone : activePlayZones) {
+									boolean inside = playZone.isPositionInsideZone(client.player.pos);
+									int[] colors = new int[4];
+									colors[0] = inside ? 50 : 255;  //RED
+									colors[1] = inside ? 255 : 50;  //GREEN
+									colors[2] = 50;                 //BLUE
+									colors[3] = 100;                 //ALPHA
+
+									RenderUtil.drawBox(
+											matrixStack.toPoseStack(),
+											bufferSource,
+											playZone.getBoundingBox().offset(camera.getPos().negate()),
+											colors[0],
+											colors[1],
+											colors[2],
+											colors[3],
+											true,
+											playZone.isPositionInsideZone(camera.getPos())
+									);
+
+								}
+							}
 						}
 
 						SelectionHandler.renderSelection(matrixStack.toPoseStack(), bufferSource, deltaTracker, camera);
@@ -114,27 +147,6 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 			}
 
 		}));
-
-		//Reload RenderTimer Animations because I can't hotswap them
-//		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
-//			@Override
-//			public Identifier getFabricId() {
-//				return DestroyingMinecraft.idOf("after_resources");
-//			}
-//
-//			@Override
-//			public void reload(ResourceManager manager) {
-//				ClientWorld clientWorld = MinecraftClient.getInstance().world;
-//
-//				if (clientWorld != null) {
-//					for(PostShader postShader : PostShader.getAllInstances()) {
-//						if(postShader.getRenderTimer() == null) continue;
-//
-//						postShader.getRenderTimer().initAnimations(clientWorld);
-//					}
-//				}
-//			}
-//		});
 
 		//Set the uniforms for all the post shaders
 		VeilEventPlatform.INSTANCE.preVeilPostProcessing((name, pipeline, context) -> {

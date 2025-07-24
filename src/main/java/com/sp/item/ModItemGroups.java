@@ -16,7 +16,8 @@ public class ModItemGroups {
             DestroyingMinecraft.idOf(DestroyingMinecraft.MOD_ID),
             FabricItemGroup.builder().displayName(Text.translatable("itemgroup.destroying-minecraft"))
                     .icon(() -> new ItemStack(Blocks.TNT)).entries((displayContext, entries) -> {
-                        entries.add(ModItems.CAMERA_SHAKE_STICK);
+                        entries.add(ModItems.CAMERA_SHAKE_STICK_ITEM);
+                        entries.add(ModItems.WALKIE_TALKIE_ITEM);
                         entries.add(ModBlocks.WHITE_VOID_BLOCK);
                         entries.add(ModBlocks.PHYSICS_DOOR_BLOCK);
                         entries.add(ModBlocks.CHAIR_BLOCK);

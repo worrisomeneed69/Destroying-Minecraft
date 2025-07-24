@@ -2,7 +2,7 @@ package com.sp.block.entity.custom;
 
 import com.sp.block.entity.ModBlockEntities;
 import com.sp.entity.custom.BlockPhysicsEntity;
-import com.sp.render.gui.PhysicsDoorBlockScreen;
+import com.sp.render.gui.screen.PhysicsDoorBlockScreen;
 import com.sp.sounds.ModSounds;
 import com.sp.sounds.instances.DoorOpeningLoopSoundInstance;
 import net.minecraft.block.Block;

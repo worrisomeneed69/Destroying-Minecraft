@@ -2,8 +2,10 @@ package com.sp;
 
 import com.sp.block.ModBlocks;
 import com.sp.block.entity.ModBlockEntities;
+import com.sp.command.AddPlayZoneCommand;
 import com.sp.command.DestructionCommand;
 import com.sp.command.RipPlatformOutCommand;
+import com.sp.component.ModDataComponentTypes;
 import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.destruction.server.custom.PlanetDestructionServer;
 import com.sp.destruction.server.custom.SupernovaDestructionServer;
@@ -15,9 +17,11 @@ import com.sp.item.ModItems;
 import com.sp.networking.InitializePackets;
 import com.sp.networking.S2C.BraamPacket;
 import com.sp.networking.S2C.PointSBEPacket;
+import com.sp.networking.S2C.UpdatePlayZonePacket;
 import com.sp.sounds.ModSounds;
 import com.sp.world.ModGameRules;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
+import com.sp.world.playzone.PlayZone;
 import com.sp.world.spinningblockexplosion.SpinningBlockExplosion;
 import eu.midnightdust.lib.config.MidnightConfig;
 import net.fabricmc.api.ModInitializer;
@@ -28,6 +32,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,10 +57,13 @@ public class DestroyingMinecraft implements ModInitializer {
 		ModBlockEntities.registerBlockEntities();
 		ModSounds.registerSounds();
 		ModGameRules.registerGameRules();
+		ModDataComponentTypes.registerDataComponentTypes();
+
 		MidnightConfig.init(MOD_ID, DestroyingMinecraftConfig.class);
 
 		CommandRegistrationCallback.EVENT.register(DestructionCommand::register);
 		CommandRegistrationCallback.EVENT.register(RipPlatformOutCommand::register);
+		CommandRegistrationCallback.EVENT.register(AddPlayZoneCommand::register);
 
 		LOGGER.info("\"It's nukein' time\" -He said as he loaded the fork into the microwave");
 
@@ -78,6 +86,20 @@ public class DestroyingMinecraft implements ModInitializer {
 
 	public static void sendBraamPacket(PlayerEntity player, SoundEvent soundEvent) {
 		ServerPlayNetworking.send((ServerPlayerEntity) player, new BraamPacket.BraamPayload(soundEvent));
+	}
+
+	public static void sendUpdatePlayZonePacket(PlayerEntity player, PlayZone playZone, boolean remove) {
+		Box playZoneBounds = playZone.getBoundingBox();
+		ServerPlayNetworking.send((ServerPlayerEntity) player, new UpdatePlayZonePacket.UpdatePlayZonePayload(
+				playZoneBounds.minX,
+				playZoneBounds.maxX,
+				playZoneBounds.minY,
+				playZoneBounds.maxY,
+				playZoneBounds.minZ,
+				playZoneBounds.maxZ,
+				playZone.getId(),
+				remove
+		));
 	}
 
 	public static Identifier idOf(String path){
