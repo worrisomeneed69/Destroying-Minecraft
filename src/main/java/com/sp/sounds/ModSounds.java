@@ -29,6 +29,7 @@ public class ModSounds {
     public static final SoundEvent LASER_POWER_DOWN = registerSoundEvent("laser_power_down");
     public static final SoundEvent LASER_PAUSE = registerSoundEvent("laser_pause");
 
+    public static final SoundEvent SUPERNOVA_JAZZ = registerSoundEvent("supernova_jazz");
     public static final SoundEvent SUPERNOVA_EXPLOSION = registerSoundEvent("supernova_explosion");
 
     public static final SoundEvent METEOR_WHISTLE = registerSoundEvent("meteor_whistle");

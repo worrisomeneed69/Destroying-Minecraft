@@ -85,6 +85,10 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 			MinecraftClient client = MinecraftClient.getInstance();
 			World clientWorld = client.world;
 
+			if (BlackScreenManager.isIsBlackScreen()) {
+				client.options.hudHidden = true;
+			}
+
 			if(clientWorld != null && !PerspectiveRenderer.isRenderingPerspective()) {
 				switch (stage) {
 					case AFTER_LEVEL -> {

@@ -10,6 +10,8 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 
+import static com.sp.command.DestructionCommand.*;
+
 public class InvokeDestructionPacket {
     private static final Identifier nukeSmokeEmitterId = DestroyingMinecraft.idOf("nuke_smoke");
 
@@ -18,7 +20,7 @@ public class InvokeDestructionPacket {
             boolean on = payload.start();
 
             switch (payload.type()){
-                case 0: {
+                case nukeType: {
 //                    DestroyingMinecraftClient.nukePostShader.getRenderTimer().toggleExplosion(on);
 
 //                    if(on) {
@@ -34,30 +36,35 @@ public class InvokeDestructionPacket {
                     break;
                 }
 
-                case 1: {
+                case orbitalLaserType: {
                     if (on) DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.ORBITAL_LASER_ANIMATION);
                     break;
                 }
 
-                case 2: {
+                case planetType: {
                     DestroyingMinecraftClient.planetPostShader.getDestructionEvent().setActive(on);
                     if (on) DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.PLANET_ANIMATION);
                     break;
                 }
 
-                case 3: {
+                case supernovaJazz: {
+                    DestroyingMinecraftClient.supernovaPostShader.supernovaJazz.setActive(on);
+                    break;
+                }
+
+                case supernovaType: {
                     DestroyingMinecraftClient.supernovaPostShader.getDestructionEvent().setActive(on);
                     if (on) DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.SUPERNOVA_ANIMATION);
                     break;
                 }
 
-                case 4: {
+                case blackHolePart1Type: {
                     DestroyingMinecraftClient.blackHolePostShader.getDestructionEvent().setActive(on);
                     if (on) DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.BLACK_HOLE_ANIMATION);
                     break;
                 }
 
-                case 5: {
+                case blackHolePart2Type: {
                     DestroyingMinecraftClient.blackHolePostShader.destruction2.setActive(on);
                     break;
                 }

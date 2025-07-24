@@ -54,6 +54,11 @@
       "destroying-minecraft:laser/laser_pause"
     ]
   },
+  "supernova_jazz": {
+    "sounds": [
+      "destroying-minecraft:supernova_jazz"
+    ]
+  },
   "supernova_explosion": {
     "sounds": [
       "destroying-minecraft:supernova_explosion"

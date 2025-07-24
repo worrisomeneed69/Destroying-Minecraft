@@ -2,6 +2,7 @@ package com.sp.render.postshaders.custom;
 
 import com.sp.DestroyingMinecraft;
 import com.sp.config.DestroyingMinecraftConfig;
+import com.sp.render.BlackScreenManager;
 import com.sp.render.postshaders.PostShader;
 import com.sp.util.BetterUniforms;
 import com.sp.util.MathUtil;
@@ -53,6 +54,7 @@ public class PostProcessingPostShader extends PostShader {
 
         BetterUniforms.setFloat(shaderProgram, "centerDepth", this.smoothDepth);
 
-        BetterUniforms.setInt(shaderProgram, "enabled", DestroyingMinecraftConfig.enableDepthOfField ? 1 : 0);
+        BetterUniforms.setInt(shaderProgram, "enabledDepthOfField", DestroyingMinecraftConfig.enableDepthOfField ? 1 : 0);
+        BetterUniforms.setInt(shaderProgram, "enabledBlackScreen", BlackScreenManager.isIsBlackScreen() ? 1 : 0);
     }
 }

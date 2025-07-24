@@ -1,4 +1,4 @@
-package com.sp.destruction.client.custom;
+package com.sp.destruction.client.custom.supernova;
 
 import com.sp.destruction.client.ClientDestructionEvent;
 import com.sp.entity.custom.StarPiercerEntity;

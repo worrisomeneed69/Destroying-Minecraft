@@ -28,12 +28,13 @@ import static net.minecraft.server.command.CommandManager.argument;
 
 public class DestructionCommand {
     //Correlates to the switch statement in the InvokeDestructionPacket
-    final static int nukeType = 0;
-    final static int orbitalLaserType = 1;
-    final static int planetType = 2;
-    final static int supernovaType = 3;
-    final static int blackHolePart1Type = 4;
-    final static int blackHolePart2Type = 5;
+    public final static int nukeType = 0;
+    public final static int orbitalLaserType = 1;
+    public final static int planetType = 2;
+    public final static int supernovaJazz = 3;
+    public final static int supernovaType = 4;
+    public final static int blackHolePart1Type = 5;
+    public final static int blackHolePart2Type = 6;
 
     public static void register(CommandDispatcher<ServerCommandSource> serverCommandSourceCommandDispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
         serverCommandSourceCommandDispatcher.register(
@@ -41,10 +42,14 @@ public class DestructionCommand {
                         .requires(source -> source.hasPermissionLevel(2))
                         .then(CommandManager.literal("supernova")
                                 .then(CommandManager.literal("start")
+                                        .then(CommandManager.literal("jazz")
+                                                .executes(commandContext -> execute(commandContext, true, supernovaJazz))
+                                        )
                                         .executes(commandContext -> execute(commandContext, true, supernovaType))
                                 )
                                 .then(CommandManager.literal("reset")
                                         .executes(commandContext -> execute(commandContext, false, supernovaType))
+                                        .executes(commandContext -> execute(commandContext, false, supernovaJazz))
                                 )
                         )
 

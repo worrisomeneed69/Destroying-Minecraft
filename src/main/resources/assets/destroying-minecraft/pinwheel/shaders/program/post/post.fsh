@@ -10,7 +10,8 @@ uniform sampler2D BlurredTexture;
 
 uniform float centerDepth;
 uniform float GameTime;
-uniform int enabled;
+uniform int enabledDepthOfField;
+uniform int enabledBlackScreen;
 
 const int ITERATIONS = 5;
 
@@ -20,7 +21,12 @@ out vec4 fragColor;
 void main() {
     vec3 color = texture(MainTexture, texCoord).rgb;
 
-    if(enabled == 0) {
+    if (enabledBlackScreen == 1) {
+        fragColor = vec4(0.0);
+        return;
+    }
+
+    if (enabledDepthOfField == 0) {
         fragColor = vec4(color, 1.0);
         return;
     }
@@ -30,33 +36,11 @@ void main() {
     vec3 playerPos = screenToLocalSpace(texCoord, depth).xyz;
     depth = length(playerPos) / 100;
 
-//    float smoothCenterDepth = smoothstep(0, 1, centerDepth);
-
     float dist = max(abs(depth - centerDepth), 0.0);
-//    dist = dist * dist;
 
     float blur = smoothstep(0.0, 0.15, dist);
-//    blur *= blur * blur;
-
-//    float steps = 0.0;
-//    if(blur > 0.0){
-//        for(int i = -ITERATIONS; i <= ITERATIONS; i++) {
-//            for(int j = -ITERATIONS; j <= ITERATIONS; j++) {
-//                vec2 offset = vec2(blur*0.0007) * ivec2(i, j);
-//                float sampleDepth = texture(MainDepth, texCoord + offset).r;
-//                float sampleDist = max(abs(sampleDepth - centerDepth), 0.0);
-//                float sampleBlur = smoothstep(0, 1, sampleDist);
-//                if(sampleBlur > 0.00) {
-//                    color += texture(DiffuseSampler, texCoord + offset).rgb;
-//                    steps += 1.0;
-//                }
-//            }
-//        }
-//        color /= steps;
-//    }
 
 
     fragColor = vec4(mix(color, blurredTexture, blur), 1.0);
-//    fragColor = vec4(blurredTexture, 1.0);
 
 }
