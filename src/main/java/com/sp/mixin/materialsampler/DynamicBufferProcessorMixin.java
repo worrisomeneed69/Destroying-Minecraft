@@ -181,21 +181,19 @@ public class DynamicBufferProcessorMixin {
                 if (type == CustomDynamicBuffers.MATERIAL_BUFFER && !markers.containsKey("veil:" + CustomDynamicBuffers.MATERIAL_BUFFER.getName())) {
 
                     if ("rendertype_entity_cutout_no_cull".equals(shaderName) || "rendertype_entity_translucent".equals(shaderName) || "rendertype_entity_solid".equals(shaderName)) {
-                        if (ctx.isVertex()) {
-//                    Optional<GlslNewFieldNode> fieldOptional = tree.field(vertexFormat.getName(VertexFormatElement.NORMAL));
-//                    if (fieldOptional.isPresent()) {
-//                        treeBody.add(GlslInjectionPoint.AFTER_DECLARATIONS, GlslParser.parseExpression("layout(location = " + (1 + i) + ") in Material"));
-//                        treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression("out int material"));
-//                        mainFunctionBody.add(new GlslAssignmentNode(new GlslVariableNode("material"), GlslParser.parseExpression("Material"), GlslAssignmentNode.Operand.EQUAL));
-//                        modified = true;
-//                        data.compute("mask", (s, o) -> (o instanceof Integer val ? val : 0) | type.getMask());
-//                    }
-                        } else if (ctx.isFragment()) {
+                        if (ctx.isFragment()) {
 //                            if (inVertex) {
 //                                treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression("in int material"));
                                 treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression(output));
                                 mainFunctionBody.add(new GlslAssignmentNode(new GlslVariableNode(sourceName), GlslParser.parseExpression("ivec4(1.0, 0.0, 0.0, 1.0)"), GlslAssignmentNode.Operand.EQUAL));
                                 modified = true;
+//                            }
+                        }
+                    } else if ("particle".equals(shaderName)) {
+                        if (ctx.isFragment()) {
+                            treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression(output));
+                            mainFunctionBody.add(new GlslAssignmentNode(new GlslVariableNode(sourceName), GlslParser.parseExpression("ivec4(1.0, 0.0, 0.0, 1.0)"), GlslAssignmentNode.Operand.EQUAL));
+                            modified = true;
 //                            }
                         }
                     }

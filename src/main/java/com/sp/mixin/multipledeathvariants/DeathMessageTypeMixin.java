@@ -21,6 +21,7 @@ public class DeathMessageTypeMixin {
 
 
     private static final DeathMessageType PLAY_ZONE = ModDamageSources.PLAY_ZONE_TYPE = addVariant("play_zone");
+    private static final DeathMessageType CRACKS = ModDamageSources.CRACKS_TYPE = addVariant("cracks");
 
     @Shadow
     @Final

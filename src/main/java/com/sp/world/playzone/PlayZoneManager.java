@@ -1,6 +1,7 @@
 package com.sp.world.playzone;
 
 import com.sp.DestroyingMinecraft;
+import com.sp.cca.InitializeComponents;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -9,14 +10,18 @@ import java.util.Vector;
 
 public class PlayZoneManager {
     private static final Vector<PlayZone> activePlayZones = new Vector<>();
+    private static boolean dirty;
 
     public static void addPlayZone(World world, PlayZone playZone) {
-        activePlayZones.add(playZone);
+        if (!activePlayZones.stream().anyMatch(playZone1 -> playZone1.getId() == playZone.getId())) {
+            activePlayZones.add(playZone);
+        }
 
-        if (!world.isClient && world.getServer().isDedicated()) {
+        if (!world.isClient) {
             for (PlayerEntity player : world.getPlayers()) {
                 DestroyingMinecraft.sendUpdatePlayZonePacket(player, playZone, false);
             }
+            InitializeComponents.EVENTS.get(world).sync();
         }
     }
 
@@ -31,13 +36,18 @@ public class PlayZoneManager {
                 }
             }
         }
-
+        InitializeComponents.EVENTS.get(world).sync();
+        System.out.println(playZonesRemoved);
         return playZonesRemoved;
     }
 
     //Client Side
     public static void removePlayZone(int id) {
         activePlayZones.removeIf(playZone -> playZone.getId() == id);
+    }
+
+    public static void clearAllPlayZones() {
+        activePlayZones.clear();
     }
 
     public static boolean isInsideAPlayZone(Vec3d pos) {
@@ -48,4 +58,11 @@ public class PlayZoneManager {
         return (Vector<PlayZone>) activePlayZones.clone();
     }
 
+    public static void markDirty(boolean isDirty) {
+        dirty = isDirty;
+    }
+
+    public static boolean isDirty() {
+        return dirty;
+    }
 }

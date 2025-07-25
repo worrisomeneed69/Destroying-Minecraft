@@ -22,7 +22,9 @@ public class DamageTrackerMixin {
     private Text isPlayZoneDeath(DamageSource instance, LivingEntity killed, Operation<Text> original, @Local DamageSource damageSource) {
         if (instance.getType().deathMessageType() == ModDamageSources.PLAY_ZONE_TYPE) {
             int randomInt = killed.getRandom().nextBetween(1, 7);
-
+            return Text.translatable("death.attack." + damageSource.getName() + randomInt, this.entity.getDisplayName());
+        } else if (instance.getType().deathMessageType() == ModDamageSources.CRACKS_TYPE) {
+            int randomInt = killed.getRandom().nextBetween(1, 4);
             return Text.translatable("death.attack." + damageSource.getName() + randomInt, this.entity.getDisplayName());
         }
         return original.call(instance, killed);

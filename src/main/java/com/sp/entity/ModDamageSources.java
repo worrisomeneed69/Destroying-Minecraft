@@ -10,9 +10,13 @@ import net.minecraft.world.World;
 
 public class ModDamageSources {
     public static DeathMessageType PLAY_ZONE_TYPE;
+    public static DeathMessageType CRACKS_TYPE;
 
     public static RegistryKey<DamageType> PLAY_ZONE_DAMAGE_TYPE = RegistryKey.of(
             RegistryKeys.DAMAGE_TYPE, DestroyingMinecraft.idOf("play_zone"));
+
+    public static RegistryKey<DamageType> CRACKS_DAMAGE_TYPE = RegistryKey.of(
+            RegistryKeys.DAMAGE_TYPE, DestroyingMinecraft.idOf("cracks"));
 
 
     public static DamageSource of(World world, RegistryKey<DamageType> key) {

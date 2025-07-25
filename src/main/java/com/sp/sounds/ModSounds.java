@@ -56,7 +56,7 @@ public class ModSounds {
     }
 
     public static void registerSounds() {
-        DestroyingMinecraft.LOGGER.info("Registering Sounds for" + DestroyingMinecraft.MOD_ID);
+        DestroyingMinecraft.LOGGER.info("Registering Sounds for " + DestroyingMinecraft.MOD_ID);
     }
 
 }

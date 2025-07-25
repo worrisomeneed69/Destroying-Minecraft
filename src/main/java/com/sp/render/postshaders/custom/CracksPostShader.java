@@ -1,6 +1,7 @@
 package com.sp.render.postshaders.custom;
 
 import com.sp.DestroyingMinecraft;
+import com.sp.destruction.client.custom.LaserDestructionClient;
 import com.sp.render.postshaders.PostShader;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import net.fabricmc.api.EnvType;
@@ -15,7 +16,7 @@ public class CracksPostShader extends PostShader {
     public static final Identifier CRACKS_HOLE_SHADER = DestroyingMinecraft.idOf("cracks/cracks");
 
     public CracksPostShader() {
-        super(CRACKS_HOLE_POST, CRACKS_HOLE_SHADER, null);
+        super(CRACKS_HOLE_POST, CRACKS_HOLE_SHADER, new LaserDestructionClient());
     }
 
     @Override

@@ -20,7 +20,6 @@ import com.sp.render.gui.hud.DestructionTitleRenderCallback;
 import com.sp.render.gui.hud.PlayZoneWarningRenderCallback;
 import com.sp.render.postshaders.PostShader;
 import com.sp.render.postshaders.custom.*;
-import com.sp.util.Noise;
 import com.sp.util.RenderUtil;
 import com.sp.util.tickinstances.client.ClientTickInstances;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
@@ -41,9 +40,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.joml.Vector2d;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -198,15 +195,6 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 			SelectionHandler.tickClientWorld(clientWorld);
 
 			PlayerEntity player = MinecraftClient.getInstance().player;
-
-			if (player != null) {
-//				Vec3d playerPos = player.pos;
-//
-//				float holeSize = (float) (1.0 - Vector2d.distance(-1709, 1575, playerPos.x, playerPos.z)/20.0);
-//
-//				float noise = Noise.getNoise(new Vec3d(playerPos.x, 4, playerPos.z));
-//				inHole = noise < holeSize && player.isOnGround();
-			}
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register((clientPlayNetworkHandler, minecraftClient) -> {

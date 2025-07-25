@@ -2,6 +2,8 @@ package com.sp.render.gui.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.DestroyingMinecraft;
+import com.sp.cca.InitializeComponents;
+import com.sp.cca.custom.entity.PlayerComponent;
 import com.sp.mixininterfaces.PlayZoneEntity;
 import com.sp.sounds.ModSounds;
 import com.sp.util.RenderUtil;
@@ -26,8 +28,11 @@ public class PlayZoneWarningRenderCallback implements HudRenderCallback {
         MinecraftClient client = MinecraftClient.getInstance();
         PlayerEntity player = client.player;
         SoundManager soundManager = client.getSoundManager();
+        if (player == null) return;
+        PlayerComponent component = InitializeComponents.PLAYERS.get(player);
 
-        if (player == null || ((PlayZoneEntity) player).isInsidePlayZone()) {
+
+        if (component.isInsideAPlayZone()) {
             startTime = 0L;
             if (soundManager.isPlaying(countdown)) {
                 soundManager.stop(countdown);
@@ -70,14 +75,14 @@ public class PlayZoneWarningRenderCallback implements HudRenderCallback {
         drawContext.getMatrices().scale(5.0f, 5.0f, 5.0f);
         drawContext.drawCenteredTextWithShadow(client.textRenderer, "Return to the Play Zone", 0, client.textRenderer.fontHeight / 2, Colors.WHITE);
 
-        long timeLeft = Math.max(((PlayZoneEntity) player).getDeathTime() - System.currentTimeMillis(), 0L);
+        long timeLeft = Math.max(component.getDeathTime() - System.currentTimeMillis(), 0L);
         int seconds = Math.max((int) Math.floor((double) timeLeft / 1000), 0);
         String milliSecondsString;
         long milliSeconds = timeLeft%1000;
 
-        if(milliSeconds > 100) {
+        if(milliSeconds > 100L) {
             milliSecondsString = String.valueOf(milliSeconds);
-        } else if (milliSeconds > 10) {
+        } else if (milliSeconds > 10L) {
             milliSecondsString = "0" + milliSeconds;
         } else {
             milliSecondsString = "00" + milliSeconds;
