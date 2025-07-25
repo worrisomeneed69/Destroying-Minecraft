@@ -62,13 +62,21 @@ public class CustomRenderLayersAndVertexFormats {
      * CUSTOM RENDER LAYERS
      */
 
+    private static final RenderPhase.ShaderProgram VOID_BLOCK_SHADER = VeilRenderBridge.shaderState(DestroyingMinecraft.idOf("void/void"));
     private static final RenderPhase.ShaderProgram METEOR_SHADER = VeilRenderBridge.shaderState(DestroyingMinecraft.idOf("meteor/meteor"));
     private static final RenderPhase.ShaderProgram ENTITY_BLOOM_SHADER = VeilRenderBridge.shaderState(DestroyingMinecraft.idOf("star_piercer/star_piercer"));
-//    public static final RenderPhase.ShaderProgram ENTITY_SOLID_PROGRAM = new RenderPhase.ShaderProgram(GameRenderer::getRenderTypeEntitySolidProgram);
-//
-//    public static ShaderProgram getRenderTypeEntitySolidProgram() {
-//        return ENTITY_BLOOM_SHADER;
-//    }
+
+    public static final RenderLayer VOID_BLOCK = RenderLayer.of(
+            "void_block",
+            VertexFormats.POSITION,
+            VertexFormat.DrawMode.QUADS,
+            256,
+            false,
+            false,
+            RenderLayer.MultiPhaseParameters.builder()
+                    .program(VOID_BLOCK_SHADER)
+                    .build(false)
+    );
 
     public static final RenderLayer METEOR = RenderLayer.of(
             "meteor",

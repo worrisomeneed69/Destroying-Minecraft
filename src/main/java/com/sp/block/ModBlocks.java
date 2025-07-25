@@ -3,6 +3,7 @@ package com.sp.block;
 import com.sp.DestroyingMinecraft;
 import com.sp.block.custom.ChairBlock;
 import com.sp.block.custom.PhysicsDoorBlock;
+import com.sp.block.custom.VoidBlock;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -14,7 +15,7 @@ import net.minecraft.registry.Registry;
 public class ModBlocks {
 
     public static final Block WHITE_VOID_BLOCK = registerBlock("white_void_block",
-            new Block(AbstractBlock.Settings.copy(Blocks.STONE).hardness(-1f).solid().noBlockBreakParticles().luminance(value -> 15)));
+            new VoidBlock(AbstractBlock.Settings.copy(Blocks.STONE).hardness(-1f).solid().noBlockBreakParticles().luminance(value -> 15)));
 
     public static final Block PHYSICS_DOOR_BLOCK = registerBlock("physics_door_block",
             new PhysicsDoorBlock(AbstractBlock.Settings.copy(Blocks.STONE).hardness(-1f).solid().noBlockBreakParticles()));

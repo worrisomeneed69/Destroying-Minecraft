@@ -106,21 +106,26 @@ void main() {
     float lightDir = dot(worldNormal, BH_DIR);
 
     float shadowSum = SHADOW_STRENGTH;
+    if (shadowScreenPos.x >= 0.0 && shadowScreenPos.x <= 1.0 && shadowScreenPos.y >= 0.0 && shadowScreenPos.y <= 1.0 ) {
 
-    if (lightDir > -0.07) {
-        mat2 randRotation = randRotMat(texCoord);
-        for (int x = -SHADOW_SAMPLES; x <= SHADOW_SAMPLES; x++){
-            for (int y = -SHADOW_SAMPLES; y <= SHADOW_SAMPLES; y++){
-                vec2 offset = randRotation * vec2(x, y) * 1;
-                float shadowSampler = texture(ShadowMap, shadowScreenPos.xy + offset).r;
+        if (lightDir > -0.07) {
+            mat2 randRotation = randRotMat(texCoord);
+            for (int x = -SHADOW_SAMPLES; x <= SHADOW_SAMPLES; x++){
+                for (int y = -SHADOW_SAMPLES; y <= SHADOW_SAMPLES; y++){
+                    vec2 offset = randRotation * vec2(x, y) * 1;
+                    float shadowSampler = texture(ShadowMap, shadowScreenPos.xy + offset).r;
 
-                if (shadowDepth < shadowSampler){
-                    shadowSum += 1.0;
+                    if (shadowDepth < shadowSampler){
+                        shadowSum += 1.0;
+                    }
                 }
             }
+
+            shadowSum /= pow(2.0 * SHADOW_SAMPLES + 1.0, 2.0);
         }
 
-        shadowSum /= pow(2.0 * SHADOW_SAMPLES + 1.0, 2.0);
+    } else {
+        shadowSum = 1.0;
     }
 
     vec3 outputColor = albedoColor.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH));

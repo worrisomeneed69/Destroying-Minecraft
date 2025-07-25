@@ -67,6 +67,7 @@ void main() {
     float handDepth = texture(HandDepthSampler, texCoord).r;
     uint material = texture(MaterialSampler, texCoord).r;
     vec3 worldPos = screenToWorldSpace(texCoord, depth).xyz;
+    vec3 viewPos = screenToViewSpace(texCoord, 1.0 - depth).xyz;
     float crackDepth = 0.0;
     bool cracks = false;
 
@@ -74,7 +75,7 @@ void main() {
 
         worldPos.y = 4;
 //        float time = abs(sin(GameTime*200)) * 100.0;
-        float time = 10.0;
+        float time = 20.0;
 //        float holeSize = smoothstep(0, (100 - time)*0.1, 1 - distance(centerPos, worldPos.xz)/time);
         float holeSize = pow(1 - distance(centerPos, worldPos.xz)/time, 1);
         float noise = getNoise(worldPos, holeSize);
@@ -86,20 +87,19 @@ void main() {
             cracks = true;
             //rayMarch
             vec3 rayPos = worldPos + rand(texCoord + GameTime) * 0.01;
-            vec3 ogRayPos = rayPos;
             vec3 rayDir = viewDirFromUv(texCoord);
-            vec3 step = rayDir * 0.05;
+            vec3 step = rayDir * length(viewPos)*2;
 
 
             vec3 magmaColor = vec3(0.0);
-            for(int i = 0; i < 100; i++) {
+            for(int i = 0; i < 50; i++) {
                 rayPos += step;
 //                holeSize = smoothstep(0, (100 - time)*0.1, 1 - distance(centerPos, worldPos.xz)/time);
-//                holeSize = pow(1 - distance(centerPos, worldPos.xz)/time, 3);
+                holeSize = pow(1 - distance(centerPos, rayPos.xz)/time, 1);
                 noise = getNoise(vec3(rayPos.x, worldPos.y, rayPos.z), holeSize);
 
 
-                magmaColor += vec3(1, 0.4, 0.08)*0.03;
+                magmaColor += vec3(1, 0.4, 0.08)*0.05;
 
                 if(noise > holeSize) {
                     break;
@@ -110,6 +110,7 @@ void main() {
             crackDepth += distance(rayPos, worldPos);
 
             color = magmaColor*2;
+//            color = vec3(0.0);
         }
 //        color = vec3(noise);
     }

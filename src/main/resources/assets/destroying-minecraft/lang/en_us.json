@@ -12,7 +12,7 @@
   "death.attack.play.zone2" : "%1$s thought they could get away!",
   "death.attack.play.zone3" : "%1$s couldn't escape!",
   "death.attack.play.zone4" : "%1$s can't escape!",
-  "death.attack.play.zone5" : "When will %1$s learn that there is no escape!",
+  "death.attack.play.zone5" : "When will %1$s learn that there is no escape?",
   "death.attack.play.zone6" : "Poor %1$s didn't return fast enough!",
   "death.attack.play.zone7" : "%1$s was so close to making it! (not really)"
 }

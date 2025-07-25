@@ -1,7 +1,9 @@
 package com.sp;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.block.entity.ModBlockEntities;
 import com.sp.block.entity.client.PhysicsDoorBlockRenderer;
+import com.sp.block.entity.client.VoidBlockEntityRenderer;
 import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.entity.ModEntities;
 import com.sp.entity.client.model.StarPiercerModel;
@@ -18,6 +20,7 @@ import com.sp.render.gui.hud.DestructionTitleRenderCallback;
 import com.sp.render.gui.hud.PlayZoneWarningRenderCallback;
 import com.sp.render.postshaders.PostShader;
 import com.sp.render.postshaders.custom.*;
+import com.sp.util.Noise;
 import com.sp.util.RenderUtil;
 import com.sp.util.tickinstances.client.ClientTickInstances;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
@@ -36,8 +39,11 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.joml.Vector2d;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -61,6 +67,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 	private static final Set<Identifier> removedPipelines = new HashSet<>(1);
 
 	private static boolean enabledDynamicBuffers = false;
+//	public static boolean inHole;
 
 	@Override
 	public void onInitializeClient() {
@@ -79,11 +86,13 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 		EntityModelLayerRegistry.registerModelLayer(StarPiercerModel.STAR_PIERCER_MODEL_LAYER, StarPiercerModel::getTexturedModelData);
 		EntityRendererRegistry.register(ModEntities.STAR_PIERCER_ENTITY, StarPiercerEntityRenderer::new);
 
+		BlockEntityRendererFactories.register(ModBlockEntities.VOID_BE, VoidBlockEntityRenderer::new);
 		BlockEntityRendererFactories.register(ModBlockEntities.PHYSICS_DOOR_BE, PhysicsDoorBlockRenderer::new);
 
 		VeilEventPlatform.INSTANCE.onVeilRenderLevelStage(((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, renderTick, deltaTracker, camera, frustum) -> {
 			MinecraftClient client = MinecraftClient.getInstance();
 			World clientWorld = client.world;
+			RenderSystem.disableDepthTest();
 
 			if (BlackScreenManager.isIsBlackScreen()) {
 				client.options.hudHidden = true;
@@ -187,6 +196,17 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 		ClientTickEvents.END_WORLD_TICK.register(clientWorld -> {
 			SelectionHandler.tickClientWorld(clientWorld);
+
+			PlayerEntity player = MinecraftClient.getInstance().player;
+
+			if (player != null) {
+//				Vec3d playerPos = player.pos;
+//
+//				float holeSize = (float) (1.0 - Vector2d.distance(-1709, 1575, playerPos.x, playerPos.z)/20.0);
+//
+//				float noise = Noise.getNoise(new Vec3d(playerPos.x, 4, playerPos.z));
+//				inHole = noise < holeSize && player.isOnGround();
+			}
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register((clientPlayNetworkHandler, minecraftClient) -> {
