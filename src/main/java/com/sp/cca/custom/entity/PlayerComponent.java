@@ -2,10 +2,16 @@ package com.sp.cca.custom.entity;
 
 import com.sp.DestroyingMinecraft;
 import com.sp.DestroyingMinecraftClient;
+import com.sp.destruction.client.ClientDestructionEvent;
+import com.sp.destruction.client.custom.LaserDestructionClient;
+import com.sp.destruction.server.custom.LaserDestructionServer;
 import com.sp.entity.ModDamageSources;
+import com.sp.render.BlackScreenManager;
+import com.sp.sounds.ModSounds;
 import com.sp.util.Noise;
 import com.sp.world.playzone.PlayZoneManager;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.navigation.GuiNavigationType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
@@ -17,49 +23,63 @@ import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent;
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
 
 public class PlayerComponent implements AutoSyncedComponent, ClientTickingComponent, ServerTickingComponent {
-    private PlayerEntity player;
+    private final PlayerEntity player;
     private boolean insideAPlayZone;
     private long deathTime;
 
     private boolean isInHole;
     private boolean spawnedEvaporateParticles;
 
+    private boolean isInWaitingRoom;
+
     public PlayerComponent(PlayerEntity player) {
         this.player = player;
-        this.insideAPlayZone = true; //If we don't do this it plays the countdown noise for a split second
+        this.insideAPlayZone = true; //If this isn't set, it plays the countdown noise for a split second
     }
 
 
     public boolean isInsideAPlayZone() {
-        return insideAPlayZone;
+        return this.insideAPlayZone;
     }
     public long getDeathTime() {
-        return deathTime;
+        return this.deathTime;
     }
 
     public boolean isInHole() {
-        return isInHole;
+        return this.isInHole;
+    }
+
+    public boolean isInWaitingRoom() {
+        return this.isInWaitingRoom;
+    }
+    public void setInWaitingRoom(boolean inWaitingRoom) {
+        this.isInWaitingRoom = inWaitingRoom;
     }
 
 
     @Override
     public void readFromNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
-
+        this.isInWaitingRoom = nbtCompound.getBoolean("isInWaitingRoom");
     }
 
     @Override
     public void writeToNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
-
+        nbtCompound.putBoolean("isInWaitingRoom", this.isInWaitingRoom);
     }
 
     @Override
     public void clientTick() {
+        this.isInWaitingRoom = false;
+        BlackScreenManager.setBlackScreen(false);
+
         this.updateInAPlayZone();
-        if (DestroyingMinecraftClient.cracksPostShader.getDestructionEvent().isActive()) {
-            this.updateInHole();
+        ClientDestructionEvent cracksDestructionEvent = DestroyingMinecraftClient.cracksPostShader.getDestructionEvent();
+        if (cracksDestructionEvent.isActive()) {
+            this.updateInHole(LaserDestructionClient.laserLength.getTimer(1.0f), LaserDestructionClient.cracksTime.getTimer(1.0f));
         }
 
         if (this.isInHole && !spawnedEvaporateParticles) {
+            this.player.playSound(ModSounds.LAVA_DEATH, 1.0f, 1.0f);
             for (int i = 0; i < 100; i++) {
                 double d = this.player.getRandom().nextGaussian() * 0.2;
                 double f = this.player.getRandom().nextGaussian() * 0.2;
@@ -75,7 +95,7 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
     public void serverTick() {
         this.updateInAPlayZone();
         if (DestroyingMinecraft.laserDestruction.isActive()) {
-            this.updateInHole();
+            this.updateInHole(LaserDestructionServer.laserLength, LaserDestructionServer.crackingTime);
         }
 
         if (this.isInHole) {
@@ -107,15 +127,20 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
         this.insideAPlayZone = insidePlayZone;
     }
 
-    private void updateInHole() {
+    private void updateInHole(float laserLength, float cracksTime) {
         if (!player.isOnGround() || this.player.isInCreativeMode() || this.player.isSpectator()) {
             this.isInHole = false;
             return;
         }
 
+        float time = 0.0f;
+        if (laserLength >= 1.0) {
+            time = (cracksTime*50) + 5.0f;
+        }
+
         Vec3d playerPos = this.player.getPos();
 
-        float holeSize = (float) (1.0 - Vector2d.distance(-1709, 1575, playerPos.x, playerPos.z)/20.0);
+        float holeSize = (float) (1.0 - Vector2d.distance(-1709, 1575, playerPos.x, playerPos.z)/time);
 
         float noise = Noise.getCrackNoise(new Vec3d(playerPos.x, 4, playerPos.z));
         this.isInHole = noise < holeSize;

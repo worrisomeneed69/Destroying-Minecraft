@@ -18,9 +18,4 @@ public class CracksPostShader extends PostShader {
     public CracksPostShader() {
         super(CRACKS_HOLE_POST, CRACKS_HOLE_SHADER, new LaserDestructionClient());
     }
-
-    @Override
-    public void setUniformsForShader(ShaderProgram shaderProgram, float tickDelta, MinecraftClient client, World clientWorld) {
-
-    }
 }

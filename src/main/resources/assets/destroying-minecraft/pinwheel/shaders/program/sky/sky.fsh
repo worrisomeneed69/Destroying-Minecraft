@@ -160,7 +160,7 @@ float mapLaser(vec3 p, vec3 sunDir) {
     vec3 rayPos = p;
     float length = laserLength * 20000;
 
-    if (length <= 0.0) return 1.0;
+    if (length <= 0.0) return 5000.0;
     rayPos -= vec3(centerPos.x, centerPos.y, centerPos.z);
     float angle = atan2(sunDir.x, sunDir.y);
     rayPos.xy *= rot2D(angle * 180/3.141592);

@@ -37,6 +37,7 @@ public class InvokeDestructionPacket {
                 }
 
                 case orbitalLaserType: {
+                    DestroyingMinecraftClient.cracksPostShader.getDestructionEvent().setActive(on);
                     if (on) DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.ORBITAL_LASER_ANIMATION);
                     break;
                 }

@@ -58,6 +58,7 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
         RenderSystem.disableBlend();
 
         if (time >= 1.0) {
+            currentDestructionTitle.keyframeAnimation().resetAnimation();
             renderTitle = false;
             startTime = -1L;
             currentDestructionTitle = null;

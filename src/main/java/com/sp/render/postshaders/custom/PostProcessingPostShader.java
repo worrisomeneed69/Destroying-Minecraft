@@ -1,6 +1,8 @@
 package com.sp.render.postshaders.custom;
 
 import com.sp.DestroyingMinecraft;
+import com.sp.cca.InitializeComponents;
+import com.sp.cca.custom.entity.PlayerComponent;
 import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.render.BlackScreenManager;
 import com.sp.render.postshaders.PostShader;
@@ -44,6 +46,9 @@ public class PostProcessingPostShader extends PostShader {
 
     @Override
     public void setUniformsForShader(ShaderProgram shaderProgram, float tickDelta, MinecraftClient client, World clientWorld) {
+        if (client.player == null) return;
+        PlayerComponent component = InitializeComponents.PLAYERS.get(client.player);
+
         float farPlane = 100;
         HitResult hitResult = client.getCameraEntity().raycast(farPlane, tickDelta, true);
 
@@ -55,6 +60,6 @@ public class PostProcessingPostShader extends PostShader {
         BetterUniforms.setFloat(shaderProgram, "centerDepth", this.smoothDepth);
 
         BetterUniforms.setInt(shaderProgram, "enabledDepthOfField", DestroyingMinecraftConfig.enableDepthOfField ? 1 : 0);
-        BetterUniforms.setInt(shaderProgram, "enabledBlackScreen", BlackScreenManager.isIsBlackScreen() ? 1 : 0);
+        BetterUniforms.setInt(shaderProgram, "enabledBlackScreen", BlackScreenManager.isIsBlackScreen() || component.isInWaitingRoom() ? 1 : 0);
     }
 }

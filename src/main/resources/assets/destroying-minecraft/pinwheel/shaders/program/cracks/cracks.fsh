@@ -13,8 +13,8 @@ uniform sampler2D DirtTexture;
 uniform sampler2D CracksTexture;
 
 uniform float GameTime;
-uniform float flashTimer;
-uniform float smokeRiseTimer;
+uniform float laserLength;
+uniform float cracksTime;
 
 in vec2 texCoord;
 out vec4 fragColor;
@@ -34,7 +34,12 @@ float getNoise(vec3 pos, float HOLE_SIZE) {
 
 float map(vec3 p) {
     vec3 rayPos = p;
-    float d = sdInfCylinder(rayPos - vec3(centerPos.x, 0, centerPos.y), vec3(0, 0, 0.5));
+//    float length = (sin(GameTime*2000) * 0.5 + 0.5) * 1000;
+    float length = laserLength * 520;
+
+    if (length <= 0.0) return 5000.0;
+    float d = sdCylinder(rayPos - vec3(centerPos.x, 500, centerPos.y), length, 0.5);
+//    float d = sdInfCylinder(rayPos - vec3(centerPos.x, 0, centerPos.y), vec3(0, 0, 0.5));
     d -= (sin(p.y*1 + rand(vec2(GameTime*1000, 745))*100)*0.5 + 0.5)*0.1;
     return d;
 
@@ -75,7 +80,11 @@ void main() {
 
         worldPos.y = 4;
 //        float time = abs(sin(GameTime*200)) * 100.0;
-        float time = 20.0;
+        float time = 0.0;
+        if (laserLength >= 1.0) {
+            time = (cracksTime*50) + 5.0;
+        }
+//        float time = cracksTime + 5.0;
 //        float holeSize = smoothstep(0, (100 - time)*0.1, 1 - distance(centerPos, worldPos.xz)/time);
         float holeSize = pow(1 - distance(centerPos, worldPos.xz)/time, 1);
         float noise = getNoise(worldPos, holeSize);
@@ -117,7 +126,7 @@ void main() {
 
     vec3 playerPos = screenToLocalSpace(texCoord, depth).xyz;
 
-//    rayMarchLaser(color, playerPos, cracks, crackDepth);
+    rayMarchLaser(color, playerPos, cracks, crackDepth);
 
 
     fragColor = vec4(color, 1.0);

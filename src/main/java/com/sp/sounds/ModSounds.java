@@ -9,6 +9,7 @@ import net.minecraft.util.Identifier;
 public class ModSounds {
 
     public static final SoundEvent WALKIE_TALKIE = registerSoundEvent("walkie_talkie");
+    public static final SoundEvent WAITING_ROOM_HIT = registerSoundEvent("waiting_room_hit");
 
     public static final SoundEvent DOOR_OPEN = registerSoundEvent("door_open");
     public static final SoundEvent DOOR_OPENING_LOOP = registerSoundEvent("door_opening_loop");
@@ -49,6 +50,12 @@ public class ModSounds {
     public static final SoundEvent BLACK_HOLE_BRAAM_FINAL = registerSoundEvent("black_hole_braam_final");
 
     public static final SoundEvent COUNT_DOWN = registerSoundEvent("count_down");
+
+    public static final SoundEvent LASER_CRACKING_INITIAL = registerSoundEvent("laser_cracking_initial");
+    public static final SoundEvent LASER_CRACKING_LOOP = registerSoundEvent("laser_cracking_loop");
+    public static final SoundEvent LASER_LANDING = registerSoundEvent("laser_landing");
+    public static final SoundEvent LASER_LOOP = registerSoundEvent("laser_loop");
+    public static final SoundEvent LAVA_DEATH = registerSoundEvent("lava_death");
 
     private static SoundEvent registerSoundEvent(String name) {
         Identifier id = DestroyingMinecraft.idOf(name);

@@ -149,6 +149,7 @@ public class DestructionCommand {
         switch (type) {
             case planetType -> DestroyingMinecraft.planetServerDestruction.setActive(start);
             case supernovaType -> DestroyingMinecraft.supernovaServerDestruction.setActive(start);
+            case orbitalLaserType -> DestroyingMinecraft.laserDestruction.setActive(start);
         }
         return 1;
     }

@@ -18,6 +18,7 @@ import com.sp.render.*;
 import com.sp.render.camerashake.CameraShakeManager;
 import com.sp.render.gui.hud.DestructionTitleRenderCallback;
 import com.sp.render.gui.hud.PlayZoneWarningRenderCallback;
+import com.sp.render.gui.hud.WaitingRoomRenderCallback;
 import com.sp.render.postshaders.PostShader;
 import com.sp.render.postshaders.custom.*;
 import com.sp.util.RenderUtil;
@@ -37,6 +38,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.navigation.GuiNavigationType;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
@@ -64,12 +66,12 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 	private static final Set<Identifier> removedPipelines = new HashSet<>(1);
 
 	private static boolean enabledDynamicBuffers = false;
-//	public static boolean inHole;
 
 	@Override
 	public void onInitializeClient() {
 		HudRenderCallback.EVENT.register(new DestructionTitleRenderCallback());
 		HudRenderCallback.EVENT.register(new PlayZoneWarningRenderCallback());
+		HudRenderCallback.EVENT.register(new WaitingRoomRenderCallback());
 
 		InitializePackets.registerClientNetworking();
 		ClientTickInstances.registerAllClientTickInstances();

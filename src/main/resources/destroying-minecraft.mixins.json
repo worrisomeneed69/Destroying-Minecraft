@@ -5,6 +5,7 @@
   "mixins": [
     "ForceRenderPlayerMixin",
     "PlayZoneMixin",
+    "StopPlayerMovementMixin",
     "collision.IsGroundedCheckMixin",
     "collision.PlatformCollisionMixin",
     "collision.SneakFixMixinOnPlatforms",

@@ -172,5 +172,35 @@
     "sounds": [
       "destroying-minecraft:count_down"
     ]
+  },
+  "laser_cracking_initial": {
+    "sounds": [
+      "destroying-minecraft:cracks/laser_cracking_initial"
+    ]
+  },
+  "laser_cracking_loop": {
+    "sounds": [
+      "destroying-minecraft:cracks/laser_cracking_loop"
+    ]
+  },
+  "laser_landing": {
+    "sounds": [
+      "destroying-minecraft:cracks/laser_landing"
+    ]
+  },
+  "laser_loop": {
+    "sounds": [
+      "destroying-minecraft:cracks/laser_loop"
+    ]
+  },
+  "lava_death": {
+    "sounds": [
+      "destroying-minecraft:cracks/lava_death"
+    ]
+  },
+  "waiting_room_hit": {
+    "sounds": [
+      "destroying-minecraft:waiting_room_hit"
+    ]
   }
 }
