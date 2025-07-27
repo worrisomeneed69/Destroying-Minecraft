@@ -15,7 +15,6 @@
     "layingdown.LyingDownPlayerEntityMixin",
     "layingdown.SetLayingDownDirectionMixin",
     "layingdown.SetSleepingPoseMixin",
-    "materialsampler.linux.LinuxFix2Mixin",
     "materialsampler.linux.LinuxFixMixin",
     "multipledeathvariants.DamageTrackerMixin",
     "multipledeathvariants.DeathMessageTypeMixin"

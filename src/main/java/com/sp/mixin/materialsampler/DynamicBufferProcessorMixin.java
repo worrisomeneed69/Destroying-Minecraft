@@ -25,6 +25,7 @@ import io.github.ocelot.glslprocessor.api.visitor.GlslNodeStringWriter;
 import io.github.ocelot.glslprocessor.lib.anarres.cpp.LexerException;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormatElement;
+import org.lwjgl.opengl.GLDebugMessageCallback;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -179,20 +180,19 @@ public class DynamicBufferProcessorMixin {
                 }
 
                 if (type == CustomDynamicBuffers.MATERIAL_BUFFER && !markers.containsKey("veil:" + CustomDynamicBuffers.MATERIAL_BUFFER.getName())) {
-
                     if ("rendertype_entity_cutout_no_cull".equals(shaderName) || "rendertype_entity_translucent".equals(shaderName) || "rendertype_entity_solid".equals(shaderName)) {
                         if (ctx.isFragment()) {
 //                            if (inVertex) {
 //                                treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression("in int material"));
                                 treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression(output));
-                                mainFunctionBody.add(new GlslAssignmentNode(new GlslVariableNode(sourceName), GlslParser.parseExpression("1.0"), GlslAssignmentNode.Operand.EQUAL));
+                                mainFunctionBody.add(new GlslAssignmentNode(new GlslVariableNode(sourceName), GlslParser.parseExpression("ivec4(1, 0, 0, 1)"), GlslAssignmentNode.Operand.EQUAL));
                                 modified = true;
 //                            }
                         }
                     } else if ("particle".equals(shaderName)) {
                         if (ctx.isFragment()) {
                             treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression(output));
-                            mainFunctionBody.add(new GlslAssignmentNode(new GlslVariableNode(sourceName), GlslParser.parseExpression("1.0"), GlslAssignmentNode.Operand.EQUAL));
+                            mainFunctionBody.add(new GlslAssignmentNode(new GlslVariableNode(sourceName), GlslParser.parseExpression("ivec4(1, 0, 0, 1)"), GlslAssignmentNode.Operand.EQUAL));
                             modified = true;
 //                            }
                         }
