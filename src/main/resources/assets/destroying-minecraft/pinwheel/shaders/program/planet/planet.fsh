@@ -97,7 +97,7 @@ float lowQualityMap(vec3 rayPos) {
     return min(planet, asteroid);
 }
 
-void displacePlanet(in out vec3 outColor, int iterations, in out Ray ray) {
+void displacePlanet(inout vec3 outColor, int iterations, inout Ray ray) {
     vec3 step = ray.direction * 20;
     float depth = 0.0;
     bool inHole = false;
@@ -132,7 +132,7 @@ void displacePlanet(in out vec3 outColor, int iterations, in out Ray ray) {
     outColor = inHole ? crackWallColor * laveColor : outColor;
 }
 
-void rayMarchShadows(in out vec3 outColor, int iterations, in out Ray ray) {
+void rayMarchShadows(inout vec3 outColor, int iterations, inout Ray ray) {
     ray.origin = ray.rayPos + ray.normal *20;
     ray.direction = LIGHT_DIR;
     float dist = 0;
@@ -155,7 +155,7 @@ void rayMarchShadows(in out vec3 outColor, int iterations, in out Ray ray) {
 
 }
 
-void rayMarch(in out vec3 outColor, int iterations, in out Ray ray) {
+void rayMarch(inout vec3 outColor, int iterations, inout Ray ray) {
     float dist = 0.0;
 
     for (int i = 0; i < iterations; i++) {

@@ -40,7 +40,7 @@ float map(vec3 p) {
 
 }
 
-void rayMarchLaser(in out vec3 color, vec3 playerPos, bool cracks, float crackDepth) {
+void rayMarchLaser(inout vec3 color, vec3 playerPos, bool cracks, float crackDepth) {
     vec3 rayOrigin = VeilCamera.CameraPosition + VeilCamera.CameraBobOffset;
     vec3 rayDir = viewDirFromUv(texCoord);
     float dist = 0.0;

@@ -14,7 +14,7 @@ uniform vec3 offset;
 out vec2 texCoord;
 out vec3 normal;
 out float brightness;
-out int textureType;
+flat out int textureType;
 
 // Thanks to https://www.shadertoy.com/view/WttXWX
 uint triple32(uint x) {

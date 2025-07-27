@@ -28,7 +28,7 @@ out float vertexDistance;
 out vec4 vertexColor;
 out vec4 lightMapColor;
 out vec3 normal;
-out ivec2 lightUV;
+flat out ivec2 lightUV;
 out vec2 texCoord0;
 
 vec3 distort(in vec3 shadowPosition) {

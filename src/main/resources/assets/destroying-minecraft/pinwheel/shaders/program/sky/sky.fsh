@@ -170,7 +170,7 @@ float mapLaser(vec3 p, vec3 sunDir) {
     return d;
 }
 
-void rayMarchLaser(in out vec3 color, vec3 playerPos, vec3 sunDir) {
+void rayMarchLaser(inout vec3 color, vec3 playerPos, vec3 sunDir) {
     vec3 rayOrigin = VeilCamera.CameraPosition + VeilCamera.CameraBobOffset;
     vec3 rayDir = viewDirFromUv(texCoord);
     float dist = 0.0;

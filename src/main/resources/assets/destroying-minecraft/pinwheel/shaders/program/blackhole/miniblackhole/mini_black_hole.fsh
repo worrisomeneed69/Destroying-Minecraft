@@ -1,5 +1,4 @@
 #veil:buffer veil:camera VeilCamera
-#include destroying-minecraft:ray_march
 #include destroying-minecraft:noise
 #include veil:space_helper
 #include veil:blend
@@ -27,7 +26,7 @@ struct Ray {
 
 // Thanks to https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
 // https://www.scratchapixel.com/images/ray-simple-shapes/raysphereisect1.png
-void intersectsSphere(in out Ray ray, vec2 uv, vec3 sphereCenter, float sphereRadius) {
+void intersectsSphere(inout Ray ray, vec2 uv, vec3 sphereCenter, float sphereRadius) {
     vec3 rayOrigin = VeilCamera.CameraPosition + VeilCamera.CameraBobOffset;
     vec3 rayDir = viewDirFromUv(uv);
 

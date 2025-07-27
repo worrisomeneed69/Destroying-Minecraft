@@ -73,7 +73,7 @@ vec3 getNormal(vec3 p) {
 }
 
 // Ray marching function
-void rayMarch(in out vec3 color, out vec3 normal, vec2 screenUv, in out bool hit) {
+void rayMarch(inout vec3 color, out vec3 normal, vec2 screenUv, inout bool hit) {
     vec3 ro = worldPos;
     vec3 rayDir = viewDirFromUv(screenUv).xyz;
     float dist = 0.0;
