@@ -185,14 +185,14 @@ public class DynamicBufferProcessorMixin {
 //                            if (inVertex) {
 //                                treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression("in int material"));
                                 treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression(output));
-                                mainFunctionBody.add(new GlslAssignmentNode(new GlslVariableNode(sourceName), GlslParser.parseExpression("ivec4(1.0, 0.0, 0.0, 1.0)"), GlslAssignmentNode.Operand.EQUAL));
+                                mainFunctionBody.add(new GlslAssignmentNode(new GlslVariableNode(sourceName), GlslParser.parseExpression("1.0"), GlslAssignmentNode.Operand.EQUAL));
                                 modified = true;
 //                            }
                         }
                     } else if ("particle".equals(shaderName)) {
                         if (ctx.isFragment()) {
                             treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression(output));
-                            mainFunctionBody.add(new GlslAssignmentNode(new GlslVariableNode(sourceName), GlslParser.parseExpression("ivec4(1.0, 0.0, 0.0, 1.0)"), GlslAssignmentNode.Operand.EQUAL));
+                            mainFunctionBody.add(new GlslAssignmentNode(new GlslVariableNode(sourceName), GlslParser.parseExpression("1.0"), GlslAssignmentNode.Operand.EQUAL));
                             modified = true;
 //                            }
                         }

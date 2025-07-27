@@ -21,7 +21,7 @@ public abstract class DynamicBufferTypeMixin {
     @Mutable
     private static DynamicBufferType[] $VALUES;
 
-    private static final DynamicBufferType MATERIAL = CustomDynamicBuffers.MATERIAL_BUFFER = addVariant("Material",GlslTypeSpecifier.BuiltinType.IVEC4, FramebufferAttachmentDefinition.Format.R8UI);
+    private static final DynamicBufferType MATERIAL = CustomDynamicBuffers.MATERIAL_BUFFER = addVariant("Material",GlslTypeSpecifier.BuiltinType.FLOAT, FramebufferAttachmentDefinition.Format.R8);
     private static final DynamicBufferType BLOOM = CustomDynamicBuffers.BLOOM_BUFFER = addVariant("Bloom",GlslTypeSpecifier.BuiltinType.VEC3, FramebufferAttachmentDefinition.Format.R11F_G11F_B10F);
 
     @Shadow

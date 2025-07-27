@@ -35,15 +35,15 @@ public class SodiumShaderPreProcessorMixin {
             String tempOutput = "layout(location = " + (1 + i) + ") out " + writer + " " + sourceName;
             if (ctx.isVertex()) {
 //                treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression("flat in int Material"));
-                treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression("flat out int material"));
-                mainBody.add(GlslParser.parseExpression("material = 2"));
+                treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression("out float material"));
+                mainBody.add(GlslParser.parseExpression("material = 2.0"));
                 modified = true;
             }
 
             if (ctx.isFragment()) {
-                treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression("flat in int material"));
+                treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression("in float material"));
                 treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression(tempOutput));
-                mainBody.add(1, GlslParser.parseExpression(sourceName + " = ivec4(material, 0, 0, 1)"));
+                mainBody.add(1, GlslParser.parseExpression(sourceName + " = material"));
                 modified = true;
             }
         }
