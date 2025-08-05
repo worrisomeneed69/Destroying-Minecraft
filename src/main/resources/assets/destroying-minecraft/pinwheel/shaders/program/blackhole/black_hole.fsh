@@ -45,7 +45,6 @@ float mapDisk(vec3 rayPos, vec3 spherePos) {
 
     float centerHole = sdCylinder(rotatedRayPos, 0.035, BH_SIZE + 0.45);
     float disk = sdCylinder(rotatedRayPos, 0.03, DISK_RADIUS);
-//    float centerDisk = sdRoundedCylinder();
 
     return opSubtraction(centerHole, disk);
 }

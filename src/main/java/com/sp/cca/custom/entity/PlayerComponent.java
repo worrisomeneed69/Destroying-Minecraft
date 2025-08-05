@@ -10,8 +10,6 @@ import com.sp.render.BlackScreenManager;
 import com.sp.sounds.ModSounds;
 import com.sp.util.Noise;
 import com.sp.world.playzone.PlayZoneManager;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.navigation.GuiNavigationType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
@@ -83,7 +81,15 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
             for (int i = 0; i < 100; i++) {
                 double d = this.player.getRandom().nextGaussian() * 0.2;
                 double f = this.player.getRandom().nextGaussian() * 0.2;
-                this.player.getWorld().addParticle(ParticleTypes.POOF, this.player.getParticleX(1.0), this.player.getRandomBodyY(), this.player.getParticleZ(1.0), d, 0, f);
+                this.player.getWorld().addParticle(
+                        ParticleTypes.POOF,
+                        this.player.getParticleX(1.0),
+                        this.player.getRandomBodyY(),
+                        this.player.getParticleZ(1.0),
+                        d,
+                        0,
+                        f
+                );
             }
             spawnedEvaporateParticles = true;
         } else if(!this.isInHole) {

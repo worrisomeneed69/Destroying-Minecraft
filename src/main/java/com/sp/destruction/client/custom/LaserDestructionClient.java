@@ -10,6 +10,8 @@ import com.sp.util.keyframes.Keyframe;
 import com.sp.util.keyframes.KeyframeAnimation;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.client.util.Easing;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.sound.SoundInstance;
@@ -17,6 +19,7 @@ import net.minecraft.client.sound.SoundManager;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.world.World;
 
+@Environment(EnvType.CLIENT)
 public class LaserDestructionClient extends ClientDestructionEvent {
     public static final ShaderTimer laserLength = new ShaderTimer();
     public static final ShaderTimer cracksTime = new ShaderTimer();
@@ -66,13 +69,11 @@ public class LaserDestructionClient extends ClientDestructionEvent {
                 new Keyframe(478.0 / this.duration, () ->{
 
                 }, (globalTime, localTime) -> {
-                    laserLength.setPrevTimer();
                     laserLength.setTimer((float) localTime);
                 }),
 
                 new Keyframe(484.0 / this.duration, () ->{
                     laserLength.setTimer(1.0f);
-                    laserLength.setPrevTimer();
                     laserLoop =  new PositionedSoundInstance(
                             ModSounds.LASER_LOOP.getId(),
                             SoundCategory.AMBIENT,
@@ -138,7 +139,6 @@ public class LaserDestructionClient extends ClientDestructionEvent {
                     );
                     CameraShakeManager.addCameraShake(cameraShakeInstance);
                 }, (globalTime, localTime) -> {
-                    cracksTime.setPrevTimer();
                     cracksTime.setTimer((float) localTime);
                 })
         );

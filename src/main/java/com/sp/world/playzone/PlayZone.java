@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PlayZone {
     private final Box boundingBox;
     private static final AtomicInteger CURRENT_ID = new AtomicInteger();
-    private int id;
+    private final int id;
 
     public PlayZone(BlockPos position1, BlockPos position2) {
         this(Box.enclosing(position1, position2));

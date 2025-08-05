@@ -13,8 +13,13 @@ import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 @Environment(EnvType.CLIENT)
@@ -49,14 +54,34 @@ public class PostProcessingPostShader extends PostShader {
         if (client.player == null) return;
         PlayerComponent component = InitializeComponents.PLAYERS.get(client.player);
 
-        float farPlane = 100;
-        HitResult hitResult = client.getCameraEntity().raycast(farPlane, tickDelta, true);
+        float farPlane = 10000;
 
-        float depth = (float) client.getCameraEntity().getEyePos().distanceTo(hitResult.getPos()) / farPlane;
+        Vec3d vec3d = client.player.getCameraPosVec(tickDelta);
+        Vec3d vec3d2 = client.player.getRotationVec(tickDelta);
+        Vec3d vec3d3 = vec3d.add(vec3d2.x * farPlane, vec3d2.y * farPlane, vec3d2.z * farPlane);
+        HitResult hitResult = client.player.getWorld()
+                .raycast(
+                        new RaycastContext(
+                                vec3d, vec3d3, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.ANY, client.player
+                        )
+                );
+
+        Box box = client.player.getBoundingBox().stretch(vec3d2).expand(100.0, 1000.0, 1000.0);
+        EntityHitResult entityHitResult = ProjectileUtil.raycast(client.player, vec3d, vec3d3, box, entity -> true, farPlane);
+
+        Vec3d closestDistance;
+        if (entityHitResult == null) {
+            closestDistance = hitResult.getPos();
+        } else if (entityHitResult.getPos().length() > hitResult.getPos().length()) {
+            closestDistance = hitResult.getPos();
+        } else {
+            closestDistance = entityHitResult.getPos();
+        }
+
+        float depth = (float) client.getCameraEntity().getEyePos().distanceTo(closestDistance) / 100;
 
         //Smooths down the Depth at the crosshair so it gives a "not so instant" autofocus effect
-        this.smoothDepth = MathUtil.Lerp(this.smoothDepth, depth, DestroyingMinecraftConfig.autoFocusTime, MinecraftClient.getInstance().getRenderTickCounter().getLastFrameDuration());
-
+        this.smoothDepth = MathUtil.Lerp(this.smoothDepth, depth, 0.0f, MinecraftClient.getInstance().getRenderTickCounter().getLastFrameDuration());
         BetterUniforms.setFloat(shaderProgram, "centerDepth", this.smoothDepth);
 
         BetterUniforms.setInt(shaderProgram, "enabledDepthOfField", DestroyingMinecraftConfig.enableDepthOfField ? 1 : 0);

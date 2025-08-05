@@ -16,10 +16,7 @@ import net.minecraft.util.math.Vec3d;
 import org.joml.Quaternionf;
 
 public enum BlockType {
-    SINGLE(BlockType::renderSingle),
-    PIG(BlockType::renderPig),
-    COW(BlockType::renderCow),
-    CHICKEN(BlockType::renderChicken);
+    SINGLE(BlockType::renderSingle);
 //    DOUBLE(BlockType::renderDouble),
 //    TRIPLE(BlockType::renderTriple);
 
@@ -47,30 +44,6 @@ public enum BlockType {
         blockRenderManager.renderBlockAsEntity(component.getBlockState(), matrices, vertexConsumers, light, OverlayTexture.DEFAULT_UV);
         matrices.scale(1/scale, 1/scale, 1/scale);
         matrices.translate(halfScale, halfScale, halfScale);
-    }
-
-    private static void renderPig(BlockRenderManager blockRenderManager, EntityRenderDispatcher entityRenderDispatcher, SpinningBlockEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        Vec3d cameraPos = startRenderingAnimal(entityRenderDispatcher, entity, tickDelta, matrices);
-
-        PigEntity pig = EntityType.PIG.create(entity.getWorld());
-        entityRenderDispatcher.render(pig, entity.getX() - cameraPos.x, entity.getY() - cameraPos.y, entity.getZ() - cameraPos.z, yaw, tickDelta, matrices, vertexConsumers, 14 << 20);
-        pig.discard();
-    }
-
-    private static void renderCow(BlockRenderManager blockRenderManager, EntityRenderDispatcher entityRenderDispatcher, SpinningBlockEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        Vec3d cameraPos = startRenderingAnimal(entityRenderDispatcher, entity, tickDelta, matrices);
-
-        CowEntity cow = EntityType.COW.create(entity.getWorld());
-        entityRenderDispatcher.render(cow, entity.getX() - cameraPos.x, entity.getY() - cameraPos.y, entity.getZ() - cameraPos.z, yaw, tickDelta, matrices, vertexConsumers, 14 << 20);
-        cow.discard();
-    }
-
-    private static void renderChicken(BlockRenderManager blockRenderManager, EntityRenderDispatcher entityRenderDispatcher, SpinningBlockEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        Vec3d cameraPos = startRenderingAnimal(entityRenderDispatcher, entity, tickDelta, matrices);
-
-        ChickenEntity chicken = EntityType.CHICKEN.create(entity.getWorld());
-        entityRenderDispatcher.render(chicken, entity.getX() - cameraPos.x, entity.getY() - cameraPos.y, entity.getZ() - cameraPos.z, yaw, tickDelta, matrices, vertexConsumers, 14 << 20);
-        chicken.discard();
     }
 
     private static Vec3d startRenderingAnimal(EntityRenderDispatcher entityRenderDispatcher, SpinningBlockEntity entity, float tickDelta, MatrixStack matrices) {

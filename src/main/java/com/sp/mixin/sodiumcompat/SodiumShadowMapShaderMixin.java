@@ -3,8 +3,6 @@ package com.sp.mixin.sodiumcompat;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.sp.DestroyingMinecraft;
 import com.sp.render.PerspectiveRenderer;
-import com.sp.render.ShadowMapRenderer;
-import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.caffeinemc.mods.sodium.client.gl.shader.*;
 import net.caffeinemc.mods.sodium.client.render.chunk.ShaderChunkRenderer;
@@ -20,8 +18,6 @@ import java.util.Map;
 
 @Mixin(value = ShaderChunkRenderer.class, remap = false)
 public abstract class SodiumShadowMapShaderMixin {
-    @Unique GlProgram<ChunkShaderInterface> shadowProgram;
-
     @Shadow protected abstract GlProgram<ChunkShaderInterface> compileProgram(ChunkShaderOptions options);
 
     @Unique

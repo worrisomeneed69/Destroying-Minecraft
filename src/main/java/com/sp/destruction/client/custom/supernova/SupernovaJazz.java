@@ -6,11 +6,14 @@ import com.sp.sounds.ModSounds;
 import com.sp.util.keyframes.Keyframe;
 import com.sp.util.keyframes.KeyframeAnimation;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.sound.SoundManager;
 import net.minecraft.world.World;
 
+@Environment(EnvType.CLIENT)
 public class SupernovaJazz extends ClientDestructionEvent {
     public SupernovaJazz() {
         super(400);

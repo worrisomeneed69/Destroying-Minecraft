@@ -55,13 +55,11 @@ public class BlackHoleDestructionClientPart1 extends ClientDestructionEvent {
                 }),
 
                 new Keyframe(220.0 / this.duration, (globalTime, localTime) -> {
-                        flashTimer.setPrevTimer();
                         flashTimer.setTimer((float) localTime);
                     }
                 ),
 
                 new Keyframe(333.0 / this.duration, (globalTime, localTime) -> {
-                        flashTimer.setPrevTimer();
                         flashTimer.setTimer((float) Math.min(0.986f + localTime * 0.1f, 1.0f));
                     }
                 )

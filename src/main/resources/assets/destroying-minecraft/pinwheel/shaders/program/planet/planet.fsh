@@ -6,6 +6,7 @@
 
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DiffuseDepthSampler;
+uniform sampler2D HandDepthSampler;
 uniform isampler2D MaterialSampler;
 uniform sampler2D PlanetColor;
 uniform sampler2D PebbleDepth;
@@ -220,10 +221,14 @@ void main() {
         fragColor = mainTexture;
     }
 
-    if (material == 5) {
-        fragColor *= 10;
-    } else if (material == 6) {
-        fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    float handDepth = texture(HandDepthSampler, texCoord).r;
+
+    if (handDepth >= 1.0) {
+        if (material == 5) {
+            fragColor *= 10;
+        } else if (material == 6) {
+            fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        }
     }
 
 

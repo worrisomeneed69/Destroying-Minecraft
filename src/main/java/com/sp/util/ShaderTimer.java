@@ -6,16 +6,13 @@ public class ShaderTimer {
     private float timer;
     private float prevTimer;
 
-    public void setTimer(float timer){
+    public void setTimer(float timer) {
+        this.prevTimer = this.timer;
         this.timer = timer;
     }
 
     public void maxTimer(){
         this.timer = 1.0f;
-    }
-
-    public void setPrevTimer() {
-        this.prevTimer = this.timer;
     }
 
     public void reset(){

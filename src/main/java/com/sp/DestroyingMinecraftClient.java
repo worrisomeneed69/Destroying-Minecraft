@@ -38,9 +38,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.navigation.GuiNavigationType;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -88,7 +86,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 		BlockEntityRendererFactories.register(ModBlockEntities.VOID_BE, VoidBlockEntityRenderer::new);
 		BlockEntityRendererFactories.register(ModBlockEntities.PHYSICS_DOOR_BE, PhysicsDoorBlockRenderer::new);
 
-		VeilEventPlatform.INSTANCE.onVeilRenderLevelStage(((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, renderTick, deltaTracker, camera, frustum) -> {
+		VeilEventPlatform.INSTANCE.onVeilRenderLevelStage((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, renderTick, deltaTracker, camera, frustum) -> {
 			MinecraftClient client = MinecraftClient.getInstance();
 			World clientWorld = client.world;
 			RenderSystem.disableDepthTest();
@@ -97,68 +95,68 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 				client.options.hudHidden = true;
 			}
 
-			if(clientWorld != null && !PerspectiveRenderer.isRenderingPerspective()) {
-				switch (stage) {
-					case AFTER_LEVEL -> {
-						//Only render the shadow map with shaders that need it
-						if (camera != null) {
-							ShadowMapRenderer.renderShadowMap(camera);
-						}
+			if(clientWorld == null || PerspectiveRenderer.isRenderingPerspective()) return;
 
-						//Remove all the shaders currently in the pipeline then add back the ones we need in their specific order
-						//Only update when the shaderType changes
-						if(prevShaderType != DestroyingMinecraftConfig.shaderType) {
-							this.updatePostShader();
-							prevShaderType = DestroyingMinecraftConfig.shaderType;
-						}
-					}
-					case AFTER_SKY -> {
-						if (this.blockInstanceRenderer == null) {
-							this.blockInstanceRenderer = new BlockInstanceRenderer();
-						}
-
-						//Only render the black hole terrain when rendering the black hole
-						if (DestroyingMinecraftConfig.shaderType == ShaderType.BLACK_HOLE) {
-							blockInstanceRenderer.render();
-						}
+			switch (stage) {
+				case AFTER_LEVEL -> {
+					//Only render the shadow map with shaders that need it
+					if (camera != null) {
+						ShadowMapRenderer.renderShadowMap(camera);
 					}
 
-					case AFTER_WEATHER -> {
-						if(shouldRenderDebug) {
-							BlackHoleDestruction.renderSelectionDebug(matrixStack.toPoseStack(), bufferSource, camera, frustum);
+					//Remove all the shaders currently in the pipeline then add back the ones we need in their specific order
+					//Only update when the shaderType changes
+					if(prevShaderType != DestroyingMinecraftConfig.shaderType) {
+						this.updatePostShader();
+						prevShaderType = DestroyingMinecraftConfig.shaderType;
+					}
+				}
+				case AFTER_SKY -> {
+					if (this.blockInstanceRenderer == null) {
+						this.blockInstanceRenderer = new BlockInstanceRenderer();
+					}
 
-							Vector<PlayZone> activePlayZones = PlayZoneManager.getActivePlayZones();
-							if (!activePlayZones.isEmpty() && client.player != null) {
-								for (PlayZone playZone : activePlayZones) {
-									boolean inside = playZone.isPositionInsideZone(client.player.pos);
-									int[] colors = new int[4];
-									colors[0] = inside ? 50 : 255;  //RED
-									colors[1] = inside ? 255 : 50;  //GREEN
-									colors[2] = 50;                 //BLUE
-									colors[3] = 100;                 //ALPHA
+					//Only render the black hole terrain when rendering the black hole
+					if (DestroyingMinecraftConfig.shaderType == ShaderType.BLACK_HOLE) {
+						blockInstanceRenderer.render();
+					}
+				}
 
-									RenderUtil.drawBox(
-											matrixStack.toPoseStack(),
-											bufferSource,
-											playZone.getBoundingBox().offset(camera.getPos().negate()),
-											colors[0],
-											colors[1],
-											colors[2],
-											colors[3],
-											true,
-											playZone.isPositionInsideZone(camera.getPos())
-									);
+				case AFTER_WEATHER -> {
+					if(shouldRenderDebug) {
+						BlackHoleDestruction.renderSelectionDebug(matrixStack.toPoseStack(), bufferSource, camera, frustum);
 
-								}
+						Vector<PlayZone> activePlayZones = PlayZoneManager.getActivePlayZones();
+						if (!activePlayZones.isEmpty() && client.player != null) {
+							for (PlayZone playZone : activePlayZones) {
+								boolean inside = playZone.isPositionInsideZone(client.player.pos);
+								int[] colors = new int[4];
+								colors[0] = inside ? 50 : 255;  //RED
+								colors[1] = inside ? 255 : 50;  //GREEN
+								colors[2] = 50;                 //BLUE
+								colors[3] = 100;                //ALPHA
+
+								RenderUtil.drawBox(
+										matrixStack.toPoseStack(),
+										bufferSource,
+										playZone.getBoundingBox().offset(camera.getPos().negate()),
+										colors[0],
+										colors[1],
+										colors[2],
+										colors[3],
+										true,
+										playZone.isPositionInsideZone(camera.getPos())
+								);
+
 							}
 						}
-
-						SelectionHandler.renderSelection(matrixStack.toPoseStack(), bufferSource, deltaTracker, camera);
 					}
+
+					SelectionHandler.renderSelection(matrixStack.toPoseStack(), bufferSource, deltaTracker, camera);
 				}
 			}
 
-		}));
+		});
 
 		//Set the uniforms for all the post shaders
 		VeilEventPlatform.INSTANCE.preVeilPostProcessing((name, pipeline, context) -> {
@@ -175,7 +173,6 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 				}
 			}
-
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register((clientPlayNetworkHandler, minecraftClient) -> {
@@ -195,8 +192,6 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 		ClientTickEvents.END_WORLD_TICK.register(clientWorld -> {
 			SelectionHandler.tickClientWorld(clientWorld);
-
-			PlayerEntity player = MinecraftClient.getInstance().player;
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register((clientPlayNetworkHandler, minecraftClient) -> {

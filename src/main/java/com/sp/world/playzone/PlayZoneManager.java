@@ -10,10 +10,9 @@ import java.util.Vector;
 
 public class PlayZoneManager {
     private static final Vector<PlayZone> activePlayZones = new Vector<>();
-    private static boolean dirty;
 
     public static void addPlayZone(World world, PlayZone playZone) {
-        if (!activePlayZones.stream().anyMatch(playZone1 -> playZone1.getId() == playZone.getId())) {
+        if (activePlayZones.stream().noneMatch(playZone1 -> playZone1.getId() == playZone.getId())) {
             activePlayZones.add(playZone);
         }
 
@@ -37,7 +36,6 @@ public class PlayZoneManager {
             }
         }
         InitializeComponents.EVENTS.get(world).sync();
-        System.out.println(playZonesRemoved);
         return playZonesRemoved;
     }
 
@@ -56,13 +54,5 @@ public class PlayZoneManager {
 
     public static Vector<PlayZone> getActivePlayZones() {
         return (Vector<PlayZone>) activePlayZones.clone();
-    }
-
-    public static void markDirty(boolean isDirty) {
-        dirty = isDirty;
-    }
-
-    public static boolean isDirty() {
-        return dirty;
     }
 }

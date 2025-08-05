@@ -1,10 +1,8 @@
 package com.sp.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.sp.mixin.WorldRendererAccessor;
-import com.sp.mixininterfaces.CullingDataCache;
+import com.moulberry.flashback.editor.ui.ReplayUI;
 import foundry.veil.api.client.render.CameraMatrices;
-import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.compat.SodiumCompat;
@@ -15,7 +13,6 @@ import foundry.veil.mixin.perspective.accessor.GameRendererAccessor;
 import foundry.veil.mixin.perspective.accessor.LevelRendererAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
-import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.hit.HitResult;
@@ -38,6 +35,9 @@ public class PerspectiveRenderer {
     private static final Matrix4f BACKUP_PROJECTION = new Matrix4f();
     private static final Vector3f BACKUP_LIGHT0_POSITION = new Vector3f();
     private static final Vector3f BACKUP_LIGHT1_POSITION = new Vector3f();
+
+    private static final Matrix4f BACKUP_FLASHBACK_PROJECTION = new Matrix4f();
+    private static final Quaternionf BACKUP_FLASHBACK_CAMERA = new Quaternionf();
 
     private static boolean renderingPerspective = false;
 
@@ -63,7 +63,6 @@ public class PerspectiveRenderer {
         final GameRenderer gameRenderer = minecraft.gameRenderer;
         final WorldRenderer levelRenderer = minecraft.worldRenderer;
         final LevelRendererAccessor levelRendererAccessor = (LevelRendererAccessor) levelRenderer;
-        final Window window = minecraft.getWindow();
         final GameRendererAccessor accessor = (GameRendererAccessor) gameRenderer;
         final RenderTargetExtension renderTargetExtension = (RenderTargetExtension) minecraft.getFramebuffer();
         final MatrixStack poseStack = new MatrixStack();
@@ -80,10 +79,8 @@ public class PerspectiveRenderer {
         float backupFogEnd = RenderSystem.getShaderFogEnd();
         FogShape backupFogShape = RenderSystem.getShaderFogShape();
 
-        int backupWidth = window.getFramebufferWidth();
-        int backupHeight = window.getFramebufferHeight();
-//        window.setFramebufferWidth(framebuffer.getWidth());
-//        window.setFramebufferHeight(framebuffer.getHeight());
+        BACKUP_FLASHBACK_PROJECTION.set(ReplayUI.lastProjectionMatrix);
+        BACKUP_FLASHBACK_CAMERA.set(ReplayUI.lastViewQuaternion);
 
         final Object backupPipeline = IrisPipelineAccess.getPipeline(levelRenderer);
 
@@ -121,8 +118,6 @@ public class PerspectiveRenderer {
         CameraMatrices matrices = VeilRenderSystem.renderer().getCameraMatrices();
         matrices.backup(BACKUP_CAMERA_MATRICES);
 
-//        RenderSystem.disableCull();
-
         try {
             levelRenderer.setupFrustum(new Vec3d(cameraPosition.x(), cameraPosition.y(), cameraPosition.z()), poseStack.peek().getPositionMatrix(), TRANSFORM);
             levelRenderer.render(deltaTracker, false, CAMERA, gameRenderer, gameRenderer.getLightmapTextureManager(), poseStack.peek().getPositionMatrix(), TRANSFORM);
@@ -140,8 +135,6 @@ public class PerspectiveRenderer {
                 }
             }
         } finally {
-//            RenderSystem.enableCull();
-
             matrices.restore(BACKUP_CAMERA_MATRICES);
 
             levelRendererAccessor.setCullingFrustum(backupFrustum);
@@ -170,8 +163,8 @@ public class PerspectiveRenderer {
             RenderSystem.setShaderFogEnd(backupFogEnd);
             RenderSystem.setShaderFogShape(backupFogShape);
 
-//            window.setFramebufferWidth(backupWidth);
-//            window.setFramebufferHeight(backupHeight);
+            ReplayUI.lastProjectionMatrix.set(BACKUP_FLASHBACK_PROJECTION);
+            ReplayUI.lastViewQuaternion.set(BACKUP_FLASHBACK_CAMERA);
 
             accessor.setRenderDistance(backupRenderDistance);
 

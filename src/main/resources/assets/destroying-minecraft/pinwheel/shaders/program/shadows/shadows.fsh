@@ -4,7 +4,7 @@
 
 #define SHADOW_SAMPLES 1
 
-#define SHADOW_STRENGTH 0.4
+#define SHADOW_STRENGTH 0.95
 
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DiffuseDepthSampler;
@@ -115,7 +115,7 @@ void main() {
                     vec2 offset = randRotation * vec2(x, y) * 1;
                     float shadowSampler = texture(ShadowMap, shadowScreenPos.xy + offset).r;
 
-                    if (shadowDepth < shadowSampler){
+                    if (shadowDepth < shadowSampler) {
                         shadowSum += 1.0;
                     }
                 }
@@ -128,9 +128,9 @@ void main() {
         shadowSum = 1.0;
     }
 
-    vec3 outputColor = albedoColor.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH));
+    vec3 outputColor;
     if (flashTimer > 0.0) {
-        outputColor += flash*lightUV.y;
+        outputColor = albedoColor.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)) + flash*lightUV.y;
     }
     else {
         outputColor = albedoColor.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)*(1.0 - supernovaTimer));
@@ -144,7 +144,7 @@ void main() {
 
 
     float height = viewDirFromUv(texCoord).y;
-    fragColor = vec4(outputColor, 1.0);
+    fragColor = vec4(outputColor*0.4, 1.0);
 //    fragColor = linear_fog(vec4(outputColor, 1.0), length(viewPos), FogEnd - 30, FogEnd, vec4(vec3(SkyColor - height * 0.7), 1.0));
     gl_FragDepth = depth;
 

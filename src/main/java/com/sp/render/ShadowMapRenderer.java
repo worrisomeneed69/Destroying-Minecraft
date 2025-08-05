@@ -47,7 +47,7 @@ public class ShadowMapRenderer {
                     new Quaternionf(),
                     20,
                     client.getRenderTickCounter(),
-                    true
+                    false
             );
             GL11.glCullFace(GL_BACK);
         }

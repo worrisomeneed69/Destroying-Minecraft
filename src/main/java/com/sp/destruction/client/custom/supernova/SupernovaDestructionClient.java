@@ -154,9 +154,6 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                 }, (globalTime, localTime) -> {
                     destructionDistance = 300 - (int) (((globalTime - 0.94) / 0.035)*300);
 
-                    implodeTimer.setPrevTimer();
-                    flashTimer.setPrevTimer();
-                    explosionTimer.setPrevTimer();
 
                     if (localTime < 0.3) {
                         //Sun implosion

@@ -1,6 +1,5 @@
 package com.sp.mixin.materialsampler;
 
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.sp.render.materialsampler.CustomDynamicBuffers;
 import foundry.veil.api.client.render.dynamicbuffer.DynamicBufferType;
 import foundry.veil.api.client.render.framebuffer.FramebufferAttachmentDefinition;
@@ -10,7 +9,6 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.function.Supplier;
 
 @Mixin(DynamicBufferType.class)
 @Unique

@@ -15,9 +15,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.client.sound.SoundManager;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.world.World;
 
 @Environment(EnvType.CLIENT)
@@ -52,7 +50,6 @@ public class PlanetDestructionClient extends ClientDestructionEvent {
 
         return new KeyframeAnimation(
                 (globalTime, localTime) -> {
-                    planetFallTimer.setPrevTimer();
                     planetFallTimer.setTimer((float) globalTime);
                 },
 
@@ -103,7 +100,6 @@ public class PlanetDestructionClient extends ClientDestructionEvent {
                     );
                     CameraShakeManager.addCameraShake(cameraShakeInstance);
                 }, (globalTime, localTime) -> {
-                    flashTimer.setPrevTimer();
                     flashTimer.setTimer((float) Math.min(localTime * 2.0f, 1.0f));
                 }),
 

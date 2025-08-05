@@ -348,7 +348,6 @@ public class BlackHoleDestructionServerPart2 extends ServerDestructionEvent {
                             }
                         });
                     }
-                    System.out.println(localTime);
                 },
 
                 //End action
@@ -365,7 +364,6 @@ public class BlackHoleDestructionServerPart2 extends ServerDestructionEvent {
                 new Keyframe(0.0),
 
                 new Keyframe(135.0 / this.duration, () -> {
-                    System.out.println("SPAWNED");
                     BlockPhysicsEntity entity = BlockPhysicsEntity.ofBlocks(world, initialBPEPositions);
                     entity.setVelocity(0, 0.06, -0.2);
                     entity.component.setRotationSpeed(0.5f, 0, 0);
