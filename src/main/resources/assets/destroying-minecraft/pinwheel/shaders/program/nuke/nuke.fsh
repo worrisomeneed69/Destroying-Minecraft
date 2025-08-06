@@ -65,7 +65,7 @@ vec4 rayMarchCloud(in vec3 viewPos, in vec3 rayOrigin, in vec3 rayDir) {
 
         float d = map(rayPos);
         if(noise > 0.0){
-            accumulation += noise * 0.01 + max(-d*0.001, 0.0);
+            accumulation += noise * 0.01 + max(-d*0.0005, 0.0);
         }
 
 
