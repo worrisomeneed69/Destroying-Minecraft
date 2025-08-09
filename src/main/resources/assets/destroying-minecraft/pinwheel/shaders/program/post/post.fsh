@@ -34,11 +34,11 @@ void main() {
     vec3 blurredTexture = texture(BlurredTexture, texCoord).rgb;
     float depth = texture(MainDepth, texCoord).r;
     vec3 playerPos = screenToLocalSpace(texCoord, depth).xyz;
-    depth = length(playerPos) / 10;
+    depth = length(playerPos) / 100;
 
     float dist = max(depth - centerDepth, 0.0);
 
-    float blur = smoothstep(0.0, 0.15, dist);
+    float blur = smoothstep(0.0, 0.2, dist);
 
 
     fragColor = vec4(mix(color, blurredTexture, blur), 1.0);

@@ -1,5 +1,6 @@
 package com.sp.networking;
 
+import com.sp.networking.C2S.UpdateLimboSquareBlockPacket;
 import com.sp.networking.C2S.UpdatePhysicsDoorPacket;
 import com.sp.networking.S2C.InvokeDestructionPacket;
 import com.sp.networking.S2C.BraamPacket;
@@ -15,9 +16,11 @@ public class InitializePackets {
     public static void registerServerNetworking() {
         //Send to server
         PayloadTypeRegistry.playC2S().register(UpdatePhysicsDoorPacket.UpdatePhysicsDoorBlock.ID, UpdatePhysicsDoorPacket.UpdatePhysicsDoorBlock.CODEC);
+        PayloadTypeRegistry.playC2S().register(UpdateLimboSquareBlockPacket.UpdateLimboSquareBlockPayload.ID, UpdateLimboSquareBlockPacket.UpdateLimboSquareBlockPayload.CODEC);
 
         //Receive from client
         ServerPlayNetworking.registerGlobalReceiver(UpdatePhysicsDoorPacket.UpdatePhysicsDoorBlock.ID, UpdatePhysicsDoorPacket::recieve);
+        ServerPlayNetworking.registerGlobalReceiver(UpdateLimboSquareBlockPacket.UpdateLimboSquareBlockPayload.ID, UpdateLimboSquareBlockPacket::receive);
 
 
         //Send to client

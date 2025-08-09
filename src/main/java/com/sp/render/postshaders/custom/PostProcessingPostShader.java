@@ -54,10 +54,10 @@ public class PostProcessingPostShader extends PostShader {
         if (client.player == null) return;
         PlayerComponent component = InitializeComponents.PLAYERS.get(client.player);
 
-        float farPlane = 10000;
+        float farPlane = 100;
 
         Vec3d vec3d = client.player.getCameraPosVec(tickDelta);
-        Vec3d vec3d2 = client.player.getRotationVec(tickDelta);
+        Vec3d vec3d2 = client.player.getRotationVec(tickDelta).normalize();
         Vec3d vec3d3 = vec3d.add(vec3d2.x * farPlane, vec3d2.y * farPlane, vec3d2.z * farPlane);
         HitResult hitResult = client.player.getWorld()
                 .raycast(
@@ -66,7 +66,7 @@ public class PostProcessingPostShader extends PostShader {
                         )
                 );
 
-        Box box = client.player.getBoundingBox().stretch(vec3d2).expand(100.0, 1000.0, 1000.0);
+        Box box = client.player.getBoundingBox().stretch(vec3d2).expand(farPlane);
         EntityHitResult entityHitResult = ProjectileUtil.raycast(client.player, vec3d, vec3d3, box, entity -> true, farPlane);
 
         Vec3d closestDistance;
@@ -78,10 +78,10 @@ public class PostProcessingPostShader extends PostShader {
             closestDistance = entityHitResult.getPos();
         }
 
-        float depth = (float) client.getCameraEntity().getEyePos().distanceTo(closestDistance) / 100;
+        float depth = (float) client.getCameraEntity().getEyePos().distanceTo(closestDistance) / farPlane;
 
         //Smooths down the Depth at the crosshair so it gives a "not so instant" autofocus effect
-        this.smoothDepth = MathUtil.Lerp(this.smoothDepth, depth, 0.0f, MinecraftClient.getInstance().getRenderTickCounter().getLastFrameDuration());
+        this.smoothDepth = MathUtil.Lerp(this.smoothDepth, depth, DestroyingMinecraftConfig.autoFocusTime, MinecraftClient.getInstance().getRenderTickCounter().getLastFrameDuration());
         BetterUniforms.setFloat(shaderProgram, "centerDepth", this.smoothDepth);
 
         BetterUniforms.setInt(shaderProgram, "enabledDepthOfField", DestroyingMinecraftConfig.enableDepthOfField ? 1 : 0);

@@ -1,7 +1,6 @@
 package com.sp.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.moulberry.flashback.editor.ui.ReplayUI;
 import foundry.veil.api.client.render.CameraMatrices;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
@@ -26,7 +25,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class PerspectiveRenderer {
-
     private static final LevelPerspectiveCamera CAMERA = new LevelPerspectiveCamera();
     private static final Matrix4f TRANSFORM = new Matrix4f();
     private static final CameraMatrices BACKUP_CAMERA_MATRICES = new CameraMatrices();
@@ -79,8 +77,8 @@ public class PerspectiveRenderer {
         float backupFogEnd = RenderSystem.getShaderFogEnd();
         FogShape backupFogShape = RenderSystem.getShaderFogShape();
 
-        BACKUP_FLASHBACK_PROJECTION.set(ReplayUI.lastProjectionMatrix);
-        BACKUP_FLASHBACK_CAMERA.set(ReplayUI.lastViewQuaternion);
+//        BACKUP_FLASHBACK_PROJECTION.set(ReplayUI.lastProjectionMatrix);
+//        BACKUP_FLASHBACK_CAMERA.set(ReplayUI.lastViewQuaternion);
 
         final Object backupPipeline = IrisPipelineAccess.getPipeline(levelRenderer);
 
@@ -163,8 +161,8 @@ public class PerspectiveRenderer {
             RenderSystem.setShaderFogEnd(backupFogEnd);
             RenderSystem.setShaderFogShape(backupFogShape);
 
-            ReplayUI.lastProjectionMatrix.set(BACKUP_FLASHBACK_PROJECTION);
-            ReplayUI.lastViewQuaternion.set(BACKUP_FLASHBACK_CAMERA);
+//            ReplayUI.lastProjectionMatrix.set(BACKUP_FLASHBACK_PROJECTION);
+//            ReplayUI.lastViewQuaternion.set(BACKUP_FLASHBACK_CAMERA);
 
             accessor.setRenderDistance(backupRenderDistance);
 

@@ -2,6 +2,7 @@ package com.sp;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.block.entity.ModBlockEntities;
+import com.sp.block.entity.client.LimboSquareBlockEntityRenderer;
 import com.sp.block.entity.client.PhysicsDoorBlockRenderer;
 import com.sp.block.entity.client.VoidBlockEntityRenderer;
 import com.sp.config.DestroyingMinecraftConfig;
@@ -16,6 +17,7 @@ import com.sp.mixin.PostProcessingManagerAccessor;
 import com.sp.networking.InitializePackets;
 import com.sp.render.*;
 import com.sp.render.camerashake.CameraShakeManager;
+import com.sp.render.gui.HSVColorTextureManager;
 import com.sp.render.gui.hud.DestructionTitleRenderCallback;
 import com.sp.render.gui.hud.PlayZoneWarningRenderCallback;
 import com.sp.render.gui.hud.WaitingRoomRenderCallback;
@@ -37,8 +39,14 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
+import net.minecraft.client.toast.SystemToast;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.ResourceType;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -85,6 +93,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 		BlockEntityRendererFactories.register(ModBlockEntities.VOID_BE, VoidBlockEntityRenderer::new);
 		BlockEntityRendererFactories.register(ModBlockEntities.PHYSICS_DOOR_BE, PhysicsDoorBlockRenderer::new);
+		BlockEntityRendererFactories.register(ModBlockEntities.LIMBO_SQUARE_BE, LimboSquareBlockEntityRenderer::new);
 
 		VeilEventPlatform.INSTANCE.onVeilRenderLevelStage((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, renderTick, deltaTracker, camera, frustum) -> {
 			MinecraftClient client = MinecraftClient.getInstance();
@@ -99,6 +108,8 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 			switch (stage) {
 				case AFTER_LEVEL -> {
+//					System.out.println(VeilRenderSystem.renderer().getCameraMatrices().getNearPlane());
+
 					//Only render the shadow map with shaders that need it
 					if (camera != null) {
 						ShadowMapRenderer.renderShadowMap(camera);
@@ -196,6 +207,19 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 		ClientPlayConnectionEvents.DISCONNECT.register((clientPlayNetworkHandler, minecraftClient) -> {
 			BlackHoleDestruction.clear();
+		});
+
+
+		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
+			@Override
+			public Identifier getFabricId() {
+				return DestroyingMinecraft.idOf("after_resources");
+			}
+
+			@Override
+			public void reload(ResourceManager manager) {
+				HSVColorTextureManager.init();
+			}
 		});
 	}
 

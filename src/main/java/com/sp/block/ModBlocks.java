@@ -2,6 +2,7 @@ package com.sp.block;
 
 import com.sp.DestroyingMinecraft;
 import com.sp.block.custom.ChairBlock;
+import com.sp.block.custom.LimboSquareBlock;
 import com.sp.block.custom.PhysicsDoorBlock;
 import com.sp.block.custom.VoidBlock;
 import net.minecraft.block.AbstractBlock;
@@ -22,6 +23,9 @@ public class ModBlocks {
 
     public static final Block CHAIR_BLOCK = registerBlock("chair_block",
             new ChairBlock(AbstractBlock.Settings.copy(Blocks.SPRUCE_STAIRS).solid().noBlockBreakParticles()));
+
+    public static final Block LIMBO_SQUARE_BLOCK = registerBlock("limbo_square_block",
+            new LimboSquareBlock(AbstractBlock.Settings.copy(Blocks.GLASS).solid().noBlockBreakParticles()));
 
 
 

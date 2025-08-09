@@ -4,7 +4,7 @@
 
 #define SHADOW_SAMPLES 1
 
-#define SHADOW_STRENGTH 0.95
+#define SHADOW_STRENGTH 0.4
 
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DiffuseDepthSampler;
@@ -79,7 +79,7 @@ void main() {
 
 
     vec3 flash = flashTimer > 0 ? vec3(0.6) * (1.0 - min(flashTimer, 1.0)) : vec3(0.0);
-//    vec3 flash = vec3(0.6);
+    //    vec3 flash = vec3(0.6);
     if(depth >= 1.0) {
         fragColor = color;
         gl_FragDepth = depth;
@@ -144,7 +144,7 @@ void main() {
 
 
     float height = viewDirFromUv(texCoord).y;
-    fragColor = vec4(outputColor*0.4, 1.0);
+    fragColor = vec4(outputColor, 1.0);
 //    fragColor = linear_fog(vec4(outputColor, 1.0), length(viewPos), FogEnd - 30, FogEnd, vec4(vec3(SkyColor - height * 0.7), 1.0));
     gl_FragDepth = depth;
 

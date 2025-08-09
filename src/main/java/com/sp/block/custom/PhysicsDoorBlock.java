@@ -3,7 +3,6 @@ package com.sp.block.custom;
 import com.mojang.serialization.MapCodec;
 import com.sp.block.entity.ModBlockEntities;
 import com.sp.block.entity.custom.PhysicsDoorBlockEntity;
-import com.sp.entity.custom.BlockPhysicsEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -41,8 +40,8 @@ public class PhysicsDoorBlock extends BlockWithEntity {
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof PhysicsDoorBlockEntity) {
-            return ((PhysicsDoorBlockEntity)blockEntity).openScreen(player) ? ActionResult.success(world.isClient) : ActionResult.PASS;
+        if (blockEntity instanceof PhysicsDoorBlockEntity physicsDoorBlockEntity) {
+            return physicsDoorBlockEntity.openScreen(player) ? ActionResult.success(world.isClient) : ActionResult.PASS;
         } else {
             return ActionResult.PASS;
         }

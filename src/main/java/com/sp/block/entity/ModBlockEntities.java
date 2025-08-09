@@ -2,6 +2,7 @@ package com.sp.block.entity;
 
 import com.sp.DestroyingMinecraft;
 import com.sp.block.ModBlocks;
+import com.sp.block.entity.custom.LimboSquareBlockEntity;
 import com.sp.block.entity.custom.PhysicsDoorBlockEntity;
 import com.sp.block.entity.custom.VoidBlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -17,6 +18,10 @@ public class ModBlockEntities {
     public static final BlockEntityType<VoidBlockEntity> VOID_BE =
             Registry.register(Registries.BLOCK_ENTITY_TYPE, DestroyingMinecraft.idOf("void_be"),
                     BlockEntityType.Builder.create(VoidBlockEntity::new, ModBlocks.WHITE_VOID_BLOCK).build());
+
+    public static final BlockEntityType<LimboSquareBlockEntity> LIMBO_SQUARE_BE =
+            Registry.register(Registries.BLOCK_ENTITY_TYPE, DestroyingMinecraft.idOf("void_be"),
+                    BlockEntityType.Builder.create(LimboSquareBlockEntity::new, ModBlocks.LIMBO_SQUARE_BLOCK).build());
 
     public static void registerBlockEntities() {
         DestroyingMinecraft.LOGGER.info("Registering Block Entities for " + DestroyingMinecraft.MOD_ID);
