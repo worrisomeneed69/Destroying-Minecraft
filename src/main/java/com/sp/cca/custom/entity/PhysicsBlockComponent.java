@@ -3,18 +3,14 @@ package com.sp.cca.custom.entity;
 import com.sp.cca.InitializeComponents;
 import com.sp.entity.custom.BlockPhysicsEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class PhysicsBlockComponent implements AutoSyncedComponent {
     private final BlockPhysicsEntity blockPhysicsEntity;
-    private List<BlockPhysicsEntity.BlockData> blocks = new ArrayList<>();
+//    private List<BlockPhysicsEntity.BlockData> blocks = new ArrayList<>();
     private Quaternionf rotation = new Quaternionf();
     private float xRotationSpeed;
     private float yRotationSpeed;
@@ -26,19 +22,19 @@ public class PhysicsBlockComponent implements AutoSyncedComponent {
         this.blockPhysicsEntity = spinningBlock;
     }
 
-    public void setBlocks(List<BlockPhysicsEntity.BlockData> blocks) {
-        sync();
-        this.blocks = blocks;
-    }
-
-    public void addBlock(BlockPhysicsEntity.BlockData blockData) {
-        this.blocks.add(blockData);
-        sync();
-    }
-
-    public List<BlockPhysicsEntity.BlockData> getBlocks() {
-        return blocks;
-    }
+//    public void setBlocks(List<BlockPhysicsEntity.BlockData> blocks) {
+//        sync();
+//        this.blocks = blocks;
+//    }
+//
+//    public void addBlock(BlockPhysicsEntity.BlockData blockData) {
+//        this.blocks.add(blockData);
+//        sync();
+//    }
+//
+//    public List<BlockPhysicsEntity.BlockData> getBlocks() {
+//        return blocks;
+//    }
 
     public void setRotation(Quaternionf rotation) {
         this.rotation = new Quaternionf(rotation);
@@ -78,6 +74,7 @@ public class PhysicsBlockComponent implements AutoSyncedComponent {
 
     @Override
     public void readFromNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
+        boolean shouldSync = false;
         if (nbtCompound.contains("rotation")) {
             NbtCompound rotationNbt = nbtCompound.getCompound("rotation");
             this.prevRotation = new Quaternionf(this.rotation);
@@ -87,7 +84,7 @@ public class PhysicsBlockComponent implements AutoSyncedComponent {
                     rotationNbt.getFloat("z"),
                     rotationNbt.getFloat("w")
             );
-            this.sync();
+            shouldSync = true;
         }
 
         if (nbtCompound.contains("rotationSpeed")) {
@@ -95,18 +92,23 @@ public class PhysicsBlockComponent implements AutoSyncedComponent {
             this.xRotationSpeed = rotationSpeedNbt.getFloat("x");
             this.yRotationSpeed = rotationSpeedNbt.getFloat("y");
             this.zRotationSpeed = rotationSpeedNbt.getFloat("z");
-            this.sync();
+            shouldSync = true;
         }
 
-        if (nbtCompound.contains("blocks")) {
-            NbtList blockList = nbtCompound.getList("blocks", NbtList.COMPOUND_TYPE);
+//        if (nbtCompound.contains("blocks")) {
+//            NbtList blockList = nbtCompound.getList("blocks", NbtList.COMPOUND_TYPE);
+//
+//            this.setBlocks(
+//                    blockList.stream().map((nbtElement) -> {
+//                        NbtCompound blockNbt = (NbtCompound) nbtElement;
+//                        return BlockPhysicsEntity.BlockData.fromNBT(blockNbt, wrapperLookup);
+//                    }).toList()
+//            );
+//
+//            shouldSync = true;
+//        }
 
-            this.setBlocks(
-                    blockList.stream().map((nbtElement) -> {
-                        NbtCompound blockNbt = (NbtCompound) nbtElement;
-                        return BlockPhysicsEntity.BlockData.fromNBT(blockNbt, wrapperLookup);
-                    }).toList()
-            );
+        if (shouldSync) {
             this.sync();
         }
     }
@@ -127,11 +129,11 @@ public class PhysicsBlockComponent implements AutoSyncedComponent {
         rotationSpeedNbt.putFloat("z", zRotationSpeed);
         nbtCompound.put("rotationSpeed", rotationSpeedNbt);
 
-        NbtList blockList = new NbtList();
-        for (BlockPhysicsEntity.BlockData blockData : blocks) {
-            blockList.add(blockData.asNBT());
-        }
-
-        nbtCompound.put("blocks", blockList);
+//        NbtList blockList = new NbtList();
+//        for (BlockPhysicsEntity.BlockData blockData : blocks) {
+//            blockList.add(blockData.asNBT());
+//        }
+//
+//        nbtCompound.put("blocks", blockList);
     }
 }

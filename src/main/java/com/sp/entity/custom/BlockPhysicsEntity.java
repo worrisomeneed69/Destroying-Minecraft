@@ -14,10 +14,13 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.sound.SoundCategory;
@@ -32,10 +35,11 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class BlockPhysicsEntity extends Entity {
+    private static final TrackedData<NbtCompound> BLOCKS = DataTracker.registerData(BlockPhysicsEntity.class, TrackedDataHandlerRegistry.NBT_COMPOUND);
     public PhysicsBlockComponent component;
+    private List<BlockPhysicsEntity.BlockData> blocks = new ArrayList<>();
     private boolean markForDiscard;
     private int startDiscardAge;
 
@@ -52,7 +56,7 @@ public class BlockPhysicsEntity extends Entity {
 
     public static BlockPhysicsEntity ofBlocks(World world, List<BlockPos> blocks) {
         BlockPhysicsEntity entity = new BlockPhysicsEntity(ModEntities.BLOCK_PHYSICS_ENTITY, world);
-        PhysicsBlockComponent component = entity.component;
+//        PhysicsBlockComponent component = entity.component;
         Vec3d pos = MathUtil.getCenterPos(blocks);
         entity.setPosition(pos);
 
@@ -61,7 +65,7 @@ public class BlockPhysicsEntity extends Entity {
             Vec3d relativePos = Vec3d.of(blockPos).subtract(pos).add(0.5, 0.5, 0.5 );
 
             if (!state.isAir()) {
-                component.addBlock(new BlockPhysicsEntity.BlockData(state, relativePos));
+                entity.addBlock(new BlockPhysicsEntity.BlockData(state, relativePos));
             }
 
             if (world.getGameRules().getBoolean(ModGameRules.ALLOW_EXPLOSIONS)) {
@@ -74,9 +78,9 @@ public class BlockPhysicsEntity extends Entity {
     }
 
     public void setDown() {
-        PhysicsBlockComponent component = InitializeComponents.PHYSICS_BLOCK.get(this);
+//        PhysicsBlockComponent component = InitializeComponents.PHYSICS_BLOCK.get(this);
 
-        for (BlockPhysicsEntity.BlockData blockData : component.getBlocks()) {
+        for (BlockPhysicsEntity.BlockData blockData : this.getBlocks()) {
             this.getWorld().setBlockState(this.getBlockPos().add(BlockPos.ofFloored(blockData.offset)), blockData.blockState);
         }
     }
@@ -85,7 +89,6 @@ public class BlockPhysicsEntity extends Entity {
         super(type, world);
         this.component = InitializeComponents.PHYSICS_BLOCK.get(this);
     }
-
 
     @Override
     public void tick() {
@@ -137,7 +140,7 @@ public class BlockPhysicsEntity extends Entity {
 
         List<BlockOBB.CollisionData> collisions = new ArrayList<>();
 
-        for (BlockData block : this.component.getBlocks()) {
+        for (BlockData block : this.getBlocks()) {
             BlockOBB obb = new BlockOBB(this.component.getRotation(), block);
 
             BlockOBB.CollisionData collisionData = obb.getMinCollisionWith(aabb, this);
@@ -152,7 +155,7 @@ public class BlockPhysicsEntity extends Entity {
     public double getYAxisCollision(Box aabb) {
         double bestOffset = 0;
 
-        for (BlockData block : this.component.getBlocks()) {
+        for (BlockData block : this.getBlocks()) {
             BlockOBB obb = new BlockOBB(this.component.getRotation(), block);
 
             //TODO Don't do this yeye as collision check with everything. Just fix the y axis check
@@ -170,7 +173,7 @@ public class BlockPhysicsEntity extends Entity {
     public Vec3d getBestCollisionOffset(Box aabb, Vec3d movement) {
         Vec3d offset = movement;
 
-        for (BlockData block : this.component.getBlocks()) {
+        for (BlockData block : this.getBlocks()) {
             BlockOBB obb = new BlockOBB(this.component.getRotation(), block);
 
             //getStepHeight()
@@ -195,7 +198,7 @@ public class BlockPhysicsEntity extends Entity {
     }
 
     public boolean collides(Box aabb) {
-        for (BlockData block : this.component.getBlocks()) {
+        for (BlockData block : this.getBlocks()) {
             BlockOBB obb = new BlockOBB(this.component.getRotation(), block);
 
             if (obb.collidesWith(aabb, this)) {
@@ -212,14 +215,14 @@ public class BlockPhysicsEntity extends Entity {
 
     @Override
     protected Box calculateBoundingBox() {
-        if (this.component == null || this.component.getBlocks() == null || this.component.getBlocks().isEmpty()) {
+        if (this.component == null || this.getBlocks() == null || this.getBlocks().isEmpty()) {
             return super.calculateBoundingBox();
         }
 
         Vec3d min = new Vec3d(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
         Vec3d max = new Vec3d(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
 
-        for (BlockData blockData : this.component.getBlocks()) {
+        for (BlockData blockData : this.getBlocks()) {
             // Calculate the corners of the block (considering it's 1x1x1)
             for (double dx = 0; dx <= 1; dx++) {
                 for (double dy = 0; dy <= 1; dy++) {
@@ -275,18 +278,70 @@ public class BlockPhysicsEntity extends Entity {
     }
 
     @Override
-    protected void initDataTracker(DataTracker.Builder builder) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        if (data.equals(BLOCKS) && this.getWorld().isClient) {
+            NbtCompound compound = this.dataTracker.get(BLOCKS);
+            NbtList blockList = compound.getList("blocks_list", NbtElement.COMPOUND_TYPE);
 
+            this.setBlocks(
+                    blockList.stream().map((nbtElement) -> {
+                        NbtCompound blockNbt = (NbtCompound) nbtElement;
+                        return BlockPhysicsEntity.BlockData.fromNBT(blockNbt, this.getWorld().createCommandRegistryWrapper(RegistryKeys.BLOCK));
+                    }).toList()
+            );
+        }
+
+        super.onTrackedDataSet(data);
+    }
+
+    @Override
+    public void onDataTrackerUpdate(List<DataTracker.SerializedEntry<?>> entries) {
+        super.onDataTrackerUpdate(entries);
+    }
+
+    public void setBlocks(List<BlockPhysicsEntity.BlockData> blocks) {
+        this.blocks = blocks;
+        NbtCompound nbtCompound = new NbtCompound();
+        NbtList blockList = new NbtList();
+        for (BlockPhysicsEntity.BlockData blockData : blocks) {
+            blockList.add(blockData.asNBT());
+        }
+
+        nbtCompound.put("blocks_list", blockList);
+        this.dataTracker.set(BLOCKS, nbtCompound);
+    }
+
+    public void addBlock(BlockPhysicsEntity.BlockData blockData) {
+        this.blocks.add(blockData);
+        this.setBlocks(this.blocks);
+    }
+
+    public List<BlockPhysicsEntity.BlockData> getBlocks() {
+        return this.blocks;
+    }
+
+    @Override
+    protected void initDataTracker(DataTracker.Builder builder) {
+        builder.add(BLOCKS, new NbtCompound());
     }
 
     @Override
     protected void writeCustomDataToNbt(NbtCompound nbt) {
-
+        nbt.put("blocks", this.dataTracker.get(BLOCKS).getList("blocks_list", NbtElement.COMPOUND_TYPE));
     }
 
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
+        if (nbt.contains("blocks")) {
+            NbtList blockList = nbt.getList("blocks", NbtElement.COMPOUND_TYPE);
 
+            this.setBlocks(
+                    blockList.stream().map((nbtElement) -> {
+                        NbtCompound blockNbt = (NbtCompound) nbtElement;
+                        return BlockPhysicsEntity.BlockData.fromNBT(blockNbt, this.getWorld().createCommandRegistryWrapper(RegistryKeys.BLOCK));
+                    }).toList()
+            );
+        }
     }
 
     public static class BlockData {
@@ -313,11 +368,11 @@ public class BlockPhysicsEntity extends Entity {
             return nbt;
         }
 
-        public static BlockData fromNBT(NbtCompound nbt, RegistryWrapper.WrapperLookup wrapperLookup) {
+        public static BlockData fromNBT(NbtCompound nbt, RegistryWrapper<Block> wrapper) {
             NbtCompound blockStateCompound = nbt.getCompound("block");
-            Optional<RegistryWrapper.Impl<Block>> wrapper = wrapperLookup.getOptionalWrapper(RegistryKeys.BLOCK);
+//            Optional<RegistryWrapper.Impl<Block>> wrapper = wrapperLookup.getOptionalWrapper(RegistryKeys.BLOCK);
 
-            BlockState blockState1 = NbtHelper.toBlockState(wrapper.orElse(Registries.BLOCK.getReadOnlyWrapper()), blockStateCompound);
+            BlockState blockState1 = NbtHelper.toBlockState(wrapper, blockStateCompound);
 
             Vec3d offset = new Vec3d(nbt.getDouble("offsetX"), nbt.getDouble("offsetY"), nbt.getDouble("offsetZ"));
             return new BlockData(blockState1, offset);

@@ -113,7 +113,7 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
             return;
         }
 
-        for (BlockPhysicsEntity.BlockData blockData : component.getBlocks()) {
+        for (BlockPhysicsEntity.BlockData blockData : entity.getBlocks()) {
             matrices.push();
 
             matrices.multiply(component.getRotation());
@@ -156,7 +156,7 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
             //RenderUtil.drawEntityBox(matrices, vertexConsumers, aabbCorner.add(0.5, 0.5, 0.5), 0.2, entity, 0, 0, 255, 255);
         }
 
-        for (BlockPhysicsEntity.BlockData block : entity.component.getBlocks()) {
+        for (BlockPhysicsEntity.BlockData block : entity.getBlocks()) {
             BlockOBB obb = new BlockOBB(entity.component.getRotation(), block);
 
 //            List<Vec3d> obbCorners = obb.getGlobalCorners(entity);
