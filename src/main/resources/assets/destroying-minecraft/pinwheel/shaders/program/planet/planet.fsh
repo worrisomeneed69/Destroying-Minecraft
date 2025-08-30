@@ -228,22 +228,13 @@ void main() {
 
     float handDepth = texture(HandDepthSampler, texCoord).r;
 
-//    if (material == 7) {
-//        fragColor = vec4(0.0, 0.0, 0.0, 1.0);
-//    } else {
-//        vec3 normal = viewToWorldSpaceDir(texture(NormalSampler, texCoord).rgb);
-//        float value = dot(normal, vec3(0, 0, -1));
-//        fragColor = vec4(vec3(value), 1.0);
-//        fragColor = vec4(1.0);
-//    }
-
-//    if (handDepth >= 1.0) {
-//        if (material == 5) {
-//            fragColor *= 10;
-//        } else if (material == 6) {
-//            fragColor = vec4(1.0, 0.0, 0.0, 1.0);
-//        }
-//    }
+    if (handDepth >= 1.0) {
+        if (material == 5) {
+            fragColor *= 10;
+        } else if (material == 6) {
+            fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        }
+    }
 
 
 }

@@ -48,7 +48,7 @@ const vec3 color2 = vec3(0.7607843137254902, 0.8666666666666667, 0.8941176470588
 const vec3 color3 = vec3(0.07450980392156863, 0.21568627450980393, 0.4117647058823529);
 const vec3 color4 = vec3(0.788235294117647, 0.21568627450980393, 0.2980392156862745);
 
-const vec3 centerPos = vec3(-1685, 80.9, 1573.5);
+const vec3 centerPos = vec3(-967, 81.2, 1290.5);
 
 //Attenuation formula https://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula
 float attenuation(float value, float a, float b) {

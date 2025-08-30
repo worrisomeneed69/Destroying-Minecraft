@@ -35,6 +35,7 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
     public PlayerComponent(PlayerEntity player) {
         this.player = player;
         this.insideAPlayZone = true; //If this isn't set, it plays the countdown noise for a split second
+        this.isInWaitingRoom = false;
     }
 
 
@@ -104,6 +105,7 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
     public void serverTick() {
         if (!initWaitingRoom) {
             if (!this.player.getDisplayName().getString().equals("SppacePotato")) {
+                System.out.println("NOOOO");
                 this.isInWaitingRoom = true;
                 this.sync();
             }
