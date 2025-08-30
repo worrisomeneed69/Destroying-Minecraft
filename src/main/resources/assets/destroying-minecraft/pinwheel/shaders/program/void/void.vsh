@@ -1,13 +1,17 @@
 #veil:buffer veil:camera VeilCamera
 #include veil:space_helper
+#include destroying-minecraft:noise
 
 layout(location = 0) in vec3 Position;
+layout(location = 1) in vec4 Color;
 
 uniform mat4 ModelViewMat;
 uniform mat4 ProjMat;
 uniform int renderingShadow;
+uniform float GameTime;
 
 out vec3 pos;
+out vec3 color;
 
 vec3 distort(in vec3 shadowPosition) {
     const float bias0 = 0.95;
@@ -21,9 +25,14 @@ vec3 distort(in vec3 shadowPosition) {
 }
 
 void main() {
-//    vec3 cameraPos = VeilCamera.CameraPosition;
-//    pos = viewToWorldSpace(vec4(Position, 1.0)).xyz;
-    pos = Position + VeilCamera.CameraPosition;
+    vec3 cameraPos = VeilCamera.CameraPosition;
+    pos = Position + cameraPos;
+
+    vec3 blockPos = floor(vec3(pos.x, pos.y + 1, pos.z) * 0.5);
+    float noise = snoise(vec4(blockPos.x, blockPos.y, blockPos.z, GameTime*3000)) * 0.5 + 0.1;
+
+    color = Color.rgb;
+//    color = vec3(noise);
 
     gl_Position = ProjMat * ModelViewMat * vec4(Position, 1.0);
 

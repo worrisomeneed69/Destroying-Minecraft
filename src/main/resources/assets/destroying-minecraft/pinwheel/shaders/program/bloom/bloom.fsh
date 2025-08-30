@@ -37,7 +37,7 @@ void main() {
 
 
 
-    fragColor = color + (highlights / 6);
+    fragColor = color;
 
 
 }

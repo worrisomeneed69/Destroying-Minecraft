@@ -2,9 +2,11 @@ package com.sp;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.block.entity.ModBlockEntities;
-import com.sp.block.entity.client.LimboSquareBlockEntityRenderer;
 import com.sp.block.entity.client.PhysicsDoorBlockRenderer;
-import com.sp.block.entity.client.VoidBlockEntityRenderer;
+import com.sp.block.entity.client.voidblock.GlitchedVoidBlockEntityRenderer;
+import com.sp.block.entity.client.voidblock.VoidBlockEntityRenderer;
+import com.sp.cca.InitializeComponents;
+import com.sp.cca.custom.entity.PlayerComponent;
 import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.entity.ModEntities;
 import com.sp.entity.client.model.StarPiercerModel;
@@ -43,10 +45,8 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
-import net.minecraft.client.toast.SystemToast;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -92,17 +92,23 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 		EntityRendererRegistry.register(ModEntities.STAR_PIERCER_ENTITY, StarPiercerEntityRenderer::new);
 
 		BlockEntityRendererFactories.register(ModBlockEntities.VOID_BE, VoidBlockEntityRenderer::new);
+        BlockEntityRendererFactories.register(ModBlockEntities.GLITCHED_VOID_BE, GlitchedVoidBlockEntityRenderer::new);
 		BlockEntityRendererFactories.register(ModBlockEntities.PHYSICS_DOOR_BE, PhysicsDoorBlockRenderer::new);
-		BlockEntityRendererFactories.register(ModBlockEntities.LIMBO_SQUARE_BE, LimboSquareBlockEntityRenderer::new);
+//		BlockEntityRendererFactories.register(ModBlockEntities.LIMBO_SQUARE_BE, LimboSquareBlockEntityRenderer::new);
 
 		VeilEventPlatform.INSTANCE.onVeilRenderLevelStage((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, renderTick, deltaTracker, camera, frustum) -> {
 			MinecraftClient client = MinecraftClient.getInstance();
 			World clientWorld = client.world;
 			RenderSystem.disableDepthTest();
 
-			if (BlackScreenManager.isIsBlackScreen()) {
-				client.options.hudHidden = true;
-			}
+            if (client.player != null) {
+                PlayerComponent component = InitializeComponents.PLAYERS.get(client.player);
+
+                if (BlackScreenManager.isBlackScreen() || component.isInWaitingRoom()) {
+                    client.options.hudHidden = true;
+                }
+            }
+
 
 			if(clientWorld == null || PerspectiveRenderer.isRenderingPerspective()) return;
 

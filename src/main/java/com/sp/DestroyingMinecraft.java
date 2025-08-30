@@ -2,9 +2,7 @@ package com.sp;
 
 import com.sp.block.ModBlocks;
 import com.sp.block.entity.ModBlockEntities;
-import com.sp.command.AddPlayZoneCommand;
-import com.sp.command.DestructionCommand;
-import com.sp.command.RipPlatformOutCommand;
+import com.sp.command.*;
 import com.sp.component.ModDataComponentTypes;
 import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.destruction.server.custom.LaserDestructionServer;
@@ -19,6 +17,7 @@ import com.sp.networking.InitializePackets;
 import com.sp.networking.S2C.BraamPacket;
 import com.sp.networking.S2C.PointSBEPacket;
 import com.sp.networking.S2C.UpdatePlayZonePacket;
+import com.sp.networking.S2C.WaitingRoomPacket;
 import com.sp.sounds.ModSounds;
 import com.sp.world.ModGameRules;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
@@ -66,6 +65,8 @@ public class DestroyingMinecraft implements ModInitializer {
 		CommandRegistrationCallback.EVENT.register(DestructionCommand::register);
 		CommandRegistrationCallback.EVENT.register(RipPlatformOutCommand::register);
 		CommandRegistrationCallback.EVENT.register(AddPlayZoneCommand::register);
+        CommandRegistrationCallback.EVENT.register(RevealBlackHoleCommand::register);
+        CommandRegistrationCallback.EVENT.register(WaitingRoomCommand::register);
 
 		LOGGER.info("\"It's nukein' time\" -He said as he loaded the fork into the microwave");
 
@@ -103,6 +104,10 @@ public class DestroyingMinecraft implements ModInitializer {
 				remove
 		));
 	}
+
+    public static void sendWaitingRoomPacket(PlayerEntity player, boolean setInWaitingRoom) {
+        ServerPlayNetworking.send((ServerPlayerEntity) player, new WaitingRoomPacket.WaitingRoomPacketPayload(setInWaitingRoom));
+    }
 
 	public static Identifier idOf(String path){
 		return Identifier.of(MOD_ID, path);

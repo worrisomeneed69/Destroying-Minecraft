@@ -2,10 +2,7 @@ package com.sp.networking;
 
 import com.sp.networking.C2S.UpdateLimboSquareBlockPacket;
 import com.sp.networking.C2S.UpdatePhysicsDoorPacket;
-import com.sp.networking.S2C.InvokeDestructionPacket;
-import com.sp.networking.S2C.BraamPacket;
-import com.sp.networking.S2C.PointSBEPacket;
-import com.sp.networking.S2C.UpdatePlayZonePacket;
+import com.sp.networking.S2C.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -28,6 +25,7 @@ public class InitializePackets {
         PayloadTypeRegistry.playS2C().register(PointSBEPacket.SBEPayload.ID, PointSBEPacket.SBEPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(BraamPacket.BraamPayload.ID, BraamPacket.BraamPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(UpdatePlayZonePacket.UpdatePlayZonePayload.ID, UpdatePlayZonePacket.UpdatePlayZonePayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(WaitingRoomPacket.WaitingRoomPacketPayload.ID, WaitingRoomPacket.WaitingRoomPacketPayload.CODEC);
     }
 
 
@@ -37,6 +35,7 @@ public class InitializePackets {
         ClientPlayNetworking.registerGlobalReceiver(PointSBEPacket.SBEPayload.ID, PointSBEPacket::receive);
         ClientPlayNetworking.registerGlobalReceiver(BraamPacket.BraamPayload.ID, BraamPacket::receive);
         ClientPlayNetworking.registerGlobalReceiver(UpdatePlayZonePacket.UpdatePlayZonePayload.ID, UpdatePlayZonePacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(WaitingRoomPacket.WaitingRoomPacketPayload.ID, WaitingRoomPacket::receive);
     }
 
 }

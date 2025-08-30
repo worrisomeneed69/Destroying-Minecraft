@@ -43,12 +43,16 @@ public class HSVColorWidget extends ClickableWidget {
         float min = Math.min(Math.min(outputColor.x, outputColor.y), outputColor.z);
         float delta = max - min;
 
-        if (max == outputColor.x) {
-            this.hue = 60 * (((outputColor.y - outputColor.z) / delta) % 6) / 360;
-        } else if (max == outputColor.y) {
-            this.hue = 60 * (((outputColor.z - outputColor.x) / delta) + 2) / 360;
-        } else if (max == outputColor.z) {
-            this.hue = 60 * (((outputColor.x - outputColor.y) / delta) + 4) / 360;
+        if (min != max) {
+            if (max == outputColor.x) {
+                this.hue = 60 * (((outputColor.y - outputColor.z) / delta) % 6) / 360;
+            } else if (max == outputColor.y) {
+                this.hue = 60 * (((outputColor.z - outputColor.x) / delta) + 2) / 360;
+            } else if (max == outputColor.z) {
+                this.hue = 60 * (((outputColor.x - outputColor.y) / delta) + 4) / 360;
+            }
+        } else {
+            this.hue = 0.0f;
         }
 
 

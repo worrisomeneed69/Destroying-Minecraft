@@ -7,6 +7,10 @@ float rand(vec2 coord) {
     return fract(sin(dot(coord, vec2(12.9898, 78.223))) * 43758.5453) * 2.0 - 1.0;
 }
 
+float rand(vec3 coord) {
+    return fract(sin(dot(coord, vec3(12.9898, 78.223, 472.63984))) * 43758.5453);
+}
+
 vec3 randVec3(float value) {
     return vec3(rand(value - 289.3254),
                 rand(value + 35663.25),

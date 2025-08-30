@@ -68,7 +68,7 @@ public class CustomRenderLayersAndVertexFormats {
 
     public static final RenderLayer VOID_BLOCK = RenderLayer.of(
             "void_block",
-            VertexFormats.POSITION,
+            VertexFormats.POSITION_COLOR,
             VertexFormat.DrawMode.QUADS,
             256,
             false,

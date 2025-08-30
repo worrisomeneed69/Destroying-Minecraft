@@ -6,7 +6,7 @@ public class BlackScreenManager {
     private static boolean isBlackScreen;
 
 
-    public static boolean isIsBlackScreen() {
+    public static boolean isBlackScreen() {
         return isBlackScreen;
     }
 

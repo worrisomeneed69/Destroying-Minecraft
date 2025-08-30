@@ -6,21 +6,14 @@ import com.sp.destruction.client.ClientDestructionEvent;
 import com.sp.destruction.server.ServerDestructionEvent;
 import com.sp.world.playzone.PlayZone;
 import com.sp.world.playzone.PlayZoneManager;
-import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent;
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 public class WorldDestructionEventsComponent implements AutoSyncedComponent, ServerTickingComponent, ClientTickingComponent {
@@ -67,8 +60,6 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Ser
                 PlayZone playZone = new PlayZone(playZoneBoundingBox, playZoneCompound.getInt("id" + i));
                 PlayZoneManager.addPlayZone(this.world, playZone);
             }
-
-
         }
     }
 

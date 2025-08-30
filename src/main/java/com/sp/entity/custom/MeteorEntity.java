@@ -31,7 +31,6 @@ public class MeteorEntity extends PersistentProjectileEntity {
 
 
         if(!this.inGround && !this.isOnGround()) {
-
             this.setVelocity(new Vec3d(-1.5, -1.5, 0));
             this.move(MovementType.SELF, this.getVelocity());
         }
@@ -48,9 +47,9 @@ public class MeteorEntity extends PersistentProjectileEntity {
             );
 
             float distanceToGround = (float) hitResult.getBlockPos().toCenterPos().squaredDistanceTo(this.getPos());
-            if (this.age > 200 || distanceToGround < 5.0f) {
-                this.onBlockHit(null);
-            }
+//            if (this.age > 200 || distanceToGround < 1.0f) {
+//                this.onBlockHit(null);
+//            }
 
         } else {
             if (this.age == 1) { //As soon as it spawns

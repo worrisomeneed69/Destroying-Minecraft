@@ -20,6 +20,8 @@ public class PhysicsBlockComponent implements AutoSyncedComponent {
 
     public PhysicsBlockComponent(BlockPhysicsEntity spinningBlock) {
         this.blockPhysicsEntity = spinningBlock;
+        this.zRotationSpeed = 0.3f;
+        this.xRotationSpeed = -0.3f;
     }
 
 //    public void setBlocks(List<BlockPhysicsEntity.BlockData> blocks) {

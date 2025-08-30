@@ -2,6 +2,7 @@ package com.sp.cca.custom.entity;
 
 import com.sp.DestroyingMinecraft;
 import com.sp.DestroyingMinecraftClient;
+import com.sp.cca.InitializeComponents;
 import com.sp.destruction.client.ClientDestructionEvent;
 import com.sp.destruction.client.custom.LaserDestructionClient;
 import com.sp.destruction.server.custom.LaserDestructionServer;
@@ -29,6 +30,7 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
     private boolean spawnedEvaporateParticles;
 
     private boolean isInWaitingRoom;
+    private boolean initWaitingRoom;
 
     public PlayerComponent(PlayerEntity player) {
         this.player = player;
@@ -65,11 +67,12 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
         nbtCompound.putBoolean("isInWaitingRoom", this.isInWaitingRoom);
     }
 
+    public void sync() {
+        InitializeComponents.PLAYERS.sync(this.player);
+    }
+
     @Override
     public void clientTick() {
-        this.isInWaitingRoom = false;
-        BlackScreenManager.setBlackScreen(false);
-
         this.updateInAPlayZone();
         ClientDestructionEvent cracksDestructionEvent = DestroyingMinecraftClient.cracksPostShader.getDestructionEvent();
         if (cracksDestructionEvent.isActive()) {
@@ -99,6 +102,17 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
 
     @Override
     public void serverTick() {
+        if (!initWaitingRoom) {
+            if (!this.player.getDisplayName().getString().equals("SppacePotato")) {
+                this.isInWaitingRoom = true;
+                this.sync();
+            }
+            initWaitingRoom = true;
+        }
+
+//        this.isInWaitingRoom = false;
+//        this.sync();
+
         this.updateInAPlayZone();
         if (DestroyingMinecraft.laserDestruction.isActive()) {
             this.updateInHole(LaserDestructionServer.laserLength, LaserDestructionServer.crackingTime);

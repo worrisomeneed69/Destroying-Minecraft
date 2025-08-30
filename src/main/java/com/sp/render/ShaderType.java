@@ -1,5 +1,6 @@
 package com.sp.render;
 
+import com.sp.DestroyingMinecraft;
 import com.sp.DestroyingMinecraftClient;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -16,6 +17,7 @@ public enum ShaderType {
     PLANET    (DestroyingMinecraftClient.planetPostShader.getPost()),
     SUPERNOVA (null),
     BLACK_HOLE(true, false, true, true,  DestroyingMinecraftClient.blackHolePostShader.getPost()),
+    MINI_BLACK_HOLE     (DestroyingMinecraft.idOf("mini_black_hole")),
     EARTH     (false, false, true, true, DestroyingMinecraftClient.earthPostShader.getPost());
 
     final List<Identifier> enabledShaders;

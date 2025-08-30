@@ -82,9 +82,9 @@ public class PostProcessingPostShader extends PostShader {
 
         //Smooths down the Depth at the crosshair so it gives a "not so instant" autofocus effect
         this.smoothDepth = MathUtil.Lerp(this.smoothDepth, depth, DestroyingMinecraftConfig.autoFocusTime, MinecraftClient.getInstance().getRenderTickCounter().getLastFrameDuration());
-        BetterUniforms.setFloat(shaderProgram, "centerDepth", this.smoothDepth);
+        BetterUniforms.setFloat(shaderProgram, "centerDepth", 0.3f);
 
         BetterUniforms.setInt(shaderProgram, "enabledDepthOfField", DestroyingMinecraftConfig.enableDepthOfField ? 1 : 0);
-        BetterUniforms.setInt(shaderProgram, "enabledBlackScreen", BlackScreenManager.isIsBlackScreen() || component.isInWaitingRoom() ? 1 : 0);
+        BetterUniforms.setInt(shaderProgram, "enabledBlackScreen", BlackScreenManager.isBlackScreen() || component.isInWaitingRoom() ? 1 : 0);
     }
 }

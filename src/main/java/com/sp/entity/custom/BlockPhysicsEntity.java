@@ -93,8 +93,8 @@ public class BlockPhysicsEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
+        this.setVelocity(0, -0.07, 0);
         if (!this.getWorld().isClient) {
-
             if (!component.isMeteorLike()) {
                 //Don't have to check every tick
                 if (this.age % 100 == 0) {

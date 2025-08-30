@@ -4,15 +4,16 @@
 
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DiffuseDepthSampler;
+uniform isampler2D MaterialSampler;
 
 uniform float GameTime;
 
 in vec2 texCoord;
 out vec4 fragColor;
 
-vec3 BLACK_HOLE_POS = vec3(-1154.5, 72.5, 362.5);
-float BLACK_HOLE_INNER_RADIUS = 1.0;
-float BLACK_HOLE_OUTER_RADIUS = 2;
+vec3 BLACK_HOLE_POS = vec3(-18.5, 282.5, -14.5);
+float BLACK_HOLE_INNER_RADIUS = 1.4;
+float BLACK_HOLE_OUTER_RADIUS = 2.5;
 
 struct Ray {
     vec3 pos;
@@ -27,9 +28,9 @@ struct Sphere {
 
 // Thanks to https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
 // https://www.scratchapixel.com/images/ray-simple-shapes/raysphereisect1.png
-void intersectsSphere(inout Ray ray, vec2 uv, inout Sphere sphere) {
+void intersectsSphere(inout Ray ray, inout Sphere sphere) {
     vec3 rayOrigin = VeilCamera.CameraPosition + VeilCamera.CameraBobOffset;
-    vec3 rayDir = viewDirFromUv(uv);
+    vec3 rayDir = viewDirFromUv(texCoord);
 
     vec3 vecToCenter = sphere.pos - rayOrigin;
     float Tca = dot(rayDir, vecToCenter);
@@ -69,10 +70,13 @@ void main() {
     vec3 color = texture(DiffuseSampler, texCoord).rgb;
     float depth = texture(DiffuseDepthSampler, texCoord).r;
     vec3 localPos = screenToLocalSpace(texCoord, depth).xyz;
+    uint material = texture(MaterialSampler, texCoord).r;
+
+
 
     Ray ray;
     Sphere innerSphere = Sphere(BLACK_HOLE_POS + randVec3(GameTime*300000).xyz*0.01, BLACK_HOLE_INNER_RADIUS);
-    intersectsSphere(ray, texCoord, innerSphere);
+    intersectsSphere(ray, innerSphere);
 
 
     if (ray.hit) {
@@ -81,7 +85,7 @@ void main() {
         }
     } else {
         Sphere innerSphere = Sphere(BLACK_HOLE_POS, BLACK_HOLE_OUTER_RADIUS);
-        intersectsSphere(ray, texCoord, innerSphere);
+        intersectsSphere(ray, innerSphere);
 
         if (depthTest(ray, localPos)) {
             if (ray.hit) {
@@ -89,11 +93,17 @@ void main() {
                 vec2 blackHoleScreenPos = worldToScreenSpace(vec4(BLACK_HOLE_POS, 1.0)).xy;
                 vec2 centerVector = blackHoleScreenPos - rayScreenPos;
 
-                vec2 dir = normalize(centerVector) * (ray.distance)*0.15 * clampBetween(rand(GameTime*1000), 0.98, 1.0);
+                vec2 dir = normalize(centerVector) * (ray.distance * ray.distance)*0.3 * (clampBetween(rand(GameTime*1000), 0.98, 1.0) + sin(ray.distance * 60 + (GameTime*40000))*0.15);
                 color = texture(DiffuseSampler, texCoord+dir).rgb;
+                depth = texture(DiffuseDepthSampler, texCoord+dir).r;
             }
         }
     }
 
+//    if (material != 7) {
+//        color = vec3(1.0);
+//    }
+
     fragColor = vec4(color, 1.0);
+    gl_FragDepth = depth;
 }

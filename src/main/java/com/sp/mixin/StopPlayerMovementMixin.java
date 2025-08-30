@@ -26,7 +26,7 @@ public abstract class StopPlayerMovementMixin extends LivingEntity {
         if (component.isInWaitingRoom()) {
             cir.setReturnValue(true);
         } else if (this.getWorld().isClient) {
-            if (BlackScreenManager.isIsBlackScreen()) {
+            if (BlackScreenManager.isBlackScreen()) {
                 cir.setReturnValue(true);
             }
         }

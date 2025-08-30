@@ -1,40 +1,24 @@
 package com.sp.render.gui.screen;
 
 import com.sp.block.entity.custom.LimboSquareBlockEntity;
-import com.sp.block.entity.custom.PhysicsDoorBlockEntity;
 import com.sp.networking.C2S.UpdateLimboSquareBlockPacket;
-import com.sp.networking.C2S.UpdatePhysicsDoorPacket;
-import com.sp.render.SelectionHandler;
 import com.sp.render.gui.screen.widget.HSVColorWidget;
-import com.sp.util.RenderUtil;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.CyclingButtonWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import org.joml.Vector3f;
 
 public class LimboSquareBlockScreen extends Screen {
     private final LimboSquareBlockEntity limboSquareBlockEntity;
-    private static final Text RED = Text.literal("Red:");
-    private static final Text GREEN = Text.literal("Green:");
-    private static final Text BLUE = Text.literal("Blue:");
     private static final Text HEIGHT_TEXT = Text.literal("Height:");
     private static final Text SIZE_TEXT = Text.literal("Size:");
     private int centerWidth;
     private int centerHeight;
-
-    private TextFieldWidget heightInupt;
-    private TextFieldWidget sizeInput;
-
-    private HSVColorWidget colorInput;
 
     private Vector3f prevColor;
     private float prevSize;
@@ -61,38 +45,57 @@ public class LimboSquareBlockScreen extends Screen {
 
         Vector3f color = this.limboSquareBlockEntity.getColor();
 
-//        281, 255
-        this.colorInput = new HSVColorWidget(this.centerWidth - 400, this.centerHeight + 30, 0.45f, color.x, color.y, color.z, (red, green, blue) -> {
+
+        this.addDrawableChild(new HSVColorWidget(this.centerWidth - 400, this.centerHeight + 30, 0.45f, color.x, color.y, color.z, (red, green, blue) -> {
             color.x = red;
             color.y = green;
             color.z = blue;
+        }));
+
+        this.addDrawableChild(new SliderWidget( this.centerWidth - 400, this.centerHeight + 160, 80, 20, ScreenTexts.EMPTY, 1.0) {
+            {
+                this.value = LimboSquareBlockScreen.this.limboSquareBlockEntity.getHeight();
+                this.updateMessage();
+            }
+
+            @Override
+            protected void updateMessage() {
+                this.setMessage(Text.literal("Height: " + LimboSquareBlockScreen.this.limboSquareBlockEntity.getHeight()));
+            }
+
+            @Override
+            protected void applyValue() {
+                float height = (float) MathHelper.clampedLerp(0.0, 1.0, this.value);
+                LimboSquareBlockScreen.this.limboSquareBlockEntity.setHeight(height);
+            }
         });
-        this.addDrawableChild(this.colorInput);
 
+        this.addDrawableChild(new SliderWidget(this.centerWidth - 300, this.centerHeight + 160, 80, 20, ScreenTexts.EMPTY, 1.0) {
+            {
+                this.value = LimboSquareBlockScreen.this.limboSquareBlockEntity.getSize() / 4;
+                this.updateMessage();
+            }
 
-        this.heightInupt = new TextFieldWidget(this.textRenderer, this.centerWidth - 400, this.centerHeight + 160, 80, 20, Text.literal("Size"));
-        this.heightInupt.setText(Float.toString(this.limboSquareBlockEntity.getHeight()));
-        this.addSelectableChild(this.heightInupt);
-        this.sizeInput = new TextFieldWidget(this.textRenderer, this.centerWidth - 300, this.centerHeight + 160, 80, 20, Text.literal("Height"));
-        this.sizeInput.setText(Float.toString(this.limboSquareBlockEntity.getSize()));
-        this.addSelectableChild(this.sizeInput);
+            @Override
+            protected void updateMessage() {
+                this.setMessage(Text.literal("Size: " + LimboSquareBlockScreen.this.limboSquareBlockEntity.getSize()));
+            }
+
+            @Override
+            protected void applyValue() {
+                float height = (float) MathHelper.clampedLerp(0.1, 4.0, this.value);
+                LimboSquareBlockScreen.this.limboSquareBlockEntity.setSize(height);
+            }
+        });
     }
 
     private void updateLimboBlock() {
         ClientPlayNetworking.send(new UpdateLimboSquareBlockPacket.UpdateLimboSquareBlockPayload(
                 this.limboSquareBlockEntity.getPos(),
                 new Vector3f(this.limboSquareBlockEntity.getColor()),
-                parseFloat(this.sizeInput.getText()),
-                parseFloat(this.heightInupt.getText())
+                this.limboSquareBlockEntity.getSize(),
+                this.limboSquareBlockEntity.getHeight()
         ));
-    }
-
-    private float parseFloat(String integer) {
-        try {
-            return Float.parseFloat(integer);
-        } catch (NumberFormatException var3) {
-            return 0;
-        }
     }
 
     @Override
@@ -100,38 +103,9 @@ public class LimboSquareBlockScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
         context.drawTextWithShadow(this.textRenderer, this.title, this.width/2 - 410, this.height/2 + 8, 16777215);
 
-        this.heightInupt.render(context, mouseX, mouseY, delta);
-        this.sizeInput.render(context, mouseX, mouseY, delta);
-
         context.drawTextWithShadow(this.textRenderer, HEIGHT_TEXT, this.centerWidth - 400, this.centerHeight - this.textRenderer.fontHeight + 160, 10526880);
 
         context.drawTextWithShadow(this.textRenderer, SIZE_TEXT, this.centerWidth - 300, this.centerHeight - this.textRenderer.fontHeight + 160, 10526880);
-    }
-
-    private void drawLetters(DrawContext context) {
-        context.drawTextWithShadow(
-                this.textRenderer,
-                RED,
-                this.centerWidth - 150 - this.textRenderer.getWidth(RED),
-                this.centerHeight - 90 - this.textRenderer.fontHeight / 2,
-                RenderUtil.getRgb(255, 0, 0)
-        );
-
-        context.drawTextWithShadow(
-                this.textRenderer,
-                GREEN,
-                this.centerWidth - 150 - this.textRenderer.getWidth(GREEN),
-                this.centerHeight - 50 - this.textRenderer.fontHeight / 2,
-                RenderUtil.getRgb(0, 255, 0)
-        );
-
-        context.drawTextWithShadow(
-                this.textRenderer,
-                BLUE,
-                this.centerWidth - 150 - this.textRenderer.getWidth(BLUE),
-                this.centerHeight - 10 - this.textRenderer.fontHeight / 2,
-                RenderUtil.getRgb(0, 0, 255)
-        );
     }
 
     @Override

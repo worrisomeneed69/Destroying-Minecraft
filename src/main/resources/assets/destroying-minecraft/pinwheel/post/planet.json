@@ -39,6 +39,11 @@
         "HandDepthSampler": {
             "type": "framebuffer",
             "name": "veil:first_person:depth"
+        },
+        "NormalSampler": {
+          "type": "framebuffer",
+          "name": "veil:dynamic_main",
+          "sampler": 2
         }
     }
 }

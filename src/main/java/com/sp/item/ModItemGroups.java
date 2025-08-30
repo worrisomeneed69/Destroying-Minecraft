@@ -19,6 +19,7 @@ public class ModItemGroups {
                         entries.add(ModItems.CAMERA_SHAKE_STICK_ITEM);
                         entries.add(ModItems.WALKIE_TALKIE_ITEM);
                         entries.add(ModBlocks.WHITE_VOID_BLOCK);
+                        entries.add(ModBlocks.GLITCHED_VOID_BLOCK);
                         entries.add(ModBlocks.PHYSICS_DOOR_BLOCK);
                         entries.add(ModBlocks.LIMBO_SQUARE_BLOCK);
                         entries.add(ModBlocks.CHAIR_BLOCK);
