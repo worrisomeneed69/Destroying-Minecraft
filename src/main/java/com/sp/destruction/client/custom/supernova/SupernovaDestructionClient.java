@@ -72,7 +72,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                     if (player != null) {
                         for (StarPiercerEntity entity : world.getEntitiesByClass(
                                 StarPiercerEntity.class,
-                                player.getBoundingBox().expand(100),
+                                player.getBoundingBox().expand(1000),
                                 Entity::isAlive)
                         ) {
                             entity.startup();

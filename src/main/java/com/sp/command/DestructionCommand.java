@@ -48,8 +48,10 @@ public class DestructionCommand {
                                         .executes(commandContext -> execute(commandContext, true, supernovaType))
                                 )
                                 .then(CommandManager.literal("reset")
-                                        .executes(commandContext -> execute(commandContext, false, supernovaType))
-                                        .executes(commandContext -> execute(commandContext, false, supernovaJazz))
+                                        .executes(commandContext ->
+                                                execute(commandContext, false, supernovaType) +
+                                                execute(commandContext, false, supernovaJazz)
+                                        )
                                 )
                         )
 
@@ -81,10 +83,10 @@ public class DestructionCommand {
                                 )
                                 .then(CommandManager.literal("start")
                                         .then(CommandManager.literal("part1")
-                                                .executes(commandContext -> blackHoleExecute(commandContext, true, 4))
+                                                .executes(commandContext -> blackHoleExecute(commandContext, true, blackHolePart1Type))
                                         )
                                         .then(CommandManager.literal("part2")
-                                                .executes(commandContext -> blackHoleExecute(commandContext, true, 5))
+                                                .executes(commandContext -> blackHoleExecute(commandContext, true, blackHolePart2Type))
                                         )
                                 )
                                 .then(CommandManager.literal("reset")
@@ -162,7 +164,7 @@ public class DestructionCommand {
 
     private  static int blackHoleExecute(CommandContext<ServerCommandSource> context, boolean start, int part) {
         if (start) {
-            switch (part){
+            switch (part) {
                 case blackHolePart1Type -> DestroyingMinecraft.blackHoleDestructionPart1.setActive(true);
                 case blackHolePart2Type -> DestroyingMinecraft.blackHoleDestructionPart2.setActive(true);
             }

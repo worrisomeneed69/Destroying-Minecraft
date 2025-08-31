@@ -3,6 +3,7 @@ package com.sp.mixin.sodiumcompat;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.sp.DestroyingMinecraft;
 import com.sp.render.PerspectiveRenderer;
+import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.caffeinemc.mods.sodium.client.gl.shader.*;
 import net.caffeinemc.mods.sodium.client.render.chunk.ShaderChunkRenderer;
@@ -25,7 +26,7 @@ public abstract class SodiumShadowMapShaderMixin {
 
     @Redirect(method = "begin", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/ShaderChunkRenderer;compileProgram(Lnet/caffeinemc/mods/sodium/client/render/chunk/shader/ChunkShaderOptions;)Lnet/caffeinemc/mods/sodium/client/gl/shader/GlProgram;"))
     private GlProgram<ChunkShaderInterface> redirectShadowShader(ShaderChunkRenderer instance, ChunkShaderOptions options, @Local(argsOnly = true) TerrainRenderPass pass){
-        if(PerspectiveRenderer.isRenderingPerspective()){
+        if(VeilLevelPerspectiveRenderer.isRenderingPerspective()){
 
             GlProgram<ChunkShaderInterface> program = this.shadowPrograms.get(options);
 

@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.10-SNAPSHOT'
+	id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 }
 
@@ -54,10 +54,25 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	//Veil
-	modImplementation("foundry.veil:veil-fabric-${project.minecraft_version}:${project.veil_version}") {
-		exclude group: "maven.modrinth"
-	}
-	include("foundry.veil:veil-fabric-${project.minecraft_version}:${project.veil_version}")
+//	modImplementation("foundry.veil:veil-fabric-${project.minecraft_version}:${project.veil_version}") {
+//		exclude group: "maven.modrinth"
+//	}
+//	include("foundry.veil:veil-fabric-${project.minecraft_version}:${project.veil_version}")
+    modImplementation(rootProject.files('src/main/resources/META-INF/jars/veil-fabric-1.21.1-2.3.1.jar'))
+//    include(files('dependencies/veil-fabric-1.21.1-2.3.1.jar'))
+
+    modImplementation(api("gg.moonflower:molang-compiler:${molang_compiler_version}"))
+    modImplementation(api("io.github.ocelot:glsl-processor:${glsl_processor_version}"))
+
+    modImplementation(api("io.github.spair:imgui-java-binding:$imgui_version"))
+    modImplementation(api("io.github.spair:imgui-java-lwjgl3:$imgui_version")) {
+        exclude group: 'org.lwjgl'
+        exclude group: 'org.lwjgl.lwjgl'
+    }
+
+    modImplementation(runtimeOnly("io.github.spair:imgui-java-natives-linux:$imgui_version"))
+    modImplementation(runtimeOnly("io.github.spair:imgui-java-natives-macos:$imgui_version"))
+    modImplementation(runtimeOnly("io.github.spair:imgui-java-natives-windows:$imgui_version"))
 
 
 	//Cardinal Components API
@@ -70,7 +85,7 @@ dependencies {
 	include "org.ladysnake.cardinal-components-api:cardinal-components-world:${project.cca_version}"
 
 	//Midnight Lib
-	modImplementation include ("maven.modrinth:midnightlib:${project.midnightlib_version}")
+	modImplementation include("maven.modrinth:midnightlib:${project.midnightlib_version}")
 
 	//Mod Menu
 	modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}")
@@ -82,7 +97,6 @@ dependencies {
 	modCompileOnly "maven.modrinth:sodium:mc1.21.1-${sodium_version}-fabric"
 	//Flashback
 	modCompileOnly "maven.modrinth:flashback:0.32.0"
-
 }
 
 processResources {

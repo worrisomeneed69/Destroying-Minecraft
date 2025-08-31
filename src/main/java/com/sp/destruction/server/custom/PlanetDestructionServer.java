@@ -69,16 +69,16 @@ public class PlanetDestructionServer extends ServerDestructionEvent {
                     int numOfTargetedPlayers = 0;
 
                     for (PlayerEntity player : players) {
-                        if (!player.canTakeDamage()) continue;
+                        if (player.isCreative() || player.isSpectator()) continue;
 
-                        averagePlayerPos = averagePlayerPos.add(player.getPos());
+                        averagePlayerPos.add(player.getPos());
                         numOfTargetedPlayers++;
                     }
 
                     averagePlayerPos.multiply(1.0f / numOfTargetedPlayers);
 
 
-                    DirectionalSBE directionalSBE = new DirectionalSBE(50, 50, -90, 0.5f, new Vec3d(averagePlayerPos.x, 65, averagePlayerPos.z));
+                    DirectionalSBE directionalSBE = new DirectionalSBE(50, 50, -90, 0.5f, new Vec3d(averagePlayerPos.x, 67, averagePlayerPos.z));
                     directionalSBE.explode(world);
                 })
         );

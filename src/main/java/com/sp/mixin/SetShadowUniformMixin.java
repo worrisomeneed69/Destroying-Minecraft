@@ -2,6 +2,7 @@ package com.sp.mixin;
 
 import com.sp.render.PerspectiveRenderer;
 import com.sp.util.BetterUniforms;
+import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.render.VertexFormat;
@@ -19,7 +20,7 @@ public abstract class SetShadowUniformMixin {
     private void setRenderingShadow(VertexFormat.DrawMode drawMode, Matrix4f viewMatrix, Matrix4f projectionMatrix, Window window, CallbackInfo ci) {
         foundry.veil.api.client.render.shader.program.ShaderProgram shader = VeilRenderSystem.getShader();
         if (shader != null) {
-            BetterUniforms.setInt(shader, "renderingShadow", PerspectiveRenderer.isRenderingPerspective() ? 1 : 0);
+            BetterUniforms.setInt(shader, "renderingShadow", VeilLevelPerspectiveRenderer.isRenderingPerspective() ? 1 : 0);
         }
 
     }

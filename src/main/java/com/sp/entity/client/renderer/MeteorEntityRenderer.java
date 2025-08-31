@@ -4,6 +4,7 @@ import com.sp.entity.custom.MeteorEntity;
 import com.sp.mixininterfaces.BufferBuilderPosition;
 import com.sp.render.PerspectiveRenderer;
 import com.sp.render.CustomRenderLayersAndVertexFormats;
+import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderer;
@@ -26,7 +27,7 @@ public class MeteorEntityRenderer extends EntityRenderer<MeteorEntity> {
 
     @Override
     public void render(MeteorEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        if(PerspectiveRenderer.isRenderingPerspective()) return;
+        if(VeilLevelPerspectiveRenderer.isRenderingPerspective()) return;
         VertexConsumer bufferBuilder = vertexConsumers.getBuffer(CustomRenderLayersAndVertexFormats.METEOR);
 
         float pMinX = 0.0f;

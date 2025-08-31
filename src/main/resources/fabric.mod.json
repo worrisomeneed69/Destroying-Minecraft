@@ -10,7 +10,6 @@
 	],
 	"contact": {
 	},
-	"license": "CC0-1.0",
 	"icon": "assets/destroying-minecraft/icon.png",
 	"environment": "*",
 	"entrypoints": {
@@ -49,6 +48,10 @@
 		"fabric-api": "*"
 	},
 	"suggests": {
-		"another-mod": "*"
-	}
+	},
+    "jars": [
+      {
+        "file": "META-INF/jars/veil-fabric-1.21.1-2.3.1.jar"
+      }
+    ]
 }

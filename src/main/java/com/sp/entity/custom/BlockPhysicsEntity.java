@@ -27,7 +27,6 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
@@ -93,15 +92,14 @@ public class BlockPhysicsEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-        this.setVelocity(0, -0.07, 0);
         if (!this.getWorld().isClient) {
             if (!component.isMeteorLike()) {
                 //Don't have to check every tick
-                if (this.age % 100 == 0) {
-                    if (!this.getBlockPos().isWithinDistance(new Vec3i(-1152, 66, 303), 200)) {
-                        this.discard();
-                    }
-                }
+//                if (this.age % 100 == 0) {
+//                    if (!this.getBlockPos().isWithinDistance(new Vec3i(-1152, 66, 303), 200)) {
+//                        this.discard();
+//                    }
+//                }
 
             } else {
                 if (this.age == 3) {

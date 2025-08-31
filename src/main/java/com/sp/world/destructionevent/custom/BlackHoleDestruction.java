@@ -26,7 +26,7 @@ import java.util.List;
 
 public class BlackHoleDestruction {
     private static Box selection;
-    private static List<BlockPos> surfaceBlocks;
+    private static List<BlockPos> surfaceBlocks = new ArrayList<>();
     private static final List<BlockPhysicsEntity> resetEntityMap = new ArrayList<>();
     private static boolean startDestruction;
     private static int breakOffCooldown;
@@ -339,6 +339,7 @@ public class BlackHoleDestruction {
     public static void clear() {
         selection = null;
         surfaceBlocks.clear();
+
     }
 
 

@@ -41,6 +41,7 @@ public class InvokeDestructionPacket {
                 }
 
                 case supernovaType: {
+                    System.out.println("WORKED");
                     DestroyingMinecraftClient.supernovaPostShader.getDestructionEvent().setActive(on);
                     if (on) DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.SUPERNOVA_ANIMATION);
                     break;

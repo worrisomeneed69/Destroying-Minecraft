@@ -3,6 +3,8 @@ package com.sp.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.sp.DestroyingMinecraft;
+import com.sp.cca.InitializeComponents;
+import com.sp.cca.custom.entity.PlayerComponent;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
@@ -37,6 +39,8 @@ public class WaitingRoomCommand {
         }
 
         for (ServerPlayerEntity player : targets) {
+            PlayerComponent component = InitializeComponents.PLAYERS.get(player);
+            component.setInWaitingRoom(setInWaitingRoom);
             DestroyingMinecraft.sendWaitingRoomPacket(player, setInWaitingRoom);
         }
 

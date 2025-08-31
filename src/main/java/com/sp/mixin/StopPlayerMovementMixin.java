@@ -3,6 +3,7 @@ package com.sp.mixin;
 import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.entity.PlayerComponent;
 import com.sp.render.BlackScreenManager;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -25,7 +26,7 @@ public abstract class StopPlayerMovementMixin extends LivingEntity {
 
         if (component.isInWaitingRoom()) {
             cir.setReturnValue(true);
-        } else if (this.getWorld().isClient) {
+        } else if (this.getWorld().isClient && ((PlayerEntity) (Object) this).equals(MinecraftClient.getInstance().player)) {
             if (BlackScreenManager.isBlackScreen()) {
                 cir.setReturnValue(true);
             }

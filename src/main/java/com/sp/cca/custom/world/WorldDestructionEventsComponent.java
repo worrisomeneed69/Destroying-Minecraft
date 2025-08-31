@@ -71,7 +71,6 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Ser
         nbtCompound.put("playZones", playZoneNbt);
         Vector<PlayZone> activePlayZones = PlayZoneManager.getActivePlayZones();
         playZoneNbt.putInt("numOfPlayZones", activePlayZones.size());
-
         for (int i = 0; i < activePlayZones.size(); i++) {
             PlayZone playZone = activePlayZones.get(i);
             Box playZoneBounds = playZone.getBoundingBox();

@@ -17,6 +17,7 @@ import com.sp.entity.client.renderer.StarPiercerEntityRenderer;
 import com.sp.item.ModModelPredicates;
 import com.sp.mixin.PostProcessingManagerAccessor;
 import com.sp.networking.InitializePackets;
+import com.sp.networking.callbacks.ClientConnectionEvents;
 import com.sp.render.*;
 import com.sp.render.camerashake.CameraShakeManager;
 import com.sp.render.gui.HSVColorTextureManager;
@@ -31,6 +32,7 @@ import com.sp.world.destructionevent.custom.BlackHoleDestruction;
 import com.sp.world.playzone.PlayZone;
 import com.sp.world.playzone.PlayZoneManager;
 import foundry.veil.Veil;
+import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.dynamicbuffer.DynamicBufferType;
 import foundry.veil.api.client.render.post.PostProcessingManager;
@@ -110,7 +112,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
             }
 
 
-			if(clientWorld == null || PerspectiveRenderer.isRenderingPerspective()) return;
+			if(clientWorld == null || VeilLevelPerspectiveRenderer.isRenderingPerspective()) return;
 
 			switch (stage) {
 				case AFTER_LEVEL -> {
@@ -192,9 +194,16 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 			}
 		});
 
-		ClientPlayConnectionEvents.DISCONNECT.register((clientPlayNetworkHandler, minecraftClient) -> {
+        ClientConnectionEvents.DISCONNECT.register(client -> {
+
 			this.blockInstanceRenderer.free();
 			this.blockInstanceRenderer = null;
+
+            BlackHoleDestruction.clear();
+            if (!client.isIntegratedServerRunning()) {
+                System.out.println("CLIENT CLEARED=======================================");
+                PlayZoneManager.clearAllPlayZones();
+            }
 		});
 
 		//Update camera shakes
@@ -209,10 +218,6 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 		ClientTickEvents.END_WORLD_TICK.register(clientWorld -> {
 			SelectionHandler.tickClientWorld(clientWorld);
-		});
-
-		ClientPlayConnectionEvents.DISCONNECT.register((clientPlayNetworkHandler, minecraftClient) -> {
-			BlackHoleDestruction.clear();
 		});
 
 

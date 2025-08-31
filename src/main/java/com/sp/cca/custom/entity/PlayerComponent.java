@@ -36,6 +36,7 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
         this.player = player;
         this.insideAPlayZone = true; //If this isn't set, it plays the countdown noise for a split second
         this.isInWaitingRoom = false;
+        System.out.println("NEW");
     }
 
 
@@ -61,11 +62,13 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
     @Override
     public void readFromNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
         this.isInWaitingRoom = nbtCompound.getBoolean("isInWaitingRoom");
+        this.initWaitingRoom = nbtCompound.getBoolean("initWaitingRoom");
     }
 
     @Override
     public void writeToNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
         nbtCompound.putBoolean("isInWaitingRoom", this.isInWaitingRoom);
+        nbtCompound.putBoolean("initWaitingRoom", this.initWaitingRoom);
     }
 
     public void sync() {
@@ -104,8 +107,8 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
     @Override
     public void serverTick() {
         if (!initWaitingRoom) {
+            System.out.println("INIT");
             if (!this.player.getDisplayName().getString().equals("SppacePotato")) {
-                System.out.println("NOOOO");
                 this.isInWaitingRoom = true;
                 this.sync();
             }

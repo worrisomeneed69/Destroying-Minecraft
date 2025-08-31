@@ -3,6 +3,7 @@ package com.sp.render;
 import com.sp.DestroyingMinecraft;
 import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.util.BetterUniforms;
+import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
@@ -39,7 +40,7 @@ public class ShadowMapRenderer {
         AdvancedFbo shadowMap = VeilRenderSystem.renderer().getFramebufferManager().getFramebuffer(DestroyingMinecraft.idOf("shadowmap"));
         if(shadowMap != null) {
             GL11.glCullFace(GL_FRONT);
-            PerspectiveRenderer.render(
+            VeilLevelPerspectiveRenderer.render(
                     shadowMap,
                     shadowModelView.peek().getPositionMatrix(),
                     shadowProjMat,

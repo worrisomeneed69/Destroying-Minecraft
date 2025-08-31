@@ -22,10 +22,12 @@ import com.sp.sounds.ModSounds;
 import com.sp.world.ModGameRules;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
 import com.sp.world.playzone.PlayZone;
+import com.sp.world.playzone.PlayZoneManager;
 import com.sp.world.spinningblockexplosion.SpinningBlockExplosion;
 import eu.midnightdust.lib.config.MidnightConfig;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;
@@ -77,6 +79,11 @@ public class DestroyingMinecraft implements ModInitializer {
 
 			BlackHoleDestruction.tick(serverWorld);
 		});
+
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            System.out.println("SERVER CLEARED=======================================");
+            PlayZoneManager.clearAllPlayZones();
+        });
 	}
 
 	public static Vec3d getGravityDir() {

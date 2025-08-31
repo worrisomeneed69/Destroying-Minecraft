@@ -81,7 +81,7 @@ void main() {
         worldPos.y = 4;
 //        float time = abs(sin(GameTime*200)) * 100.0;
         float time = 0.0;
-        if (laserLength >= 1.0) {
+        if (cracksTime > 0.0) {
             time = (cracksTime*50) + 5.0;
         }
 //        float time = cracksTime + 5.0;

@@ -183,7 +183,7 @@ void rayMarchLaser(inout vec3 color, vec3 playerPos, vec3 sunDir) {
         if(d < 0.01) {
             color = vec3(10.0, 1.0, 1.0);
             break;
-        } else if(dist > length(playerPos) || dist > 500.0) {
+        } else if(dist > length(playerPos) || dist > 700.0) {
             break;
         }
 
