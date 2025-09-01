@@ -60,7 +60,6 @@ public class Keyframe {
     protected boolean isInitialized() {
         return this.initialized;
     }
-
     protected void setInitialized(boolean initialized) {
         this.initialized = initialized;
     }

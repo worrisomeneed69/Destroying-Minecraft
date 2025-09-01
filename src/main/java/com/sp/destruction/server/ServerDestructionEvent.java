@@ -16,6 +16,11 @@ public abstract class ServerDestructionEvent extends DestructionEvent {
         serverInstances.add(this);
     }
 
+    @Override
+    protected void sync() {
+        super.sync();
+    }
+
     public static synchronized Vector<DestructionEvent> getAllServerInstances() {
         return (Vector<DestructionEvent>) serverInstances.clone();
     }

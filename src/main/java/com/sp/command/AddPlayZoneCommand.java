@@ -20,7 +20,7 @@ public class AddPlayZoneCommand {
 
     public static void register(CommandDispatcher<ServerCommandSource> serverCommandSourceCommandDispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
         serverCommandSourceCommandDispatcher.register(
-                literal("playZone")
+                literal("playzone")
                         .requires(source -> source.hasPermissionLevel(2)) // Permission level 2 (op)
                         .then(CommandManager.literal("add")
                                 .then(argument("position1", BlockPosArgumentType.blockPos())

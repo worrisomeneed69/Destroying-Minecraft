@@ -18,6 +18,14 @@ public abstract class ClientDestructionEvent extends DestructionEvent {
         clientInstances.add(this);
     }
 
+    /**
+     * Shouldn't skip keyframes client side
+     */
+    @Override
+    protected void skipKeyframe() {
+
+    }
+
     public abstract void setUniforms(ShaderProgram shaderProgram, float tickDelta);
 
     public static synchronized Vector<DestructionEvent> getAllClientInstances() {

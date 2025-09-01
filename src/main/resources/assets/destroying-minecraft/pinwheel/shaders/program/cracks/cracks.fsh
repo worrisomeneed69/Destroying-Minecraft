@@ -15,6 +15,7 @@ uniform sampler2D CracksTexture;
 uniform float GameTime;
 uniform float laserLength;
 uniform float cracksTime;
+uniform float flashTimer;
 
 in vec2 texCoord;
 out vec4 fragColor;
@@ -34,12 +35,10 @@ float getNoise(vec3 pos, float HOLE_SIZE) {
 
 float map(vec3 p) {
     vec3 rayPos = p;
-//    float length = (sin(GameTime*2000) * 0.5 + 0.5) * 1000;
     float length = laserLength * 520;
 
     if (length <= 0.0) return 5000.0;
-    float d = sdCylinder(rayPos - vec3(centerPos.x, 500, centerPos.y), length, 0.5);
-//    float d = sdInfCylinder(rayPos - vec3(centerPos.x, 0, centerPos.y), vec3(0, 0, 0.5));
+    float d = sdCylinder(rayPos - vec3(centerPos.x, 500, centerPos.y), length, 0.5 * (1.0 + flashTimer*10.0));
     d -= (sin(p.y*1 + rand(vec2(GameTime*1000, 745))*100)*0.5 + 0.5)*0.1;
     return d;
 
@@ -56,7 +55,8 @@ void rayMarchLaser(inout vec3 color, vec3 playerPos, bool cracks, float crackDep
         dist += d;
 
         if(d < 0.01) {
-            color = vec3(10.0, 2.0, 2.0);
+            float whiteValue = 2.0 + (1.0 + flashTimer*2.0);
+            color = vec3(10.0, whiteValue, whiteValue);
             break;
         } else if((dist > length(playerPos) && dist > length(playerPos) + crackDepth) || dist > 500.0) {
             break;
@@ -119,9 +119,7 @@ void main() {
             crackDepth += distance(rayPos, worldPos);
 
             color = magmaColor*2;
-//            color = vec3(0.0);
         }
-//        color = vec3(noise);
     }
 
     vec3 playerPos = screenToLocalSpace(texCoord, depth).xyz;
@@ -129,5 +127,5 @@ void main() {
     rayMarchLaser(color, playerPos, cracks, crackDepth);
 
 
-    fragColor = vec4(color, 1.0);
+    fragColor = vec4(color + flashTimer, 1.0);
 }

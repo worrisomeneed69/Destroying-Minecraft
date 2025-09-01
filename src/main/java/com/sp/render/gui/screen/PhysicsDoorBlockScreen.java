@@ -2,6 +2,7 @@ package com.sp.render.gui.screen;
 
 import com.sp.block.entity.custom.PhysicsDoorBlockEntity;
 import com.sp.networking.C2S.UpdatePhysicsDoorPacket;
+import com.sp.networking.CustomPayloads;
 import com.sp.render.SelectionHandler;
 import com.sp.util.RenderUtil;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -146,7 +147,7 @@ public class PhysicsDoorBlockScreen extends Screen {
         BlockPos corner1 = new BlockPos(parseInt(this.corner1XInput.getText()), parseInt(this.corner1YInput.getText()), parseInt(this.corner1ZInput.getText()));
         BlockPos corner2 = new BlockPos(parseInt(this.corner2XInput.getText()), parseInt(this.corner2YInput.getText()), parseInt(this.corner2ZInput.getText()));
 
-        ClientPlayNetworking.send(new UpdatePhysicsDoorPacket.UpdatePhysicsDoorBlock(
+        ClientPlayNetworking.send(new CustomPayloads.UpdatePhysicsDoorBlock(
                 this.physicsDoorBlockEntity.getPos(),
                 corner1,
                 corner2,

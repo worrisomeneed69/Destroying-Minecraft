@@ -337,7 +337,7 @@ public class BlackHoleDestructionServerPart2 extends ServerDestructionEvent {
                     double clampedGlobalTime = Math.floor(globalTime * 10) * 0.1;
                     if (clampedGlobalTime != prevGravityLerp) {
                         component.setGravityLerp(clampedGlobalTime);
-                        component.sync();
+                        component.syncLight();
                         prevGravityLerp = clampedGlobalTime;
 
                         BRAAMS.forEach((aDouble, soundEvent) -> {
@@ -354,7 +354,7 @@ public class BlackHoleDestructionServerPart2 extends ServerDestructionEvent {
                 () -> {
                     prevGravityLerp = 0.0;
                     component.setGravityLerp(1.2);
-                    component.sync();
+                    component.syncLight();
 
                     for (PlayerEntity player : world.getPlayers()) {
                         DestroyingMinecraft.sendBraamPacket(player, ModSounds.BLACK_HOLE_BRAAM_FINAL);

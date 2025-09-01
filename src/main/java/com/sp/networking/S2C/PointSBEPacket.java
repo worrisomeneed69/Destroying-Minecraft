@@ -1,6 +1,7 @@
 package com.sp.networking.S2C;
 
 import com.sp.DestroyingMinecraft;
+import com.sp.networking.CustomPayloads;
 import com.sp.render.camerashake.CameraShakeManager;
 import com.sp.render.camerashake.custom.PointCameraShake;
 import com.sp.util.MathUtil;
@@ -14,27 +15,11 @@ import org.joml.Vector3f;
 
 public class PointSBEPacket {
 
-    public static void receive(SBEPayload payload, ClientPlayNetworking.Context context) {
+    public static void receive(CustomPayloads.SBEPayload payload, ClientPlayNetworking.Context context) {
         context.client().execute(()->{
             PointCameraShake cameraShake = new PointCameraShake(MathUtil.toVec3d(payload.position()), (float) payload.radius(), 40, Easing.LINEAR);
             CameraShakeManager.addCameraShake(cameraShake);
         });
-    }
-
-
-    public record SBEPayload(Vector3f position, int radius) implements CustomPayload {
-        public static final Id<SBEPayload> ID = new Id<>(DestroyingMinecraft.idOf("sbe"));
-
-        public static final PacketCodec<RegistryByteBuf, SBEPayload> CODEC = PacketCodec.tuple(
-                PacketCodecs.VECTOR3F, SBEPayload::position,
-                PacketCodecs.INTEGER, SBEPayload::radius,
-                SBEPayload::new);
-
-
-        @Override
-        public Id<? extends CustomPayload> getId() {
-            return ID;
-        }
     }
 
 }

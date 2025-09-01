@@ -13,11 +13,10 @@ import com.sp.destruction.server.custom.blackhole.BlackHoleDestructionServerPart
 import com.sp.entity.ModEntities;
 import com.sp.item.ModItemGroups;
 import com.sp.item.ModItems;
+import com.sp.networking.CustomPayloads;
 import com.sp.networking.InitializePackets;
-import com.sp.networking.S2C.BraamPacket;
-import com.sp.networking.S2C.PointSBEPacket;
-import com.sp.networking.S2C.UpdatePlayZonePacket;
-import com.sp.networking.S2C.WaitingRoomPacket;
+import com.sp.networking.S2C.*;
+import com.sp.render.ShaderType;
 import com.sp.sounds.ModSounds;
 import com.sp.world.ModGameRules;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
@@ -61,6 +60,7 @@ public class DestroyingMinecraft implements ModInitializer {
 		ModSounds.registerSounds();
 		ModGameRules.registerGameRules();
 		ModDataComponentTypes.registerDataComponentTypes();
+        ModArgumentTypes.registerModArgumentTypes();
 
 		MidnightConfig.init(MOD_ID, DestroyingMinecraftConfig.class);
 
@@ -68,7 +68,7 @@ public class DestroyingMinecraft implements ModInitializer {
 		CommandRegistrationCallback.EVENT.register(RipPlatformOutCommand::register);
 		CommandRegistrationCallback.EVENT.register(AddPlayZoneCommand::register);
         CommandRegistrationCallback.EVENT.register(RevealBlackHoleCommand::register);
-        CommandRegistrationCallback.EVENT.register(WaitingRoomCommand::register);
+        CommandRegistrationCallback.EVENT.register(PlayersCommand::register);
 
 		LOGGER.info("\"It's nukein' time\" -He said as he loaded the fork into the microwave");
 
@@ -81,7 +81,6 @@ public class DestroyingMinecraft implements ModInitializer {
 		});
 
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-            System.out.println("SERVER CLEARED=======================================");
             PlayZoneManager.clearAllPlayZones();
         });
 	}
@@ -91,16 +90,16 @@ public class DestroyingMinecraft implements ModInitializer {
 	}
 
 	public static void sendPointSBEPacket(PlayerEntity player, Vec3d position, int radius) {
-		ServerPlayNetworking.send((ServerPlayerEntity) player, new PointSBEPacket.SBEPayload(position.toVector3f(), radius));
+		ServerPlayNetworking.send((ServerPlayerEntity) player, new CustomPayloads.SBEPayload(position.toVector3f(), radius));
 	}
 
 	public static void sendBraamPacket(PlayerEntity player, SoundEvent soundEvent) {
-		ServerPlayNetworking.send((ServerPlayerEntity) player, new BraamPacket.BraamPayload(soundEvent));
+		ServerPlayNetworking.send((ServerPlayerEntity) player, new CustomPayloads.BraamPayload(soundEvent));
 	}
 
 	public static void sendUpdatePlayZonePacket(PlayerEntity player, PlayZone playZone, boolean remove) {
 		Box playZoneBounds = playZone.getBoundingBox();
-		ServerPlayNetworking.send((ServerPlayerEntity) player, new UpdatePlayZonePacket.UpdatePlayZonePayload(
+		ServerPlayNetworking.send((ServerPlayerEntity) player, new CustomPayloads.UpdatePlayZonePayload(
 				playZoneBounds.minX,
 				playZoneBounds.maxX,
 				playZoneBounds.minY,
@@ -113,7 +112,11 @@ public class DestroyingMinecraft implements ModInitializer {
 	}
 
     public static void sendWaitingRoomPacket(PlayerEntity player, boolean setInWaitingRoom) {
-        ServerPlayNetworking.send((ServerPlayerEntity) player, new WaitingRoomPacket.WaitingRoomPacketPayload(setInWaitingRoom));
+        ServerPlayNetworking.send((ServerPlayerEntity) player, new CustomPayloads.WaitingRoomPacketPayload(setInWaitingRoom));
+    }
+
+    public static void sendShaderChangePacket(PlayerEntity player, ShaderType shaderType) {
+        ServerPlayNetworking.send((ServerPlayerEntity) player, new CustomPayloads.ShaderChangePacketPayload(shaderType.asString()));
     }
 
 	public static Identifier idOf(String path){

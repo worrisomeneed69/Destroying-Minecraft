@@ -7,17 +7,22 @@ import com.sp.destruction.server.ServerDestructionEvent;
 import com.sp.world.playzone.PlayZone;
 import com.sp.world.playzone.PlayZoneManager;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent;
+import org.ladysnake.cca.api.v3.component.tick.CommonTickingComponent;
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
 
 import java.util.Vector;
 
-public class WorldDestructionEventsComponent implements AutoSyncedComponent, ServerTickingComponent, ClientTickingComponent {
+public class WorldDestructionEventsComponent implements AutoSyncedComponent, CommonTickingComponent {
     private final World world;
+    private boolean syncLight;
+    private DestructionEvent currentDestructionEvent;
     private double gravityLerp;
     private NbtCompound worldPlayZones;
 
@@ -33,13 +38,37 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Ser
         this.gravityLerp = gravityLerp;
     }
 
-//    public NbtElement getWorldPlayZones() {
-//        return worldPlayZones;
-//    }
+    public DestructionEvent getCurrentDestructionEvent() {
+        return this.currentDestructionEvent;
+    }
+    public void setAndStartCurrentDestructionEvent(DestructionEvent currentDestructionEvent, long startTime) {
+        if (this.currentDestructionEvent != null) {
+            this.currentDestructionEvent.setActive(false, -1);
+        }
+        this.currentDestructionEvent = currentDestructionEvent;
+        this.currentDestructionEvent.setActive(true, startTime);
+    }
+
+
+    @Override
+    public void writeSyncPacket(RegistryByteBuf buf, ServerPlayerEntity recipient) {
+        if (this.syncLight) {
+            NbtCompound nbtCompound = new NbtCompound();
+            nbtCompound.putDouble("gravityLerp", this.gravityLerp);
+            nbtCompound.putDouble("currentDestructionEventProgress", this.currentDestructionEvent != null ? this.currentDestructionEvent.getProgress() : -1);
+
+            buf.writeNbt(nbtCompound);
+            this.syncLight = false;
+        }
+        AutoSyncedComponent.super.writeSyncPacket(buf, recipient);
+    }
 
     @Override
     public void readFromNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
         this.gravityLerp = nbtCompound.getDouble("gravityLerp");
+        if (this.currentDestructionEvent != null) {
+            this.currentDestructionEvent.setProgress(nbtCompound.getInt("currentDestructionEventProgress"));
+        }
 
         if (nbtCompound.contains("playZones")) {
             this.worldPlayZones = nbtCompound.getCompound("playZones");
@@ -66,6 +95,7 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Ser
     @Override
     public void writeToNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
         nbtCompound.putDouble("gravityLerp", this.gravityLerp);
+        nbtCompound.putDouble("currentDestructionEventProgress", this.currentDestructionEvent != null ? this.currentDestructionEvent.getProgress() : -1);
 
         NbtCompound playZoneNbt = new NbtCompound();
         nbtCompound.put("playZones", playZoneNbt);
@@ -90,25 +120,37 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Ser
 
     }
 
+    public void syncLight() {
+        this.syncLight = true;
+        this.sync();
+    }
+
     public void sync() {
         InitializeComponents.EVENTS.sync(this.world);
     }
 
-    @Override
-    public void clientTick() {
-        if (this.world.getRegistryKey() == World.OVERWORLD) {
-            for (DestructionEvent event : ClientDestructionEvent.getAllClientInstances()) {
-                event.tick(this.world);
-            }
-        }
-    }
+//    @Override
+//    public void clientTick() {
+//        if (this.world.getRegistryKey() == World.OVERWORLD) {
+//            for (DestructionEvent event : ClientDestructionEvent.getAllClientInstances()) {
+//                event.tick(this.world);
+//            }
+//        }
+//    }
+
+//    @Override
+//    public void serverTick() {
+//        if (this.world.getRegistryKey() == World.OVERWORLD) {
+//            for (DestructionEvent event : ServerDestructionEvent.getAllServerInstances()) {
+//                event.tick(this.world);
+//            }
+//        }
+//    }
 
     @Override
-    public void serverTick() {
-        if (this.world.getRegistryKey() == World.OVERWORLD) {
-            for (DestructionEvent event : ServerDestructionEvent.getAllServerInstances()) {
-                event.tick(this.world);
-            }
+    public void tick() {
+        if (this.world.getRegistryKey() == World.OVERWORLD && this.currentDestructionEvent != null) {
+            this.currentDestructionEvent.tick(this.world);
         }
     }
 }

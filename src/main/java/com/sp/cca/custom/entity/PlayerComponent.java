@@ -11,11 +11,14 @@ import com.sp.render.BlackScreenManager;
 import com.sp.sounds.ModSounds;
 import com.sp.util.Noise;
 import com.sp.world.playzone.PlayZoneManager;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.GameMode;
 import org.joml.Vector2d;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent;
@@ -23,6 +26,7 @@ import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
 
 public class PlayerComponent implements AutoSyncedComponent, ClientTickingComponent, ServerTickingComponent {
     private final PlayerEntity player;
+    private boolean hasDied;
     private boolean insideAPlayZone;
     private long deathTime;
 
@@ -36,7 +40,6 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
         this.player = player;
         this.insideAPlayZone = true; //If this isn't set, it plays the countdown noise for a split second
         this.isInWaitingRoom = false;
-        System.out.println("NEW");
     }
 
 
@@ -58,30 +61,44 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
         this.isInWaitingRoom = inWaitingRoom;
     }
 
+    public boolean hasDied() {
+        return this.hasDied;
+    }
+
+    public void setHasDied(boolean hasDied) {
+        this.hasDied = hasDied;
+    }
+
 
     @Override
     public void readFromNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
         this.isInWaitingRoom = nbtCompound.getBoolean("isInWaitingRoom");
         this.initWaitingRoom = nbtCompound.getBoolean("initWaitingRoom");
+        this.isInHole = nbtCompound.getBoolean("isInHole");
+        this.hasDied = nbtCompound.getBoolean("hasDied");
     }
 
     @Override
     public void writeToNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
         nbtCompound.putBoolean("isInWaitingRoom", this.isInWaitingRoom);
         nbtCompound.putBoolean("initWaitingRoom", this.initWaitingRoom);
+        nbtCompound.putBoolean("isInHole", this.isInHole);
+        nbtCompound.putBoolean("hasDied", this.hasDied);
     }
 
     public void sync() {
         InitializeComponents.PLAYERS.sync(this.player);
     }
 
+    public void resetPlayer() {
+        this.isInHole = false;
+        this.hasDied = false;
+        this.sync();
+    }
+
     @Override
     public void clientTick() {
         this.updateInAPlayZone();
-        ClientDestructionEvent cracksDestructionEvent = DestroyingMinecraftClient.cracksPostShader.getDestructionEvent();
-        if (cracksDestructionEvent.isActive()) {
-            this.updateInHole(LaserDestructionClient.laserLength.getTimer(1.0f), LaserDestructionClient.cracksTime.getTimer(1.0f));
-        }
 
         if (this.isInHole && !spawnedEvaporateParticles) {
             this.player.playSound(ModSounds.LAVA_DEATH, 1.0f, 1.0f);
@@ -107,7 +124,6 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
     @Override
     public void serverTick() {
         if (!initWaitingRoom) {
-            System.out.println("INIT");
             if (!this.player.getDisplayName().getString().equals("SppacePotato")) {
                 this.isInWaitingRoom = true;
                 this.sync();
@@ -115,15 +131,18 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
             initWaitingRoom = true;
         }
 
-//        this.isInWaitingRoom = false;
-//        this.sync();
+        if (this.hasDied && !this.player.isSpectator()) {
+            ((ServerPlayerEntity) this.player).changeGameMode(GameMode.SPECTATOR);
+        }
 
         this.updateInAPlayZone();
         if (DestroyingMinecraft.laserDestruction.isActive()) {
             this.updateInHole(LaserDestructionServer.laserLength, LaserDestructionServer.crackingTime);
         }
 
-        if (this.isInHole) {
+        if (this.isInHole && !this.hasDied) {
+            this.hasDied = true;
+            this.sync();
             this.player.damage(ModDamageSources.of(this.player.getWorld(), ModDamageSources.CRACKS_DAMAGE_TYPE), Float.MAX_VALUE);
         }
     }
@@ -132,7 +151,7 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
 
     private void updateInAPlayZone() {
         boolean insidePlayZone;
-        if (this.player.isInCreativeMode() || this.player.isSpectator()) {
+        if ((this.player.isInCreativeMode() || this.player.isSpectator()) && !this.hasDied) {
             insidePlayZone = true;
             this.deathTime = 0L;
         } else {
@@ -147,6 +166,7 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
 
         if (!insidePlayZone && (this.deathTime - System.currentTimeMillis()) <= 0) {
             this.player.damage(ModDamageSources.of(this.player.getWorld(), ModDamageSources.PLAY_ZONE_DAMAGE_TYPE), Float.MAX_VALUE);
+//            this.player.kill();
         }
 
         this.insideAPlayZone = insidePlayZone;

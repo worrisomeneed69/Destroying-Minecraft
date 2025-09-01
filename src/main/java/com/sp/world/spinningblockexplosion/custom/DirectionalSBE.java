@@ -45,6 +45,7 @@ public class DirectionalSBE extends SpinningBlockExplosion {
                     float randomYAcceleration = spinningBlockEntity.getRandom().nextFloat()*0.05f + 0.3f;
                     component.setAcceleration(0.0f, randomYAcceleration, 0.0f);
                     component.setApplyGravity(false);
+                    spinningBlockEntity.noClip = true;
                     component.sync();
                     spinningBlockEntity.refreshPositionAndAngles(this.position.add(newBlockPos), 0, 0);
 

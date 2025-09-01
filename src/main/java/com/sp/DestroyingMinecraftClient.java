@@ -201,7 +201,6 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
             BlackHoleDestruction.clear();
             if (!client.isIntegratedServerRunning()) {
-                System.out.println("CLIENT CLEARED=======================================");
                 PlayZoneManager.clearAllPlayZones();
             }
 		});

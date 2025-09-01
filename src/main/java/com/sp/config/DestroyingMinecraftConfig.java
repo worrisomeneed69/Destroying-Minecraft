@@ -7,7 +7,7 @@ public class DestroyingMinecraftConfig extends MidnightConfig {
     public static final String SHADERS = "shaders";
 
     @Entry(category = SHADERS)
-    public static ShaderType shaderType = ShaderType.NONE;
+    public static ShaderType shaderType = ShaderType.CRACKS;
 
 //    @Entry(category = SHADERS)
 //    public static Comment spacer1;

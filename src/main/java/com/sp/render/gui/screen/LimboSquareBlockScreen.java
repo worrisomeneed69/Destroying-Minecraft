@@ -2,6 +2,7 @@ package com.sp.render.gui.screen;
 
 import com.sp.block.entity.custom.LimboSquareBlockEntity;
 import com.sp.networking.C2S.UpdateLimboSquareBlockPacket;
+import com.sp.networking.CustomPayloads;
 import com.sp.render.gui.screen.widget.HSVColorWidget;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.DrawContext;
@@ -90,7 +91,7 @@ public class LimboSquareBlockScreen extends Screen {
     }
 
     private void updateLimboBlock() {
-        ClientPlayNetworking.send(new UpdateLimboSquareBlockPacket.UpdateLimboSquareBlockPayload(
+        ClientPlayNetworking.send(new CustomPayloads.UpdateLimboSquareBlockPayload(
                 this.limboSquareBlockEntity.getPos(),
                 new Vector3f(this.limboSquareBlockEntity.getColor()),
                 this.limboSquareBlockEntity.getSize(),

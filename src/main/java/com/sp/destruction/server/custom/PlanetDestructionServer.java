@@ -6,7 +6,6 @@ import com.sp.entity.custom.MeteorEntity;
 import com.sp.util.keyframes.Keyframe;
 import com.sp.util.keyframes.KeyframeAnimation;
 import com.sp.world.spinningblockexplosion.custom.DirectionalSBE;
-import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
@@ -71,12 +70,11 @@ public class PlanetDestructionServer extends ServerDestructionEvent {
                     for (PlayerEntity player : players) {
                         if (player.isCreative() || player.isSpectator()) continue;
 
-                        averagePlayerPos.add(player.getPos());
+                        averagePlayerPos = averagePlayerPos.add(player.getPos());
                         numOfTargetedPlayers++;
                     }
 
-                    averagePlayerPos.multiply(1.0f / numOfTargetedPlayers);
-
+                    averagePlayerPos = averagePlayerPos.multiply(1.0f / numOfTargetedPlayers);
 
                     DirectionalSBE directionalSBE = new DirectionalSBE(50, 50, -90, 0.5f, new Vec3d(averagePlayerPos.x, 67, averagePlayerPos.z));
                     directionalSBE.explode(world);

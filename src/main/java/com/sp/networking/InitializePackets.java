@@ -12,30 +12,32 @@ public class InitializePackets {
 
     public static void registerServerNetworking() {
         //Send to server
-        PayloadTypeRegistry.playC2S().register(UpdatePhysicsDoorPacket.UpdatePhysicsDoorBlock.ID, UpdatePhysicsDoorPacket.UpdatePhysicsDoorBlock.CODEC);
-        PayloadTypeRegistry.playC2S().register(UpdateLimboSquareBlockPacket.UpdateLimboSquareBlockPayload.ID, UpdateLimboSquareBlockPacket.UpdateLimboSquareBlockPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(CustomPayloads.UpdatePhysicsDoorBlock.ID, CustomPayloads.UpdatePhysicsDoorBlock.CODEC);
+        PayloadTypeRegistry.playC2S().register(CustomPayloads.UpdateLimboSquareBlockPayload.ID, CustomPayloads.UpdateLimboSquareBlockPayload.CODEC);
 
         //Receive from client
-        ServerPlayNetworking.registerGlobalReceiver(UpdatePhysicsDoorPacket.UpdatePhysicsDoorBlock.ID, UpdatePhysicsDoorPacket::recieve);
-        ServerPlayNetworking.registerGlobalReceiver(UpdateLimboSquareBlockPacket.UpdateLimboSquareBlockPayload.ID, UpdateLimboSquareBlockPacket::receive);
+        ServerPlayNetworking.registerGlobalReceiver(CustomPayloads.UpdatePhysicsDoorBlock.ID, UpdatePhysicsDoorPacket::recieve);
+        ServerPlayNetworking.registerGlobalReceiver(CustomPayloads.UpdateLimboSquareBlockPayload.ID, UpdateLimboSquareBlockPacket::receive);
 
 
         //Send to client
-        PayloadTypeRegistry.playS2C().register(InvokeDestructionPacket.DestructionPayload.ID, InvokeDestructionPacket.DestructionPayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(PointSBEPacket.SBEPayload.ID, PointSBEPacket.SBEPayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(BraamPacket.BraamPayload.ID, BraamPacket.BraamPayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(UpdatePlayZonePacket.UpdatePlayZonePayload.ID, UpdatePlayZonePacket.UpdatePlayZonePayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(WaitingRoomPacket.WaitingRoomPacketPayload.ID, WaitingRoomPacket.WaitingRoomPacketPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(CustomPayloads.DestructionPayload.ID, CustomPayloads.DestructionPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(CustomPayloads.SBEPayload.ID, CustomPayloads.SBEPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(CustomPayloads.BraamPayload.ID, CustomPayloads.BraamPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(CustomPayloads.UpdatePlayZonePayload.ID, CustomPayloads.UpdatePlayZonePayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(CustomPayloads.WaitingRoomPacketPayload.ID, CustomPayloads.WaitingRoomPacketPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(CustomPayloads.ShaderChangePacketPayload.ID, CustomPayloads.ShaderChangePacketPayload.CODEC);
     }
 
 
     public static void registerClientNetworking() {
         //Receive from server
-        ClientPlayNetworking.registerGlobalReceiver(InvokeDestructionPacket.DestructionPayload.ID, InvokeDestructionPacket::receive);
-        ClientPlayNetworking.registerGlobalReceiver(PointSBEPacket.SBEPayload.ID, PointSBEPacket::receive);
-        ClientPlayNetworking.registerGlobalReceiver(BraamPacket.BraamPayload.ID, BraamPacket::receive);
-        ClientPlayNetworking.registerGlobalReceiver(UpdatePlayZonePacket.UpdatePlayZonePayload.ID, UpdatePlayZonePacket::receive);
-        ClientPlayNetworking.registerGlobalReceiver(WaitingRoomPacket.WaitingRoomPacketPayload.ID, WaitingRoomPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(CustomPayloads.DestructionPayload.ID, InvokeDestructionPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(CustomPayloads.SBEPayload.ID, PointSBEPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(CustomPayloads.BraamPayload.ID, BraamPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(CustomPayloads.UpdatePlayZonePayload.ID, UpdatePlayZonePacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(CustomPayloads.WaitingRoomPacketPayload.ID, WaitingRoomPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(CustomPayloads.ShaderChangePacketPayload.ID, ShaderChangePacket::receive);
     }
 
 }

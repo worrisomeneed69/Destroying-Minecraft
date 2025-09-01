@@ -16,6 +16,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.client.sound.SoundManager;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.world.World;
 
@@ -23,17 +24,19 @@ import net.minecraft.world.World;
 public class LaserDestructionClient extends ClientDestructionEvent {
     public static final ShaderTimer laserLength = new ShaderTimer();
     public static final ShaderTimer cracksTime = new ShaderTimer();
+    public static final ShaderTimer flashTimer = new ShaderTimer();
     private static PositionedSoundInstance laserLoop;
     private static PositionedSoundInstance crackingLoop;
 
     public LaserDestructionClient() {
-        super(2400);
+        super(2500);
     }
 
     @Override
     protected void resetEvent() {
         laserLength.reset();
         cracksTime.reset();
+        flashTimer.reset();
         if (laserLoop != null) {
             MinecraftClient.getInstance().getSoundManager().stop(laserLoop);
         }
@@ -47,6 +50,7 @@ public class LaserDestructionClient extends ClientDestructionEvent {
     public void setUniforms(ShaderProgram shaderProgram, float tickDelta) {
         BetterUniforms.setFloat(shaderProgram, "laserLength", laserLength.getTimer(tickDelta));
         BetterUniforms.setFloat(shaderProgram, "cracksTime", cracksTime.getTimer(tickDelta));
+        BetterUniforms.setFloat(shaderProgram, "flashTimer", flashTimer.getTimer(tickDelta));
     }
 
     @Override
@@ -140,6 +144,9 @@ public class LaserDestructionClient extends ClientDestructionEvent {
                     CameraShakeManager.addCameraShake(cameraShakeInstance);
                 }, (globalTime, localTime) -> {
                     cracksTime.setTimer((float) localTime);
+                }),
+                new Keyframe(2100.0 / this.duration, (globalTime, localTime) -> {
+                    flashTimer.setTimer((float) localTime);
                 })
         );
     }

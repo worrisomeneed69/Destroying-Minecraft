@@ -7,6 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.sp.DestroyingMinecraft;
 import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.world.WorldDestructionEventsComponent;
+import com.sp.networking.CustomPayloads;
 import com.sp.networking.S2C.InvokeDestructionPacket;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
 import com.sp.world.spinningblockexplosion.custom.DirectionalSBE;
@@ -28,51 +29,34 @@ import static net.minecraft.server.command.CommandManager.argument;
 
 public class DestructionCommand {
     //Correlates to the switch statement in the InvokeDestructionPacket
-    public final static int nukeType = 0;
-    public final static int orbitalLaserType = 1;
-    public final static int planetType = 2;
-    public final static int supernovaJazz = 3;
-    public final static int supernovaType = 4;
-    public final static int blackHolePart1Type = 5;
-    public final static int blackHolePart2Type = 6;
+    public final static int reset = 0;
+    public final static int nukeType = 1;
+    public final static int orbitalLaserType = 2;
+    public final static int planetType = 3;
+    public final static int supernovaJazz = 4;
+    public final static int supernovaType = 5;
+    public final static int blackHolePart1Type = 6;
+    public final static int blackHolePart2Type = 7;
 
     public static void register(CommandDispatcher<ServerCommandSource> serverCommandSourceCommandDispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
         serverCommandSourceCommandDispatcher.register(
                 CommandManager.literal("destruction")
                         .requires(source -> source.hasPermissionLevel(2))
                         .then(CommandManager.literal("supernova")
-                                .then(CommandManager.literal("start")
-                                        .then(CommandManager.literal("jazz")
-                                                .executes(commandContext -> execute(commandContext, true, supernovaJazz))
-                                        )
-                                        .executes(commandContext -> execute(commandContext, true, supernovaType))
+                                .then(CommandManager.literal("jazz")
+                                        .executes(commandContext -> execute(commandContext, supernovaJazz))
                                 )
-                                .then(CommandManager.literal("reset")
-                                        .executes(commandContext ->
-                                                execute(commandContext, false, supernovaType) +
-                                                execute(commandContext, false, supernovaJazz)
-                                        )
-                                )
+                                .executes(commandContext -> execute(commandContext, supernovaType))
                         )
 
 
                         .then(CommandManager.literal("nuke")
-                                .then(CommandManager.literal("start")
-                                        .executes(commandContext -> execute(commandContext, true, nukeType))
-                                )
-                                .then(CommandManager.literal("reset")
-                                        .executes(commandContext -> execute(commandContext, false, nukeType))
-                                )
+                                .executes(commandContext -> execute(commandContext, nukeType))
                         )
 
 
                         .then(CommandManager.literal("planet")
-                                .then(CommandManager.literal("start")
-                                        .executes(commandContext -> execute(commandContext, true, planetType))
-                                )
-                                .then(CommandManager.literal("reset")
-                                        .executes(commandContext -> execute(commandContext, false, planetType))
-                                )
+                                .executes(commandContext -> execute(commandContext, planetType))
                         )
 
                         .then(CommandManager.literal("black_hole")
@@ -81,26 +65,16 @@ public class DestructionCommand {
                                                 .executes(commandContext -> blackHoleSelect(commandContext, BlockPosArgumentType.getBlockPos(commandContext, "position")))
                                         )
                                 )
-                                .then(CommandManager.literal("start")
-                                        .then(CommandManager.literal("part1")
-                                                .executes(commandContext -> blackHoleExecute(commandContext, true, blackHolePart1Type))
-                                        )
-                                        .then(CommandManager.literal("part2")
-                                                .executes(commandContext -> blackHoleExecute(commandContext, true, blackHolePart2Type))
-                                        )
+                                .then(CommandManager.literal("part1")
+                                        .executes(commandContext -> blackHoleExecute(commandContext, blackHolePart1Type))
                                 )
-                                .then(CommandManager.literal("reset")
-                                        .executes(commandContext -> blackHoleExecute(commandContext, false, 0))
+                                .then(CommandManager.literal("part2")
+                                        .executes(commandContext -> blackHoleExecute(commandContext, blackHolePart2Type))
                                 )
                         )
 
                         .then(CommandManager.literal("orbital_laser")
-                                .then(CommandManager.literal("start")
-                                        .executes(commandContext -> execute(commandContext, true, orbitalLaserType))
-                                )
-                                .then(CommandManager.literal("reset")
-                                        .executes(commandContext -> execute(commandContext, false, orbitalLaserType))
-                                )
+                                    .executes(commandContext -> execute(commandContext, orbitalLaserType))
                         )
 
                         .then(CommandManager.literal("explosion")
@@ -138,20 +112,45 @@ public class DestructionCommand {
                                 )
 
                         )
+                        .then(CommandManager.literal("reset")
+                                .executes(DestructionCommand::reset)
+                        )
         );
     }
 
-    private static int execute(CommandContext<ServerCommandSource> context, boolean start, int type) {
+    private static int execute(CommandContext<ServerCommandSource> context, int type) {
         List<ServerPlayerEntity> playerList = context.getSource().getWorld().getPlayers();
+        WorldDestructionEventsComponent worldComponent = InitializeComponents.EVENTS.get(context.getSource().getWorld());
+        BlockPos spawnPointPos = BlockPos.ORIGIN;
 
+        long startTime = System.currentTimeMillis();
         for(ServerPlayerEntity player : playerList) {
-            ServerPlayNetworking.send(player, new InvokeDestructionPacket.DestructionPayload(start, type));
+            ServerPlayNetworking.send(player, new CustomPayloads.DestructionPayload(type, startTime));
+
+            switch (type) {
+                case planetType -> {
+                    spawnPointPos = new BlockPos(-1496, 66, 1205);
+                }
+                case supernovaType -> {
+                    spawnPointPos = new BlockPos(-1048, 76, 1328);
+                }
+                case orbitalLaserType -> {
+                    spawnPointPos = new BlockPos(-1705, 67, 1560);
+                }
+            }
+            player.setSpawnPoint(context.getSource().getWorld().getRegistryKey(), spawnPointPos, 0, true, false);
         }
 
         switch (type) {
-            case planetType -> DestroyingMinecraft.planetServerDestruction.setActive(start);
-            case supernovaType -> DestroyingMinecraft.supernovaServerDestruction.setActive(start);
-            case orbitalLaserType -> DestroyingMinecraft.laserDestruction.setActive(start);
+            case planetType -> {
+                worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraft.planetServerDestruction, startTime);
+            }
+            case supernovaType -> {
+                worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraft.supernovaServerDestruction, startTime);
+            }
+            case orbitalLaserType -> {
+                worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraft.laserDestruction, startTime);
+            }
         }
         return 1;
     }
@@ -162,32 +161,34 @@ public class DestructionCommand {
         return 1;
     }
 
-    private  static int blackHoleExecute(CommandContext<ServerCommandSource> context, boolean start, int part) {
-        if (start) {
-            switch (part) {
-                case blackHolePart1Type -> DestroyingMinecraft.blackHoleDestructionPart1.setActive(true);
-                case blackHolePart2Type -> DestroyingMinecraft.blackHoleDestructionPart2.setActive(true);
-            }
-        } else {
-            DestroyingMinecraft.blackHoleDestructionPart1.setActive(false);
-            DestroyingMinecraft.blackHoleDestructionPart2.setActive(false);
+    private static int blackHoleExecute(CommandContext<ServerCommandSource> context, int part) {
+        WorldDestructionEventsComponent worldComponent = InitializeComponents.EVENTS.get(context.getSource().getWorld());
 
-            BlackHoleDestruction.setStartDestruction(false);
-            BlackHoleDestruction.reset();
-
-            WorldDestructionEventsComponent component = InitializeComponents.EVENTS.get(context.getSource().getWorld());
-            component.setGravityLerp(0.0);
-            component.sync();
+        switch (part) {
+            case blackHolePart1Type -> worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraft.blackHoleDestructionPart1, System.currentTimeMillis());
+            case blackHolePart2Type -> worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraft.blackHoleDestructionPart2, System.currentTimeMillis());
         }
 
         for(ServerPlayerEntity player : context.getSource().getWorld().getPlayers()) {
-            if (start) {
-                ServerPlayNetworking.send(player, new InvokeDestructionPacket.DestructionPayload(true, part));
-            } else {
-                ServerPlayNetworking.send(player, new InvokeDestructionPacket.DestructionPayload(false, blackHolePart1Type));
-                ServerPlayNetworking.send(player, new InvokeDestructionPacket.DestructionPayload(false, blackHolePart2Type));
-            }
+            player.setSpawnPoint(context.getSource().getWorld().getRegistryKey(), new BlockPos(-1150, 71, 363), 0, true, false);
+            ServerPlayNetworking.send(player, new CustomPayloads.DestructionPayload(part, System.currentTimeMillis()));
+        }
 
+        return 1;
+    }
+
+    private static int reset(CommandContext<ServerCommandSource> context) {
+        WorldDestructionEventsComponent worldComponent = InitializeComponents.EVENTS.get(context.getSource().getWorld());
+        worldComponent.getCurrentDestructionEvent().setActive(false, -1);
+
+        BlackHoleDestruction.setStartDestruction(false);
+        BlackHoleDestruction.reset();
+
+        worldComponent.setGravityLerp(0.0);
+        worldComponent.syncLight();
+
+        for (ServerPlayerEntity player : context.getSource().getWorld().getPlayers()) {
+            ServerPlayNetworking.send(player, new CustomPayloads.DestructionPayload(reset, -1));
         }
 
         return 1;

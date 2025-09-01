@@ -48,8 +48,8 @@ public class KeyframeAnimation {
             return;
         }
 
-        Keyframe currentKeyframe = keyframeList.get(currentKeyframeIndex);
-        Keyframe nextKeyframe = currentKeyframeIndex + 1 <= keyframeList.size() - 1 ? keyframeList.get(currentKeyframeIndex + 1) : null;
+        Keyframe currentKeyframe = this.getCurrentKeyframe();
+        Keyframe nextKeyframe = this.getNextKeyframe();
 
         if (nextKeyframe != null && nextKeyframe.getKeyframeTime() <= time ) {
             currentKeyframe = nextKeyframe;
@@ -69,6 +69,21 @@ public class KeyframeAnimation {
         currentKeyframe.getAction().run(time, localTime);
 
         globalAction.run(time, time);
+    }
+
+    private Keyframe getCurrentKeyframe() {
+        return keyframeList.get(currentKeyframeIndex);
+    }
+
+    private Keyframe getNextKeyframe() {
+        return currentKeyframeIndex + 1 <= keyframeList.size() - 1 ? keyframeList.get(currentKeyframeIndex + 1) : null;
+    }
+
+    public double getNextKeyframeTime() {
+        Keyframe nextKeyframe = this.getNextKeyframe();
+        if (nextKeyframe == null) return 1.0;
+
+        return nextKeyframe.getKeyframeTime();
     }
 
     /**
