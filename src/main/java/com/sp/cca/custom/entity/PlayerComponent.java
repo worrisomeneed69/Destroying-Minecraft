@@ -159,8 +159,6 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
 
     @Override
     public void serverTick() {
-//        this.hasDied = true;
-//        this.sync();
         if (!initWaitingRoom) {
             if (!this.player.getDisplayName().getString().equals("SppacePotato")) {
                 this.isInWaitingRoom = true;

@@ -142,33 +142,33 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 				}
 
 				case AFTER_WEATHER -> {
-					if(shouldRenderDebug) {
+                    if (client.player == null) return;
+
+                    PlayerComponent component = InitializeComponents.PLAYERS.get(client.player);
+					if(shouldRenderDebug || !component.isInsideAPlayZone()) {
 						BlackHoleDestruction.renderSelectionDebug(matrixStack.toPoseStack(), bufferSource, camera, frustum);
 
-						Vector<PlayZone> activePlayZones = PlayZoneManager.getActivePlayZones();
-						if (!activePlayZones.isEmpty() && client.player != null) {
-							for (PlayZone playZone : activePlayZones) {
-								boolean inside = playZone.isPositionInsideZone(client.player.pos);
-								int[] colors = new int[4];
-								colors[0] = inside ? 50 : 255;  //RED
-								colors[1] = inside ? 255 : 50;  //GREEN
-								colors[2] = 50;                 //BLUE
-								colors[3] = 100;                //ALPHA
+                        for (PlayZone playZone : PlayZoneManager.getActivePlayZones()) {
+                            boolean inside = playZone.isPositionInsideZone(client.player.pos);
+                            int[] colors = new int[4];
+                            colors[0] = inside ? 50 : 255;  //RED
+                            colors[1] = inside ? 255 : 50;  //GREEN
+                            colors[2] = 50;                 //BLUE
+                            colors[3] = 100;                //ALPHA
 
-								RenderUtil.drawBox(
-										matrixStack.toPoseStack(),
-										bufferSource,
-										playZone.getBoundingBox().offset(camera.getPos().negate()),
-										colors[0],
-										colors[1],
-										colors[2],
-										colors[3],
-										true,
-										playZone.isPositionInsideZone(camera.getPos())
-								);
+                            RenderUtil.drawBox(
+                                    matrixStack.toPoseStack(),
+                                    bufferSource,
+                                    playZone.getBoundingBox().offset(camera.getPos().negate()),
+                                    colors[0],
+                                    colors[1],
+                                    colors[2],
+                                    colors[3],
+                                    true,
+                                    playZone.isPositionInsideZone(camera.getPos())
+                            );
 
-							}
-						}
+                        }
 					}
 
 					SelectionHandler.renderSelection(matrixStack.toPoseStack(), bufferSource, deltaTracker, camera);
