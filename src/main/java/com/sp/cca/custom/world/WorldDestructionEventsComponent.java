@@ -2,8 +2,6 @@ package com.sp.cca.custom.world;
 
 import com.sp.cca.InitializeComponents;
 import com.sp.destruction.DestructionEvent;
-import com.sp.destruction.client.ClientDestructionEvent;
-import com.sp.destruction.server.ServerDestructionEvent;
 import com.sp.world.playzone.PlayZone;
 import com.sp.world.playzone.PlayZoneManager;
 import net.minecraft.nbt.NbtCompound;
@@ -13,9 +11,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
-import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent;
 import org.ladysnake.cca.api.v3.component.tick.CommonTickingComponent;
-import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
 
 import java.util.Vector;
 
@@ -44,6 +40,7 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Com
     public void setAndStartCurrentDestructionEvent(DestructionEvent currentDestructionEvent, long startTime) {
         if (this.currentDestructionEvent != null) {
             this.currentDestructionEvent.setActive(false, -1);
+//            this.currentDestructionEvent.resetEvent();
         }
         this.currentDestructionEvent = currentDestructionEvent;
         this.currentDestructionEvent.setActive(true, startTime);

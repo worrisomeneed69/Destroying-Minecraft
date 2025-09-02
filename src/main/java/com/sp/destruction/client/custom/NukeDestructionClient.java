@@ -41,7 +41,7 @@ public class NukeDestructionClient extends ClientDestructionEvent {
     }
 
     @Override
-    protected void resetEvent() {
+    public void resetEvent() {
         smokeRiseTimer.reset();
         flashTimer.reset();
         this.startTime = -1;

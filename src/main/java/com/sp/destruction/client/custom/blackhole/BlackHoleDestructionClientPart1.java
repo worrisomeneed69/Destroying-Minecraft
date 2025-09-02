@@ -24,7 +24,7 @@ public class BlackHoleDestructionClientPart1 extends ClientDestructionEvent {
     }
 
     @Override
-    protected void resetEvent() {
+    public void resetEvent() {
         flashTimer.reset();
         if (blackHoleAmbience != null) {
             MinecraftClient.getInstance().getSoundManager().stop(blackHoleAmbience);
@@ -42,6 +42,7 @@ public class BlackHoleDestructionClientPart1 extends ClientDestructionEvent {
         SoundManager soundManager = MinecraftClient.getInstance().getSoundManager();
 
         return new KeyframeAnimation(
+                this.duration,
                 new Keyframe(0.0, () -> {
                     blackHoleAmbience = FadingSoundInstance.ambient(
                             ModSounds.BLACK_HOLE_AMBIENCE,
@@ -56,6 +57,7 @@ public class BlackHoleDestructionClientPart1 extends ClientDestructionEvent {
 
                 new Keyframe(220.0 / this.duration, (globalTime, localTime) -> {
                         flashTimer.setTimer((float) localTime);
+
                     }
                 ),
 

@@ -35,7 +35,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
     public static int destructionDistance = Integer.MAX_VALUE;
 
     public SupernovaDestructionClient() {
-        super(3000);
+        super(2900);
     }
 
     @Override
@@ -63,11 +63,18 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
         SoundManager soundManager = MinecraftClient.getInstance().getSoundManager();
 
         return new KeyframeAnimation(
+                this.duration,
+                //End action
+                () -> {
+                    //Avoid lag
+                    this.setActive(false, -1);
+                    this.resetEvent();
+                },
                 //*Pause
                 new Keyframe(0.0f),
 
                 //*Startup Star Piercers
-                new Keyframe(15.0/150, () -> {
+                new Keyframe(300.0/this.duration, () -> {
                     PlayerEntity player = MinecraftClient.getInstance().player;
                     if (player != null) {
                         for (StarPiercerEntity entity : world.getEntitiesByClass(
@@ -91,7 +98,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                 }),
 
                 //*Pause
-                new Keyframe(60.0/150, () -> {
+                new Keyframe(1200.0/this.duration, () -> {
                     soundManager.play(
                             PositionedSoundInstance.master(
                                     ModSounds.LASER_PAUSE,
@@ -104,7 +111,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                 }),
 
                 //*Fire Star Piercers
-                new Keyframe(121.0/300, () -> {
+                new Keyframe(1210.0/this.duration, () -> {
                     SustainedCameraShakeInstance shakeInstance = new SustainedCameraShakeInstance(
                             0.8f,
                             280,
@@ -125,7 +132,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                 }),
 
                 //*Stop firing / Power down
-                new Keyframe(75.0/150, () -> {
+                new Keyframe(1500.0/this.duration, () -> {
                     for (StarPiercerEntity entity : starPiercers) {
                         entity.powerDown();
                     }
@@ -140,10 +147,10 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                 }),
 
                 //*Pause
-                new Keyframe(100.0/150),
+                new Keyframe(2000.0/this.duration),
 
                 //*Supernova Explosion
-                new Keyframe(115.0/150, () -> {
+                new Keyframe(2300.0/this.duration, () -> {
                     soundManager.play(
                             PositionedSoundInstance.master(
                                     ModSounds.SUPERNOVA_EXPLOSION,
@@ -152,20 +159,22 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                             )
                     );
                 }, (globalTime, localTime) -> {
-                    destructionDistance = 300 - (int) (((globalTime - 0.94) / 0.035)*300);
+                    destructionDistance = 300 - (int) (((globalTime - (2830.0/this.duration)) / 0.04)*300);
 
-
-                    if (localTime < 0.3) {
+//                    flashTimer.reset();
+//                    explosionTimer.reset();
+                    if (localTime < 0.35) {
+                        System.out.println("IMPLODING");
                         //Sun implosion
-                        implodeTimer.setTimer(Easing.EASE_IN_CUBIC.ease((float) (localTime * 3.3333f)));
+                        implodeTimer.setTimer(Easing.EASE_IN_CUBIC.ease((float) (localTime * 2.85f)));
                     } else {
                         //Flash, then fade to supernova
                         implodeTimer.maxTimer();
-                        flashTimer.setTimer(Math.clamp(Easing.EASE_IN_OUT_CUBIC.ease((float) ((localTime - 0.3f) / 0.35f)), 0.0f, 1.0f));
-                        explosionTimer.setTimer((float) ((localTime - 0.3f) / (0.7f)));
+                        flashTimer.setTimer(Math.clamp(Easing.EASE_IN_OUT_CUBIC.ease((float) ((localTime - 0.35f) / 0.41f)), 0.0f, 1.0f));
+                        explosionTimer.setTimer((float) ((localTime - 0.35f) / (0.8f)));
                     }
 
-                    if (globalTime >= 0.969) {
+                    if (globalTime >= 0.998) {
                         CameraShakeInstance shakeInstance = new CameraShakeInstance(
                                 1.0f,
                                 0.0f,

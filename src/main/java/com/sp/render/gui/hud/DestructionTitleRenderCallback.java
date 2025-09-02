@@ -68,6 +68,7 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
     private void initializeAnimations(DrawContext drawContext, RenderTickCounter renderTickCounter) {
         MinecraftClient client = MinecraftClient.getInstance();
         ORBITAL_LASER_ANIMATION = new DestructionTitleAnimation(new KeyframeAnimation(
+                200,
                 new Keyframe(0.0f, () -> {
                     client.getSoundManager().play(PositionedSoundInstance.master(ModSounds.ORBITAL_LASER_INITIALIZE, 1.0f, 1.0f));
                 }, (globalTime, localTime) -> {
@@ -90,6 +91,7 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
         ), ORBITAL_LASER);
 
         PLANET_ANIMATION = new DestructionTitleAnimation(new KeyframeAnimation(
+                200,
                 new Keyframe(0.0f, () -> {
                     client.getSoundManager().play(PositionedSoundInstance.master(ModSounds.PLANET_INITIALIZE, 1.0f, 1.0f));
                 }, (globalTime, localTime) -> {
@@ -112,6 +114,7 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
         ), PLANET);
 
         SUPERNOVA_ANIMATION = new DestructionTitleAnimation(new KeyframeAnimation(
+                200,
                 new Keyframe(0.0f, () -> {
                     client.getSoundManager().play(PositionedSoundInstance.master(ModSounds.SUPERNOVA_INITIALIZE, 1.0f, 1.0f));
                 }, (globalTime, localTime) -> {
@@ -134,6 +137,7 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
         ), SUPERNOVA);
 
         BLACK_HOLE_ANIMATION = new DestructionTitleAnimation(new KeyframeAnimation(
+                500,
                 new Keyframe(0.0f, () -> {
                     client.getSoundManager().play(PositionedSoundInstance.master(ModSounds.BLACK_HOLE_INITIALIZE, 1.0f, 1.0f));
                 }),

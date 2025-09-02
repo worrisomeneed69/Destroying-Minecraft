@@ -33,7 +33,7 @@ public class LaserDestructionClient extends ClientDestructionEvent {
     }
 
     @Override
-    protected void resetEvent() {
+    public void resetEvent() {
         laserLength.reset();
         cracksTime.reset();
         flashTimer.reset();
@@ -58,6 +58,7 @@ public class LaserDestructionClient extends ClientDestructionEvent {
         SoundManager soundManager = MinecraftClient.getInstance().getSoundManager();
 
         return new KeyframeAnimation(
+                this.duration,
                 new Keyframe(0.0),
 
                 new Keyframe(400.0 / this.duration, () -> {
@@ -145,9 +146,19 @@ public class LaserDestructionClient extends ClientDestructionEvent {
                 }, (globalTime, localTime) -> {
                     cracksTime.setTimer((float) localTime);
                 }),
-                new Keyframe(2100.0 / this.duration, (globalTime, localTime) -> {
+                new Keyframe(2100.0 / this.duration, () ->{
+                    soundManager.play(
+                            PositionedSoundInstance.master(
+                                    ModSounds.LASER_END,
+                                    1.0f,
+                                    1.0f
+                            )
+                    );
+                }, (globalTime, localTime) -> {
                     flashTimer.setTimer((float) localTime);
-                })
+                }),
+
+                new Keyframe(2500.0 / this.duration)
         );
     }
 }

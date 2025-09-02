@@ -116,6 +116,11 @@
       "destroying-minecraft:black_hole/black_hole_destruction_ambience"
     ]
   },
+  "glitch": {
+    "sounds": [
+      "destroying-minecraft:black_hole/glitch"
+    ]
+  },
   "snap_snap": {
     "sounds": [
       "destroying-minecraft:black_hole/snap_snap"
@@ -181,6 +186,11 @@
   "laser_cracking_loop": {
     "sounds": [
       "destroying-minecraft:cracks/laser_cracking_loop"
+    ]
+  },
+  "laser_end": {
+    "sounds": [
+      "destroying-minecraft:cracks/laser_end"
     ]
   },
   "laser_landing": {

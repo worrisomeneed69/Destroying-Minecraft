@@ -1,17 +1,15 @@
 package com.sp.cca.custom.entity;
 
 import com.sp.DestroyingMinecraft;
-import com.sp.DestroyingMinecraftClient;
 import com.sp.cca.InitializeComponents;
-import com.sp.destruction.client.ClientDestructionEvent;
-import com.sp.destruction.client.custom.LaserDestructionClient;
+import com.sp.cca.custom.world.WorldDestructionEventsComponent;
 import com.sp.destruction.server.custom.LaserDestructionServer;
 import com.sp.entity.ModDamageSources;
-import com.sp.render.BlackScreenManager;
 import com.sp.sounds.ModSounds;
+import com.sp.sounds.instances.FadingSoundInstance;
 import com.sp.util.Noise;
 import com.sp.world.playzone.PlayZoneManager;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
@@ -27,6 +25,7 @@ import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
 public class PlayerComponent implements AutoSyncedComponent, ClientTickingComponent, ServerTickingComponent {
     private final PlayerEntity player;
     private boolean hasDied;
+    private GameMode prevGameMode;
     private boolean insideAPlayZone;
     private long deathTime;
 
@@ -35,6 +34,10 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
 
     private boolean isInWaitingRoom;
     private boolean initWaitingRoom;
+
+    private boolean shouldGlitch;
+    private int glitchTime;
+    private FadingSoundInstance glitchSoundInstance;
 
     public PlayerComponent(PlayerEntity player) {
         this.player = player;
@@ -64,11 +67,13 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
     public boolean hasDied() {
         return this.hasDied;
     }
-
     public void setHasDied(boolean hasDied) {
         this.hasDied = hasDied;
     }
 
+    public int getGlitchTime() {
+        return glitchTime;
+    }
 
     @Override
     public void readFromNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
@@ -76,6 +81,7 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
         this.initWaitingRoom = nbtCompound.getBoolean("initWaitingRoom");
         this.isInHole = nbtCompound.getBoolean("isInHole");
         this.hasDied = nbtCompound.getBoolean("hasDied");
+        this.shouldGlitch = nbtCompound.getBoolean("shouldGlitch");
     }
 
     @Override
@@ -84,6 +90,7 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
         nbtCompound.putBoolean("initWaitingRoom", this.initWaitingRoom);
         nbtCompound.putBoolean("isInHole", this.isInHole);
         nbtCompound.putBoolean("hasDied", this.hasDied);
+        nbtCompound.putBoolean("shouldGlitch", this.shouldGlitch);
     }
 
     public void sync() {
@@ -93,13 +100,16 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
     public void resetPlayer() {
         this.isInHole = false;
         this.hasDied = false;
+
+        if (this.prevGameMode != null) {
+            ((ServerPlayerEntity) this.player).changeGameMode(prevGameMode);
+            prevGameMode = null;
+        }
         this.sync();
     }
 
     @Override
     public void clientTick() {
-        this.updateInAPlayZone();
-
         if (this.isInHole && !spawnedEvaporateParticles) {
             this.player.playSound(ModSounds.LAVA_DEATH, 1.0f, 1.0f);
             for (int i = 0; i < 100; i++) {
@@ -119,10 +129,38 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
         } else if(!this.isInHole) {
             spawnedEvaporateParticles = false;
         }
+
+        if (this.player == MinecraftClient.getInstance().player) {
+            this.updateInAPlayZone();
+
+            if (this.shouldGlitch) {
+                if (glitchSoundInstance == null || glitchSoundInstance.isDone()) {
+                    glitchSoundInstance = FadingSoundInstance.ambient(
+                            ModSounds.GLITCH,
+                            50,
+                            true,
+                            0,
+                            1.0f,
+                            1.0f
+                    );
+                    MinecraftClient.getInstance().getSoundManager().play(glitchSoundInstance);
+                }
+                this.glitchTime = Math.min(this.glitchTime + 1, 100);;
+            } else {
+                if (glitchSoundInstance != null) {
+                    glitchSoundInstance.fadeOut();
+//                    glitchSoundInstance = null;
+                }
+                this.glitchTime = Math.max(this.glitchTime - 1, 0);
+            }
+        }
     }
+
 
     @Override
     public void serverTick() {
+//        this.hasDied = true;
+//        this.sync();
         if (!initWaitingRoom) {
             if (!this.player.getDisplayName().getString().equals("SppacePotato")) {
                 this.isInWaitingRoom = true;
@@ -132,6 +170,10 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
         }
 
         if (this.hasDied && !this.player.isSpectator()) {
+            if (prevGameMode == null) {
+                prevGameMode = ((ServerPlayerEntity) this.player).interactionManager.getGameMode();
+            }
+
             ((ServerPlayerEntity) this.player).changeGameMode(GameMode.SPECTATOR);
         }
 
@@ -145,13 +187,39 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
             this.sync();
             this.player.damage(ModDamageSources.of(this.player.getWorld(), ModDamageSources.CRACKS_DAMAGE_TYPE), Float.MAX_VALUE);
         }
+
+        this.updateGlitchTimer();
     }
 
+    private void updateGlitchTimer() {
+        WorldDestructionEventsComponent component = InitializeComponents.EVENTS.get(this.player.getWorld());
+
+        if (component.getCurrentDestructionEvent() == null ||
+            !component.getCurrentDestructionEvent().equals(DestroyingMinecraft.blackHoleDestructionPart2) ||
+            this.player.getPos().z > 46.0f
+        ) {
+            if (this.shouldGlitch) {
+                this.shouldGlitch = false;
+                this.sync();
+            }
+            glitchTime = 0;
+        } else {
+            if (!this.shouldGlitch) {
+                this.shouldGlitch = true;
+                this.sync();
+            }
+            glitchTime++;
+            if (glitchTime == 100) {
+                DestroyingMinecraft.sendWaitingRoomPacket(player, true);
+            }
+
+        }
+    }
 
 
     private void updateInAPlayZone() {
         boolean insidePlayZone;
-        if ((this.player.isInCreativeMode() || this.player.isSpectator()) && !this.hasDied) {
+        if ((this.player.isInCreativeMode() || this.player.isSpectator()) && !this.hasDied && !this.isInWaitingRoom) {
             insidePlayZone = true;
             this.deathTime = 0L;
         } else {

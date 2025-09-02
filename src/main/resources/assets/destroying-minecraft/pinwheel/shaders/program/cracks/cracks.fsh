@@ -41,7 +41,6 @@ float map(vec3 p) {
     float d = sdCylinder(rayPos - vec3(centerPos.x, 500, centerPos.y), length, 0.5 * (1.0 + flashTimer*10.0));
     d -= (sin(p.y*1 + rand(vec2(GameTime*1000, 745))*100)*0.5 + 0.5)*0.1;
     return d;
-
 }
 
 void rayMarchLaser(inout vec3 color, vec3 playerPos, bool cracks, float crackDepth) {

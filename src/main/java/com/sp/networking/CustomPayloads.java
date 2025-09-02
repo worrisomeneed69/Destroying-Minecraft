@@ -12,7 +12,7 @@ import org.joml.Vector3f;
 
 public class CustomPayloads {
 
-    //C2S//
+    ///////////////////////////// C2S /////////////////////////////
     public record UpdateLimboSquareBlockPayload(BlockPos blockEntityPos, Vector3f color, float size, float height) implements CustomPayload {
         public static final Id<UpdateLimboSquareBlockPayload> ID = new Id<>(DestroyingMinecraft.idOf("updatelimboblk"));
 
@@ -80,7 +80,8 @@ public class CustomPayloads {
     }
 
 
-    //S2C//
+
+    ///////////////////////////// S2C /////////////////////////////
     public record BraamPayload(SoundEvent soundEvent) implements CustomPayload {
         public static final Id<BraamPayload> ID = new Id<>(DestroyingMinecraft.idOf("asp"));
 

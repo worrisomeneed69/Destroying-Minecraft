@@ -1,16 +1,13 @@
 package com.sp.networking.S2C;
 
-import com.sp.DestroyingMinecraft;
 import com.sp.DestroyingMinecraftClient;
 import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.world.WorldDestructionEventsComponent;
+import com.sp.destruction.DestructionEvent;
+import com.sp.destruction.client.ClientDestructionEvent;
 import com.sp.networking.CustomPayloads;
 import com.sp.render.gui.hud.DestructionTitleRenderCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
 
 import static com.sp.command.DestructionCommand.*;
 
@@ -22,7 +19,10 @@ public class InvokeDestructionPacket {
 
             switch (payload.type()) {
                 case reset: {
-                    worldComponent.getCurrentDestructionEvent().setActive(false, -1);
+                    for (DestructionEvent event : ClientDestructionEvent.getAllClientInstances()) {
+                        event.setActive(false, -1);
+                        event.resetEvent();
+                    }
                     break;
                 }
 

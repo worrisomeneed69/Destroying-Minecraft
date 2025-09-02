@@ -20,6 +20,7 @@ import net.minecraft.world.World;
 import java.util.List;
 
 public class BlackHoleDestructionServerPart2 extends ServerDestructionEvent {
+    private static BlockPhysicsEntity entity;
     private static final List<BlockPos> initialBPEPositions = List.of(
             new BlockPos(-1151, 77, 398),
             new BlockPos(-1152, 78, 398),
@@ -329,10 +330,21 @@ public class BlackHoleDestructionServerPart2 extends ServerDestructionEvent {
     }
 
     @Override
+    public void resetEvent() {
+        if (entity != null) {
+            System.out.println("NOT WORKING");
+            entity.discard();
+            entity = null;
+        }
+        super.resetEvent();
+    }
+
+    @Override
     protected KeyframeAnimation initAnimations(World world) {
         WorldDestructionEventsComponent component = InitializeComponents.EVENTS.get(world);
 
         return new KeyframeAnimation(
+                this.duration,
                 (globalTime, localTime) -> {
                     double clampedGlobalTime = Math.floor(globalTime * 10) * 0.1;
                     if (clampedGlobalTime != prevGravityLerp) {
@@ -364,7 +376,7 @@ public class BlackHoleDestructionServerPart2 extends ServerDestructionEvent {
                 new Keyframe(0.0),
 
                 new Keyframe(135.0 / this.duration, () -> {
-                    BlockPhysicsEntity entity = BlockPhysicsEntity.ofBlocks(world, initialBPEPositions);
+                    entity = BlockPhysicsEntity.ofBlocks(world, initialBPEPositions);
                     entity.setVelocity(0, 0.06, -0.2);
                     entity.component.setRotationSpeed(0.5f, 0, 0);
                     entity.component.sync();

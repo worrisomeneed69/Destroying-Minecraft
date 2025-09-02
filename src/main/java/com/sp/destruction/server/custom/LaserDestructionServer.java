@@ -1,5 +1,6 @@
 package com.sp.destruction.server.custom;
 
+import com.sp.DestroyingMinecraft;
 import com.sp.destruction.server.ServerDestructionEvent;
 import com.sp.util.keyframes.Keyframe;
 import com.sp.util.keyframes.KeyframeAnimation;
@@ -15,7 +16,7 @@ public class LaserDestructionServer extends ServerDestructionEvent {
     }
 
     @Override
-    protected void resetEvent() {
+    public void resetEvent() {
         crackingTime = 0.0f;
         laserLength = 0.0f;
         super.resetEvent();
@@ -24,6 +25,13 @@ public class LaserDestructionServer extends ServerDestructionEvent {
     @Override
     protected KeyframeAnimation initAnimations(World world) {
         return new KeyframeAnimation(
+                this.duration,
+                //End Action
+                () -> {
+                    for (PlayerEntity player : world.getPlayers()) {
+                        DestroyingMinecraft.sendWaitingRoomPacket(player, true);
+                    }
+                },
                 new Keyframe(0.0),
 
                 new Keyframe(484.0 / this.duration, () -> {
@@ -37,9 +45,9 @@ public class LaserDestructionServer extends ServerDestructionEvent {
                         if (player.isCreative() || player.isSpectator()) continue;
                         playerCount++;
                     }
-
-                    if (playerCount <= 1) {
-
+                    System.out.println(playerCount);
+                    if (playerCount <= 0) {
+                        System.out.println("SKIPPING");
                         this.skipKeyframe();
                     }
                 }),

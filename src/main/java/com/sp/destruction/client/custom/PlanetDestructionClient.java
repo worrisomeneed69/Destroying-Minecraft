@@ -29,7 +29,7 @@ public class PlanetDestructionClient extends ClientDestructionEvent {
     }
 
     @Override
-    protected void resetEvent() {
+    public void resetEvent() {
         planetFallTimer.reset();
         flashTimer.reset();
         if (ambientSound != null) {
@@ -49,6 +49,7 @@ public class PlanetDestructionClient extends ClientDestructionEvent {
         SoundManager soundManager = MinecraftClient.getInstance().getSoundManager();
 
         return new KeyframeAnimation(
+                this.duration,
                 (globalTime, localTime) -> {
                     planetFallTimer.setTimer((float) globalTime);
                 },

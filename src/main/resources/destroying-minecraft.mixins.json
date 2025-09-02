@@ -47,7 +47,6 @@
     "materialsampler.sodium.SodiumShaderPreProcessorMixin",
     "sodiumcompat.ChunkDestroyingMixin",
     "sodiumcompat.SodiumAOMixin",
-    "sodiumcompat.SodiumShadowMapShaderMixin",
-    "supernova.SunMixin"
+    "sodiumcompat.SodiumShadowMapShaderMixin"
   ]
 }

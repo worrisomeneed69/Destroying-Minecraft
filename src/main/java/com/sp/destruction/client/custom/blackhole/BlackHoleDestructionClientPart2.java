@@ -30,7 +30,7 @@ public class BlackHoleDestructionClientPart2 extends ClientDestructionEvent {
     }
 
     @Override
-    protected void resetEvent() {
+    public void resetEvent() {
         if (destructionSoundInstance != null) {
             MinecraftClient.getInstance().getSoundManager().stop(destructionSoundInstance);
         }
@@ -42,6 +42,7 @@ public class BlackHoleDestructionClientPart2 extends ClientDestructionEvent {
         SoundManager soundManager = MinecraftClient.getInstance().getSoundManager();
 
         return new KeyframeAnimation(
+                this.duration,
                 new Keyframe(0.0, () -> {
                     soundManager.play(PositionedSoundInstance.master(ModSounds.SNAP_SNAP, 1.0f, 1.0f));
                 }),

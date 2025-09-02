@@ -7,8 +7,9 @@ import com.mojang.brigadier.context.CommandContext;
 import com.sp.DestroyingMinecraft;
 import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.world.WorldDestructionEventsComponent;
+import com.sp.destruction.DestructionEvent;
+import com.sp.destruction.server.ServerDestructionEvent;
 import com.sp.networking.CustomPayloads;
-import com.sp.networking.S2C.InvokeDestructionPacket;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
 import com.sp.world.spinningblockexplosion.custom.DirectionalSBE;
 import com.sp.world.spinningblockexplosion.custom.PointSBE;
@@ -179,7 +180,10 @@ public class DestructionCommand {
 
     private static int reset(CommandContext<ServerCommandSource> context) {
         WorldDestructionEventsComponent worldComponent = InitializeComponents.EVENTS.get(context.getSource().getWorld());
-        worldComponent.getCurrentDestructionEvent().setActive(false, -1);
+        for (DestructionEvent event : ServerDestructionEvent.getAllServerInstances()) {
+            event.setActive(false, -1);
+            event.resetEvent();
+        }
 
         BlackHoleDestruction.setStartDestruction(false);
         BlackHoleDestruction.reset();

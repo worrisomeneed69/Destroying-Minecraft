@@ -1,5 +1,6 @@
 package com.sp.destruction.server.custom;
 
+import com.sp.DestroyingMinecraft;
 import com.sp.destruction.server.ServerDestructionEvent;
 import com.sp.entity.ModEntities;
 import com.sp.entity.custom.MeteorEntity;
@@ -26,6 +27,14 @@ public class PlanetDestructionServer extends ServerDestructionEvent {
     @Override
     protected KeyframeAnimation initAnimations(World world) {
         return new KeyframeAnimation(
+                this.duration,
+                //End Action
+                () -> {
+                    for (PlayerEntity player : world.getPlayers()) {
+                        DestroyingMinecraft.sendWaitingRoomPacket(player, true);
+                    }
+                },
+
                 new Keyframe(0.0),
 
                 new Keyframe(320.0/this.duration, (globalTime, localTime) -> {

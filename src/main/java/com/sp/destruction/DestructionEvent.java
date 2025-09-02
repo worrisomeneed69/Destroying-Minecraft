@@ -26,18 +26,8 @@ public abstract class DestructionEvent {
 
         if(animation != null) {
             if (this.isActive()) {
-                this.progress++;
-                if (shouldSkipKeyframe) {
-                    double nextKeyframeTime = animation.getNextKeyframeTime();
-                    this.progress = (int) Math.floor(this.duration * nextKeyframeTime);
-                    InitializeComponents.EVENTS.get(world).syncLight();
-
-                    this.shouldSkipKeyframe = false;
-                }
-
-                animation.updateKeyframeAnimation((double) this.progress / this.duration);
-
-                if (progress % 200 == 0 && !this.isClient) {
+                this.animation.run();
+                if (animation.wasKeyframeSkipped() || (animation.getProgress() % 200 == 0 && !world.isClient)) {
                     InitializeComponents.EVENTS.get(world).syncLight();
                 }
             } else {
@@ -48,11 +38,7 @@ public abstract class DestructionEvent {
     }
 
     protected void skipKeyframe() {
-        this.shouldSkipKeyframe = true;
-    }
-
-    protected void sync() {
-
+        animation.skipKeyframe();
     }
 
     protected KeyframeAnimation initAnimations(World world) {
@@ -60,18 +46,20 @@ public abstract class DestructionEvent {
     }
 
     public int getProgress() {
-        return progress;
+        return animation.progress;
     }
 
     public void setProgress(int progress) {
         if (this.isClient()) {
-            this.progress = progress;
+            animation.progress = progress;
         }
     }
 
-    protected void resetEvent() {
+    public void resetEvent() {
         this.active = false;
-        this.progress = 0;
+        if (this.animation != null) {
+            this.animation.progress = 0;
+        }
     }
 
     public boolean isClient() {
@@ -85,7 +73,10 @@ public abstract class DestructionEvent {
     public void setActive(boolean active, long startTime) {
         if (active) {
             //Sync up with the server after packets arrive at the clients
-            this.progress = Math.toIntExact((System.currentTimeMillis() - startTime) / 50);
+            if (this.animation != null) {
+                this.animation.progress = Math.toIntExact((System.currentTimeMillis() - startTime) / 50);
+            }
+
         }
         this.active = active;
     }

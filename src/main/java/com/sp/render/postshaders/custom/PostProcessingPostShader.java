@@ -86,5 +86,7 @@ public class PostProcessingPostShader extends PostShader {
 
         BetterUniforms.setInt(shaderProgram, "enabledDepthOfField", DestroyingMinecraftConfig.enableDepthOfField ? 1 : 0);
         BetterUniforms.setInt(shaderProgram, "enabledBlackScreen", BlackScreenManager.isBlackScreen() || component.isInWaitingRoom() ? 1 : 0);
+
+        BetterUniforms.setFloat(shaderProgram, "glitchTime", Math.min(component.getGlitchTime() / 100.0f, 1.0f));
     }
 }

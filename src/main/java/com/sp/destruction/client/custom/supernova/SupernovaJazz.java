@@ -29,6 +29,7 @@ public class SupernovaJazz extends ClientDestructionEvent {
         SoundManager soundManager = MinecraftClient.getInstance().getSoundManager();
 
         return new KeyframeAnimation(
+                this.duration,
                 new Keyframe(0.0, () -> {
                     BlackScreenManager.setBlackScreen(true);
                     soundManager.play(PositionedSoundInstance.ambient(

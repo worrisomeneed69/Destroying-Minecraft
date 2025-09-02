@@ -2,6 +2,8 @@ package com.sp;
 
 import com.sp.block.ModBlocks;
 import com.sp.block.entity.ModBlockEntities;
+import com.sp.cca.InitializeComponents;
+import com.sp.cca.custom.entity.PlayerComponent;
 import com.sp.command.*;
 import com.sp.component.ModDataComponentTypes;
 import com.sp.config.DestroyingMinecraftConfig;
@@ -112,6 +114,9 @@ public class DestroyingMinecraft implements ModInitializer {
 	}
 
     public static void sendWaitingRoomPacket(PlayerEntity player, boolean setInWaitingRoom) {
+        PlayerComponent component = InitializeComponents.PLAYERS.get(player);
+        component.setHasDied(true);
+        component.sync();
         ServerPlayNetworking.send((ServerPlayerEntity) player, new CustomPayloads.WaitingRoomPacketPayload(setInWaitingRoom));
     }
 
