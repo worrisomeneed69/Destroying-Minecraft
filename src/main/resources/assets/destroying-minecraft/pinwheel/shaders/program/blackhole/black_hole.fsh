@@ -25,20 +25,25 @@ uniform vec3 prevCameraPos;
 in vec2 texCoord;
 out vec4 fragColor;
 
+struct Ray {
+    vec3 pos;
+    vec3 dir;
+    bool hit;
+};
 
 const float BH_SIZE = 0.15;
 const float DISK_RADIUS = BH_SIZE + 3.5;
-const int ITERATIONS = 150;
-
-//const vec3 InDiskColor = vec3(1, 0.9647058823529412, 0.9450980392156862) * 0.5;
-//const vec3 OutDiskColor = vec3(0.1607843137254902, 0.11764705882352941, 0.09411764705882353) * 5;
+const int ITERATIONS = 70;
+const int DISK_ITERATIONS = 5;
+vec3 BH_POS = VeilCamera.CameraPosition + vec3(0.0, 1.0, -2.9);
+//vec3 BH_POS = vec3(-1194, 74, 1235);
 
 vec3 InDiskColor = vec3(1) * 0.5 * redMultiplier;
 const vec3 OutDiskColor = vec3(0.1607843137254902, 0.11764705882352941, 0.09411764705882353) * 5;
 
 
-float mapDisk(vec3 rayPos, vec3 spherePos) {
-    vec3 rotatedRayPos = rayPos - spherePos;
+float mapDisk(vec3 rayPos) {
+    vec3 rotatedRayPos = rayPos - BH_POS;
     //BH Rotation
     rotatedRayPos.xy *= rot2D(-9);
     rotatedRayPos.yz *= rot2D(-21);
@@ -49,39 +54,41 @@ float mapDisk(vec3 rayPos, vec3 spherePos) {
     return opSubtraction(centerHole, disk);
 }
 
-
-float mapSphere(vec3 rayPos, vec3 spherePos) {
-    return length(rayPos - spherePos) - BH_SIZE;
-}
-
-void warpSpace(inout vec3 rayPos, inout vec3 rayDir, vec3 BH_POS, in float stepDist) {
-    vec3 dirToCenter = normalize(BH_POS - rayPos);
-    float dstToCenter = distance(BH_POS, rayPos);
+void warpSpace(inout Ray ray, in float stepDist) {
+    vec3 dirToCenter = normalize(BH_POS - ray.pos);
+    float dstToCenter = distance(BH_POS, ray.pos);
 
     float force = 1 / (pow(dstToCenter, 2.0));
-    rayDir = normalize(mix(rayDir, dirToCenter, force * 5.0 / float(ITERATIONS)));
+    ray.dir = normalize(mix(ray.dir, dirToCenter, force * BH_SIZE * 30 / float(ITERATIONS)));
 }
 
 //Attenuation formula https://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula
-float attenuation(float value, float a, float b){
+float attenuation(float value, float a, float b) {
     return 1 / (1 + a*abs(value) + b*abs(value)*abs(value));
 }
 
-void raymarchAccretionDisk(vec3 rayPos, float diskDist, vec3 BH_POS, inout vec4 color) {
-    float radius = distance(rayPos, BH_POS);
-    vec3 diskPos = rayPos - BH_POS;
-    float angle = atan2(diskPos.x, diskPos.z) + GameTime * 500;
-    float attenuate = attenuation(radius / 2.5, 0, 3) * (1.0 - diskDist);
+void raymarchAccretionDisk(inout Ray ray, float diskDist, inout vec4 color) {
 
-    float cloud = clamp(fbm(vec3(radius * 15, angle * 5, diskPos.y * attenuate * attenuate), 8), 0.0, 1.0);
-    color.rgb += vec3(cloud * attenuate) * mix(OutDiskColor, InDiskColor, attenuate * attenuate);
-    color.rgb *= attenuate * attenuate;
-    color.a += attenuate * 0.8;
-}
+    vec3 step = ray.dir * 0.01;
+    for (int i = 0; i < DISK_ITERATIONS; i++) {
+        ray.pos += step;
+        float radius = distance(ray.pos, BH_POS);
+        vec3 diskPos = ray.pos - BH_POS;
+        float angle = atan2(diskPos.x, diskPos.z) + GameTime * 500;
+        float attenuate = attenuation(radius / 1.5, 0.1, 1) * (1.0 - diskDist);
 
-vec3 projectAndDivide(mat4 projMat, vec3 position){
-    vec4 homogeneousPos = projMat * vec4(position, 1.0);
-    return homogeneousPos.xyz / homogeneousPos.w;
+        float noise = fbm(vec3(radius * 15,diskPos.y * attenuate * attenuate * 10, angle * 5), 6);
+        float cloud = clamp(noise, 0.0, 1.0);
+        color.rgb += vec3(cloud * attenuate) * mix(OutDiskColor, InDiskColor, attenuate * attenuate);
+        color.rgb *= attenuate * attenuate;
+        color.a += attenuate * 0.8;
+
+        if (color.a >= 1.0) {
+            break;
+        }
+    }
+
+
 }
 
 vec3 getSphereTexture(in vec3 rayPos, in vec3 normal, sampler2D textureSampler) {
@@ -92,13 +99,11 @@ vec3 getSphereTexture(in vec3 rayPos, in vec3 normal, sampler2D textureSampler) 
 
 void main() {
     vec3 cameraPos = VeilCamera.CameraPosition;
-    vec3 BH_POS = cameraPos + vec3(0.0, 1.0, -2.9);
-//    vec3 BH_POS = vec3(-96, 80, 156);
 
     float depth = texture(DiffuseDepthSampler, texCoord).r;
     float handDepth = texture(HandDepth, texCoord).r;
 
-    if(depth >= 1.0) {
+    if(depth >= 1.0 && handDepth >= 1.0) {
         vec3 worldSpacePos = screenToWorldSpace(texCoord, depth).xyz;
 
 
@@ -109,45 +114,43 @@ void main() {
         vec2 prevTexcoord = (prevNDCPos * 0.5 + 0.5).xy;
         float prevDepth = texture(PrevDepth, prevTexcoord).r;
 
-        float farPlane = 8.0;
+        float farPlane = 7.0;
         vec3 ro = (VeilCamera.CameraPosition) + rand(texCoord + GameTime) * 0.02;
-
         vec3 rayDir = viewDirFromUv(texCoord);
+        Ray ray = Ray(ro, rayDir, false);
+
         float stepDist = farPlane / float(ITERATIONS);
-        float dist = 0.0;
 
 
-        bool hit = false;
         vec4 BHcolor = vec4(0.0);
-        vec3 rayPos = ro;
         vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
+
         for(int i = 0; i <= ITERATIONS; i++) {
-            rayPos += rayDir * stepDist;
+            ray.pos += ray.dir * stepDist;
 
 
-            float diskDist = mapDisk(rayPos, BH_POS);
-//            dist += stepDist;
+            float diskDist = mapDisk(ray.pos);
 
             //Warp Space
-            warpSpace(rayPos, rayDir, BH_POS, stepDist);
+            warpSpace(ray, stepDist);
 
 
             //Hit Accretion Disk
-            if (diskDist <= 0.001) {
-                hit = true;
-                raymarchAccretionDisk(rayPos, clamp(diskDist * 1000.0, 0.0, 1.0), BH_POS, BHcolor);
+            if (diskDist <= 0.0001) {
+                ray.hit = true;
+                raymarchAccretionDisk(ray, clamp(diskDist * 1000.0, 0.0, 1.0), BHcolor);
                 if (BHcolor.a >= 1.0) {
                     break;
                 }
             }
-            if (distance(rayPos, BH_POS) < BH_SIZE) {
-                hit = true;
+            if (distance(ray.pos, BH_POS) < BH_SIZE) {
+                ray.hit = true;
                 break;
             }
 
         }
 
-        if(hit) {
+        if (ray.hit) {
             BHcolor.rgb *= 30;
             BHcolor.rgb = clamp(BHcolor.rgb, vec3(0.0), vec3(400.0));
             color = vec4(blend(color, BHcolor), 1.0);
@@ -156,16 +159,17 @@ void main() {
             color.rgb = getSphereTexture(viewDirFromUv(texCoord), normal, StarsTexture)*2;
 
         }
-        //SkyFlash
-//        color =     mix(color, vec4(vec3(5.0), 1.0), flashTimer);
-        fragColor = mix(vec4(vec3(5.0), 1.0), color, flashTimer);
 
+        //SkyFlash
+        fragColor = mix(vec4(vec3(5.0), 1.0), color, flashTimer);
+//        fragColor = color;
 
 
 
         if(prevTexcoord.x >= 0.0 && prevTexcoord.x <= 1.0 && prevTexcoord.y >= 0.0 && prevTexcoord.y <= 1.0) {
-            if(prevDepth >= 1.0){
+            if(prevDepth >= 1.0) {
                 fragColor = mix(fragColor, texture(PrevSampler, prevTexcoord), min(flashTimer, 0.5));
+//                fragColor = mix(fragColor, texture(PrevSampler, prevTexcoord), 0.9);
             }
         }
 

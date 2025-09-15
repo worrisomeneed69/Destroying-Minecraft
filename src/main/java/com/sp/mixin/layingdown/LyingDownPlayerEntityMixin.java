@@ -68,21 +68,11 @@ public abstract class LyingDownPlayerEntityMixin extends LivingEntity implements
         builder.add(LAYING_DOWN_POS, Optional.empty());
     }
 
-
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;updatePose()V"))
     private void stopLayingDown(CallbackInfo ci) {
         if (!this.getWorld().isClient) {
             if (this.isLayingDown() && this.shouldDismount()) {
-                this.setPose(EntityPose.STANDING);
-
-                BlockState blockState = this.getWorld().getBlockState(this.getLayingDownPos().get());
-
-                if (blockState.getBlock() instanceof ChairBlock) {
-                    this.getWorld().setBlockState(this.getLayingDownPos().get(), blockState.with(ChairBlock.OCCUPIED, false));
-                }
-
-                this.setLayingDown(false);
-                this.setLayingDownPos(null);
+                this.getUp();
             }
         }
 
@@ -97,13 +87,6 @@ public abstract class LyingDownPlayerEntityMixin extends LivingEntity implements
                         layingDownDirection.getOffsetZ()
                 ).multiply(0.25).add(0, 0.1, 0);
 
-                switch (layingDownDirection) {
-                    case NORTH -> this.clampPassengerYaw(180);
-                    case SOUTH -> this.clampPassengerYaw(0);
-                    case EAST -> this.clampPassengerYaw(-90);
-                    case WEST -> this.clampPassengerYaw(90);
-                }
-
                 this.setPosition(this.getLayingDownPos().get().toCenterPos().add(offset));
                 this.setVelocity(0, 0, 0);
             }
@@ -111,18 +94,21 @@ public abstract class LyingDownPlayerEntityMixin extends LivingEntity implements
     }
 
     @Override
+    public void getUp() {
+        this.setPose(EntityPose.STANDING);
+
+        BlockState blockState = this.getWorld().getBlockState(this.getLayingDownPos().get());
+        if (blockState.getBlock() instanceof ChairBlock) {
+            this.getWorld().setBlockState(this.getLayingDownPos().get(), blockState.with(ChairBlock.OCCUPIED, false));
+        }
+
+        this.setLayingDown(false);
+        this.setLayingDownPos(null);
+    }
+
+    @Override
     public Direction getLayingDownDirection() {
         BlockPos layingDownPos = this.getLayingDownPos().orElse(null);
         return layingDownPos != null ? ChairBlock.getDirection(getWorld(), layingDownPos) : null;
-    }
-
-    @Unique
-    protected void clampPassengerYaw(float directionYaw) {
-//        this.setBodyYaw(this.getYaw());
-        float f = MathHelper.wrapDegrees(this.getYaw() - directionYaw);
-        float g = MathHelper.clamp(f, -90.0F, 90.0F);
-        this.prevYaw += g - f;
-        this.setYaw(this.getYaw() + g - f);
-        this.setHeadYaw(this.getYaw());
     }
 }

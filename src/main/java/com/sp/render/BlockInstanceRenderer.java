@@ -38,6 +38,7 @@ public class BlockInstanceRenderer {
     }
 
     public void render() {
+        RenderSystem.enableDepthTest();
         AdvancedFbo fbo = VeilRenderSystem.renderer().getFramebufferManager().getFramebuffer(MAIN_WRAPPER);
         if(fbo == null) return;
 

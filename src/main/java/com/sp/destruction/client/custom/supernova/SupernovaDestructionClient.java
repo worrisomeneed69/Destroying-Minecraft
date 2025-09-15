@@ -62,14 +62,8 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
     protected KeyframeAnimation initAnimations(World world) {
         SoundManager soundManager = MinecraftClient.getInstance().getSoundManager();
 
-        return new KeyframeAnimation(
+        return new KeyframeAnimation.KeyframeAnimationBuilder(
                 this.duration,
-                //End action
-                () -> {
-                    //Avoid lag
-                    this.setActive(false, -1);
-                    this.resetEvent();
-                },
                 //*Pause
                 new Keyframe(0.0f),
 
@@ -161,10 +155,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                 }, (globalTime, localTime) -> {
                     destructionDistance = 300 - (int) (((globalTime - (2830.0/this.duration)) / 0.04)*300);
 
-//                    flashTimer.reset();
-//                    explosionTimer.reset();
                     if (localTime < 0.35) {
-                        System.out.println("IMPLODING");
                         //Sun implosion
                         implodeTimer.setTimer(Easing.EASE_IN_CUBIC.ease((float) (localTime * 2.85f)));
                     } else {
@@ -185,6 +176,10 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                     }
                 })
 
-        );
+        ).endAction(() -> {
+            //Avoid lag
+            this.setActive(false, -1);
+            this.resetEvent();
+        }).build();
     }
 }

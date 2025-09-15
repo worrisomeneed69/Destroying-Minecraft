@@ -67,7 +67,7 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
 
     private void initializeAnimations(DrawContext drawContext, RenderTickCounter renderTickCounter) {
         MinecraftClient client = MinecraftClient.getInstance();
-        ORBITAL_LASER_ANIMATION = new DestructionTitleAnimation(new KeyframeAnimation(
+        ORBITAL_LASER_ANIMATION = new DestructionTitleAnimation(new KeyframeAnimation.KeyframeAnimationBuilder(
                 200,
                 new Keyframe(0.0f, () -> {
                     client.getSoundManager().play(PositionedSoundInstance.master(ModSounds.ORBITAL_LASER_INITIALIZE, 1.0f, 1.0f));
@@ -88,9 +88,9 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
                 new Keyframe(0.35f, (globalTime, localTime) -> {
                     this.renderText(drawContext, localTime);
                 })
-        ), ORBITAL_LASER);
+        ).build(), ORBITAL_LASER);
 
-        PLANET_ANIMATION = new DestructionTitleAnimation(new KeyframeAnimation(
+        PLANET_ANIMATION = new DestructionTitleAnimation(new KeyframeAnimation.KeyframeAnimationBuilder(
                 200,
                 new Keyframe(0.0f, () -> {
                     client.getSoundManager().play(PositionedSoundInstance.master(ModSounds.PLANET_INITIALIZE, 1.0f, 1.0f));
@@ -111,9 +111,9 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
                 new Keyframe(0.31f, (globalTime, localTime) -> {
                     this.renderText(drawContext, localTime);
                 })
-        ), PLANET);
+        ).build(), PLANET);
 
-        SUPERNOVA_ANIMATION = new DestructionTitleAnimation(new KeyframeAnimation(
+        SUPERNOVA_ANIMATION = new DestructionTitleAnimation(new KeyframeAnimation.KeyframeAnimationBuilder(
                 200,
                 new Keyframe(0.0f, () -> {
                     client.getSoundManager().play(PositionedSoundInstance.master(ModSounds.SUPERNOVA_INITIALIZE, 1.0f, 1.0f));
@@ -134,9 +134,9 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
                 new Keyframe(0.47f, (globalTime, localTime) -> {
                     this.renderText(drawContext, localTime);
                 })
-        ), SUPERNOVA);
+        ).build(), SUPERNOVA);
 
-        BLACK_HOLE_ANIMATION = new DestructionTitleAnimation(new KeyframeAnimation(
+        BLACK_HOLE_ANIMATION = new DestructionTitleAnimation(new KeyframeAnimation.KeyframeAnimationBuilder(
                 500,
                 new Keyframe(0.0f, () -> {
                     client.getSoundManager().play(PositionedSoundInstance.master(ModSounds.BLACK_HOLE_INITIALIZE, 1.0f, 1.0f));
@@ -144,7 +144,7 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
                 new Keyframe(0.64f, (globalTime, localTime) -> {
                     this.renderText(drawContext, localTime);
                 })
-        ), BLACK_HOLE, 25000L);
+        ).build(), BLACK_HOLE, 25000L);
     }
 
     private void renderText(DrawContext drawContext, double localTime) {

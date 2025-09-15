@@ -1,9 +1,7 @@
 package com.sp.render;
 
 import com.mojang.serialization.Codec;
-import com.sp.DestroyingMinecraft;
 import com.sp.DestroyingMinecraftClient;
-import net.minecraft.util.BlockMirror;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
 import org.jetbrains.annotations.Nullable;
@@ -19,9 +17,9 @@ public enum ShaderType implements StringIdentifiable {
     CRACKS          ("orbital_laser", DestroyingMinecraftClient.cracksPostShader.getPost()),
     PLANET          ("planet", DestroyingMinecraftClient.planetPostShader.getPost()),
     SUPERNOVA       ("supernova", null),
-    BLACK_HOLE      ("black_hole", true, false, true, true,  DestroyingMinecraftClient.blackHolePostShader.getPost()),
-    MINI_BLACK_HOLE ("mini_black_hole", DestroyingMinecraft.idOf("mini_black_hole"));
-//    EARTH           ("earth", false, false, true, true, DestroyingMinecraftClient.earthPostShader.getPost());
+    BLACK_HOLE      ("black_hole", true, false, true, true,  DestroyingMinecraftClient.blackHolePostShader.getPost());
+//    MINI_BLACK_HOLE ("mini_black_hole", DestroyingMinecraft.idOf("mini_black_hole"))
+//    INITIALIZE      ("init", DestroyingMinecraftClient.initializePostShader.getPost());
 
     public static final Codec<ShaderType> CODEC = StringIdentifiable.createCodec(ShaderType::values);
     final String id;
@@ -36,8 +34,9 @@ public enum ShaderType implements StringIdentifiable {
 
         this.enabledShaders = new ArrayList<>();
 
-        if(enableShadows) this.enabledShaders.add(DestroyingMinecraftClient.shadowPostShader.getPost());
         if(enableSky) this.enabledShaders.add(DestroyingMinecraftClient.supernovaPostShader.getPost());
+        if(enableShadows) this.enabledShaders.add(DestroyingMinecraftClient.shadowPostShader.getPost());
+
 
         //then add whatever shader after
         if(identifiers != null) {
@@ -59,14 +58,12 @@ public enum ShaderType implements StringIdentifiable {
     }
 
     public static ShaderType getFromString(String shader) {
-        return switch (shader) {
-            case "nuke" -> ShaderType.NUKE;
-            case "orbital_laser" -> ShaderType.CRACKS;
-            case "planet" -> ShaderType.PLANET;
-            case "supernova" -> ShaderType.SUPERNOVA;
-            case "black_hole" -> ShaderType.BLACK_HOLE;
-            case "mini_black_hole" -> ShaderType.MINI_BLACK_HOLE;
-            default -> ShaderType.NONE;
-        };
+        for (ShaderType type : ShaderType.values()) {
+            if (shader.equals(type.id)) {
+                return type;
+            }
+        }
+
+        return ShaderType.NONE;
     }
 }

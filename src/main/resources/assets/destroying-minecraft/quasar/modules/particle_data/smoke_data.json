@@ -8,7 +8,6 @@
   },
   "render_style": "BILLBOARD",
   "init_modules": [
-    "veil:smoke_random_init_rotation"
   ],
   "update_modules": [],
   "collision_modules": [
@@ -16,7 +15,7 @@
   "forces": [
   ],
   "render_modules": [
-    "destroying-minecraft:color/nuke_smoke_color"
+    "destroying-minecraft:color/smoke_color"
   ],
   "face_velocity": false,
   "velocity_stretch_factor": 0.0,

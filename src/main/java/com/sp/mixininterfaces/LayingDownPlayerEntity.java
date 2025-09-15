@@ -15,4 +15,5 @@ public interface LayingDownPlayerEntity {
 
     Direction getLayingDownDirection();
 
+    void getUp();
 }

@@ -6,7 +6,6 @@ import com.sp.entity.ModEntities;
 import com.sp.entity.custom.SpinningBlockEntity;
 import com.sp.world.spinningblockexplosion.SpinningBlockExplosion;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 
 public class DirectionalSBE extends SpinningBlockExplosion {
     private final int length;
@@ -25,8 +24,8 @@ public class DirectionalSBE extends SpinningBlockExplosion {
 
 
     @Override
-    public void explode(World world) {
-        super.explode(world);
+    public void explode() {
+        super.explode();
         if(this.delay <= 0) {
             if (this.progress > length * 2) {
                 this.explode = false;

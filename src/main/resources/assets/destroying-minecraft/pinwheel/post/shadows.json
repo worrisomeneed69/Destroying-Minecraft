@@ -7,11 +7,25 @@
         {
             "type": "veil:blit",
             "shader": "destroying-minecraft:shadows/shadows",
-            "in": "minecraft:main",
-            "out": "destroying-minecraft:bloom/bloom_start"
+            "in": "destroying-minecraft:bloom/bloom_start",
+            "out": "swap"
+        },
+        {
+          "type": "veil:copy",
+          "in": "swap",
+          "out": "destroying-minecraft:bloom/bloom_start",
+          "depth": true
         }
     ],
     "framebuffers": {
+      "swap": {
+        "depth": true,
+        "format": "R11F_G11F_B10F",
+        "autoClear": true,
+        "filter": {
+          "blur": true
+        }
+      }
     },
     "textures": {
         "NoiseTex": {
@@ -25,6 +39,10 @@
         "ShadowMap": {
             "type": "framebuffer",
             "name": "destroying-minecraft:shadowmap:depth"
+        },
+        "OpaqueDepth": {
+          "type": "framebuffer",
+          "name": "veil:dynamic_main:depth"
         },
         "AlbedoSampler": {
             "type": "framebuffer",
@@ -41,19 +59,53 @@
             "name": "veil:dynamic_main",
             "sampler": 3
         },
-        "LightMapSampler": {
-            "type": "framebuffer",
-            "name": "veil:dynamic_main",
-            "sampler": 4
-        },
         "BloomSampler": {
             "type": "framebuffer",
             "name": "veil:dynamic_main",
             "sampler": 7
         },
+        "TranslucentAlbedoSampler": {
+          "type": "framebuffer",
+          "name": "destroying-minecraft:translucent",
+          "sampler": 1
+        },
+        "TranslucentNormalSampler": {
+          "type": "framebuffer",
+          "name": "destroying-minecraft:translucent",
+          "sampler": 2
+        },
+        "TranslucentUVSampler": {
+          "type": "framebuffer",
+          "name": "destroying-minecraft:translucent",
+          "sampler": 3
+        },
+        "TranslucentLightMapSampler": {
+          "type": "framebuffer",
+          "name": "destroying-minecraft:translucent",
+          "sampler": 4
+        },
+        "TranslucentDepth": {
+          "type": "framebuffer",
+          "name": "destroying-minecraft:translucent:depth"
+        },
         "HandDepth": {
-            "type": "framebuffer",
-            "name": "veil:first_person:depth"
+          "type": "framebuffer",
+          "name": "veil:first_person:depth"
+        },
+        "HandAlbedoSampler": {
+          "type": "framebuffer",
+          "name": "veil:first_person",
+          "sampler": 1
+        },
+        "HandLightColor": {
+          "type": "framebuffer",
+          "name": "veil:first_person",
+          "sampler": 4
+        },
+        "MaterialSampler": {
+          "type": "framebuffer",
+          "name": "veil:dynamic_main",
+          "sampler": 6
         }
     }
 }

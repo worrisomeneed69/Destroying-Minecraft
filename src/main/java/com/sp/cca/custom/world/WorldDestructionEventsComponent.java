@@ -9,6 +9,7 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.tick.CommonTickingComponent;
@@ -20,6 +21,7 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Com
     private boolean syncLight;
     private DestructionEvent currentDestructionEvent;
     private double gravityLerp;
+    public static final Vec3d gravityDir = new Vec3d(0.0, 0.07, -0.03);
     private NbtCompound worldPlayZones;
 
     public WorldDestructionEventsComponent(World world) {
@@ -42,6 +44,16 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Com
             this.currentDestructionEvent.setActive(false, -1);
 //            this.currentDestructionEvent.resetEvent();
         }
+
+        if (currentDestructionEvent == null) {
+            this.currentDestructionEvent = null;
+            return;
+        }
+
+        if (currentDestructionEvent.isClient() != this.world.isClient) {
+            throw new RuntimeException("Tried to add a " + (currentDestructionEvent.isClient() ? "client" : "server") + " event on a " + (this.world.isClient ? "client" : "server") + " world");
+        }
+
         this.currentDestructionEvent = currentDestructionEvent;
         this.currentDestructionEvent.setActive(true, startTime);
     }
@@ -95,7 +107,6 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Com
         nbtCompound.putDouble("currentDestructionEventProgress", this.currentDestructionEvent != null ? this.currentDestructionEvent.getProgress() : -1);
 
         NbtCompound playZoneNbt = new NbtCompound();
-        nbtCompound.put("playZones", playZoneNbt);
         Vector<PlayZone> activePlayZones = PlayZoneManager.getActivePlayZones();
         playZoneNbt.putInt("numOfPlayZones", activePlayZones.size());
         for (int i = 0; i < activePlayZones.size(); i++) {
@@ -111,6 +122,7 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Com
             playZoneNbt.putDouble("maxZ" + i, playZoneBounds.maxZ);
             playZoneNbt.putInt("id" + i, playZone.getId());
         }
+        nbtCompound.put("playZones", playZoneNbt);
 
         this.worldPlayZones = playZoneNbt;
         nbtCompound.put("playZones", this.worldPlayZones);
@@ -125,24 +137,6 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Com
     public void sync() {
         InitializeComponents.EVENTS.sync(this.world);
     }
-
-//    @Override
-//    public void clientTick() {
-//        if (this.world.getRegistryKey() == World.OVERWORLD) {
-//            for (DestructionEvent event : ClientDestructionEvent.getAllClientInstances()) {
-//                event.tick(this.world);
-//            }
-//        }
-//    }
-
-//    @Override
-//    public void serverTick() {
-//        if (this.world.getRegistryKey() == World.OVERWORLD) {
-//            for (DestructionEvent event : ServerDestructionEvent.getAllServerInstances()) {
-//                event.tick(this.world);
-//            }
-//        }
-//    }
 
     @Override
     public void tick() {

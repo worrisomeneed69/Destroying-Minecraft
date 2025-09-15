@@ -23,6 +23,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -116,7 +117,7 @@ public class BlockPhysicsEntity extends Entity {
                 if (this.getBlockStateAtPos().isSolid()) {
                     this.playSound(ModSounds.METEOR_IMPACT, 100.0F, 1.2F / (this.random.nextFloat() * 0.2F + 0.9F));
                     PointSBE explosion = new PointSBE(this.random.nextBetween(4, 7), 0.2f, this.getPos());
-                    explosion.beginExplosion();
+                    explosion.beginExplosion((ServerWorld) this.getWorld());
                     discard();
                 }
             }

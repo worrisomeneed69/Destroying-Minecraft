@@ -32,5 +32,5 @@ void main() {
     OutNormal = vec3(1.0);
     LightUV = vec2(1, 1);
     Material = ivec4(7,0,0,1);
-    Bloom = vec4(sideOfPlane, 1.0);
+    Bloom = vec4(sideOfPlane * 0.1, 1.0);
 }

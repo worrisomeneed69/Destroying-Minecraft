@@ -27,6 +27,7 @@ public class LaserDestructionClient extends ClientDestructionEvent {
     public static final ShaderTimer flashTimer = new ShaderTimer();
     private static PositionedSoundInstance laserLoop;
     private static PositionedSoundInstance crackingLoop;
+    private static PositionedSoundInstance laserEnding;
 
     public LaserDestructionClient() {
         super(2500);
@@ -37,11 +38,15 @@ public class LaserDestructionClient extends ClientDestructionEvent {
         laserLength.reset();
         cracksTime.reset();
         flashTimer.reset();
+        SoundManager soundManager = MinecraftClient.getInstance().getSoundManager();
         if (laserLoop != null) {
-            MinecraftClient.getInstance().getSoundManager().stop(laserLoop);
+            soundManager.stop(laserLoop);
         }
         if (crackingLoop != null) {
-            MinecraftClient.getInstance().getSoundManager().stop(crackingLoop);
+            soundManager.stop(crackingLoop);
+        }
+        if (laserEnding != null) {
+            soundManager.stop(laserEnding);
         }
         super.resetEvent();
     }
@@ -57,7 +62,7 @@ public class LaserDestructionClient extends ClientDestructionEvent {
     protected KeyframeAnimation initAnimations(World world) {
         SoundManager soundManager = MinecraftClient.getInstance().getSoundManager();
 
-        return new KeyframeAnimation(
+        return new KeyframeAnimation.KeyframeAnimationBuilder(
                 this.duration,
                 new Keyframe(0.0),
 
@@ -147,18 +152,18 @@ public class LaserDestructionClient extends ClientDestructionEvent {
                     cracksTime.setTimer((float) localTime);
                 }),
                 new Keyframe(2100.0 / this.duration, () ->{
-                    soundManager.play(
-                            PositionedSoundInstance.master(
-                                    ModSounds.LASER_END,
-                                    1.0f,
-                                    1.0f
-                            )
+                    laserEnding = PositionedSoundInstance.master(
+                            ModSounds.LASER_END,
+                            1.0f,
+                            1.0f
                     );
+
+                    soundManager.play(laserEnding);
                 }, (globalTime, localTime) -> {
                     flashTimer.setTimer((float) localTime);
                 }),
 
                 new Keyframe(2500.0 / this.duration)
-        );
+        ).build();
     }
 }

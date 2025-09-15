@@ -6,11 +6,9 @@ import net.minecraft.world.World;
 
 public abstract class DestructionEvent {
     private final boolean isClient;
-    private boolean shouldSkipKeyframe;
     protected boolean active;
     protected boolean initAnimations;
     protected KeyframeAnimation animation;
-    protected int progress;
     protected final int duration;
 
     public DestructionEvent(int duration, boolean isClient) {
@@ -21,20 +19,26 @@ public abstract class DestructionEvent {
     public void tick(World world) {
         if (!initAnimations) {
             animation = initAnimations(world);
+            animation.keyframeSkippedCallback(() -> {
+                InitializeComponents.EVENTS.get(world).syncLight();
+            });
             initAnimations = true;
         }
 
         if(animation != null) {
             if (this.isActive()) {
-                this.animation.run();
-                if (animation.wasKeyframeSkipped() || (animation.getProgress() % 200 == 0 && !world.isClient)) {
+                this.animation.run(world);
+                if ((animation.getProgress() % 200 == 0 && !world.isClient)) {
                     InitializeComponents.EVENTS.get(world).syncLight();
                 }
             } else {
-                animation.resetAnimation();
                 this.resetEvent();
             }
         }
+    }
+
+    public void resetAnimationToCurrentTime(World world) {
+        this.animation.resetToCurrentTime(world);
     }
 
     protected void skipKeyframe() {
@@ -46,19 +50,24 @@ public abstract class DestructionEvent {
     }
 
     public int getProgress() {
-        return animation.progress;
+        return animation.skippedTime;
     }
 
     public void setProgress(int progress) {
         if (this.isClient()) {
-            animation.progress = progress;
+            animation.skippedTime = progress;
         }
+    }
+
+    public void resetAnimations() {
+        this.initAnimations = false;
+        this.animation = null;
     }
 
     public void resetEvent() {
         this.active = false;
         if (this.animation != null) {
-            this.animation.progress = 0;
+            this.animation.resetAnimation();
         }
     }
 
@@ -71,13 +80,12 @@ public abstract class DestructionEvent {
     }
 
     public void setActive(boolean active, long startTime) {
-        if (active) {
-            //Sync up with the server after packets arrive at the clients
-            if (this.animation != null) {
-                this.animation.progress = Math.toIntExact((System.currentTimeMillis() - startTime) / 50);
-            }
-
-        }
+//        if (active) {
+//            //Sync up with the server after packets arrive at the clients
+//            if (this.animation != null) {
+//                this.animation.startTime = Math.toIntExact((System.currentTimeMillis() - startTime) / 50);
+//            }
+//        }
         this.active = active;
     }
 }

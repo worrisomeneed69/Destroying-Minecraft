@@ -27,6 +27,7 @@ public class InitializePackets {
         PayloadTypeRegistry.playS2C().register(CustomPayloads.UpdatePlayZonePayload.ID, CustomPayloads.UpdatePlayZonePayload.CODEC);
         PayloadTypeRegistry.playS2C().register(CustomPayloads.WaitingRoomPacketPayload.ID, CustomPayloads.WaitingRoomPacketPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(CustomPayloads.ShaderChangePacketPayload.ID, CustomPayloads.ShaderChangePacketPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(CustomPayloads.LavaSpewPacketPayload.ID, CustomPayloads.LavaSpewPacketPayload.CODEC);
     }
 
 
@@ -38,6 +39,7 @@ public class InitializePackets {
         ClientPlayNetworking.registerGlobalReceiver(CustomPayloads.UpdatePlayZonePayload.ID, UpdatePlayZonePacket::receive);
         ClientPlayNetworking.registerGlobalReceiver(CustomPayloads.WaitingRoomPacketPayload.ID, WaitingRoomPacket::receive);
         ClientPlayNetworking.registerGlobalReceiver(CustomPayloads.ShaderChangePacketPayload.ID, ShaderChangePacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(CustomPayloads.LavaSpewPacketPayload.ID, LavaSpewPacket::receive);
     }
 
 }

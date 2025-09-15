@@ -15,7 +15,7 @@ public class BlackHoleDestructionServerPart1 extends ServerDestructionEvent {
 
     @Override
     protected KeyframeAnimation initAnimations(World world) {
-        return new KeyframeAnimation(
+        return new KeyframeAnimation.KeyframeAnimationBuilder(
                 this.duration,
                 new Keyframe(0.0, () -> {
                     world.setBlockState(new BlockPos(-1156, 84, 425), Blocks.REDSTONE_BLOCK.getDefaultState());
@@ -24,7 +24,7 @@ public class BlackHoleDestructionServerPart1 extends ServerDestructionEvent {
                 new Keyframe(0.9f, () -> {
                     world.setBlockState(new BlockPos(-1156, 84, 425), Blocks.REDSTONE_BLOCK.getDefaultState());
                 })
-        );
+        ).build();
     }
 
 }

@@ -5,6 +5,7 @@ import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.world.WorldDestructionEventsComponent;
 import com.sp.destruction.server.custom.LaserDestructionServer;
 import com.sp.entity.ModDamageSources;
+import com.sp.networking.ServerPacketManager;
 import com.sp.sounds.ModSounds;
 import com.sp.sounds.instances.FadingSoundInstance;
 import com.sp.util.Noise;
@@ -208,7 +209,7 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
             }
             glitchTime++;
             if (glitchTime == 100) {
-                DestroyingMinecraft.sendWaitingRoomPacket(player, true);
+                ServerPacketManager.sendWaitingRoomPacket(player, true);
             }
 
         }

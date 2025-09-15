@@ -9,8 +9,9 @@ uniform sampler2D DiffuseDepthSampler;
 uniform isampler2D MaterialSampler;
 uniform sampler2D HandDepthSampler;
 
+uniform sampler2D TranslucentAlbedoSampler;
+
 uniform sampler2D DirtTexture;
-uniform sampler2D CracksTexture;
 
 uniform float GameTime;
 uniform float laserLength;
@@ -67,6 +68,7 @@ void rayMarchLaser(inout vec3 color, vec3 playerPos, bool cracks, float crackDep
 
 void main() {
     vec3 color = texture(DiffuseSampler, texCoord).rgb;
+    vec4 translucentColor = texture(TranslucentAlbedoSampler, texCoord);
     float depth = texture(DiffuseDepthSampler, texCoord).r;
     float handDepth = texture(HandDepthSampler, texCoord).r;
     uint material = texture(MaterialSampler, texCoord).r;
@@ -74,6 +76,9 @@ void main() {
     vec3 viewPos = screenToViewSpace(texCoord, 1.0 - depth).xyz;
     float crackDepth = 0.0;
     bool cracks = false;
+//    if (material == 2) {
+//        color = vec3(1.0);
+//    }
 
     if (depth < 1.0 && material == 2 && handDepth >= 1.0) {
 

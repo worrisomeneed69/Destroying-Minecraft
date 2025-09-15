@@ -48,11 +48,8 @@ public class PlanetDestructionClient extends ClientDestructionEvent {
     protected KeyframeAnimation initAnimations(World world) {
         SoundManager soundManager = MinecraftClient.getInstance().getSoundManager();
 
-        return new KeyframeAnimation(
+        return new KeyframeAnimation.KeyframeAnimationBuilder(
                 this.duration,
-                (globalTime, localTime) -> {
-                    planetFallTimer.setTimer((float) globalTime);
-                },
 
                 new Keyframe(0.0, () -> {
                     ambientSound = FadingSoundInstance.ambient(
@@ -122,6 +119,8 @@ public class PlanetDestructionClient extends ClientDestructionEvent {
                 }, (globalTime, localTime) -> {
                     flashTimer.setTimer(1.0f);
                 })
-        );
+        ).globalAction((globalTime, localTime) -> {
+            planetFallTimer.setTimer((float) globalTime);
+        }).build();
     }
 }

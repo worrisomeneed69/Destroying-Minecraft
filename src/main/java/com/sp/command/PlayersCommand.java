@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.sp.DestroyingMinecraft;
 import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.entity.PlayerComponent;
+import com.sp.networking.ServerPacketManager;
 import com.sp.render.ShaderType;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -62,7 +63,7 @@ public class PlayersCommand {
 
     private static int executeChangeShaders(CommandContext<ServerCommandSource> context, ShaderType shader) {
         for (ServerPlayerEntity player : context.getSource().getWorld().getPlayers()) {
-            DestroyingMinecraft.sendShaderChangePacket(player, shader);
+            ServerPacketManager.sendShaderChangePacket(player, shader);
         }
 
         return 1;
@@ -76,7 +77,7 @@ public class PlayersCommand {
         for (ServerPlayerEntity player : targets) {
             PlayerComponent component = InitializeComponents.PLAYERS.get(player);
             component.setInWaitingRoom(setInWaitingRoom);
-            DestroyingMinecraft.sendWaitingRoomPacket(player, setInWaitingRoom);
+            ServerPacketManager.sendWaitingRoomPacket(player, setInWaitingRoom);
         }
 
         return targets.size();
@@ -86,6 +87,7 @@ public class PlayersCommand {
         for (ServerPlayerEntity player : targets) {
             PlayerComponent component = InitializeComponents.PLAYERS.get(player);
             component.resetPlayer();
+            ServerPacketManager.sendWaitingRoomPacket(player, false);
         }
 
         return targets.size();

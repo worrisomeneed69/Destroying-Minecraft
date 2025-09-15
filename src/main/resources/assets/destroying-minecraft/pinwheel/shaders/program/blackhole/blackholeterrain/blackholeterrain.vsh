@@ -56,9 +56,20 @@ void main() {
     pos *= 1.0 - (distToBlackHole * distToBlackHole * distToBlackHole);
 
     //Random Rotation
-    pos.xz *= rot2D(GameTime * 200000 * hash(gl_InstanceID * 1324));
-    pos.xy *= rot2D(GameTime * 200000 * hash(gl_InstanceID * 674));
-    pos.yz *= rot2D(-GameTime * 20000 * hash(gl_InstanceID * 94));
+    mat2 yRot = rot2D(GameTime * 200000 * hash(gl_InstanceID * 1324));
+    mat2 zRot = rot2D(GameTime * 200000 * hash(gl_InstanceID * 674));
+    mat2 xRot = rot2D(-GameTime * 20000 * hash(gl_InstanceID * 94));
+
+    pos.xz *= yRot;
+    pos.xy *= zRot;
+    pos.yz *= xRot;
+
+    normal = Normal;
+    normal.xz *= yRot;
+    normal.xy *= zRot;
+    normal.yz *= xRot;
+
+    normal = worldToViewSpace(vec4(normal, 1.0)).xyz;
 
     //Go Back to prev pos
     pos += vec3(1);
@@ -89,5 +100,5 @@ void main() {
     textureType = int(floor(mod(float(gl_InstanceID), 4.0)));
 
 
-    normal = worldToViewSpace(vec4(Normal, 1.0)).xyz;
+
 }

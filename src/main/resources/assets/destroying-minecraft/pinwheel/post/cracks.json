@@ -36,9 +36,10 @@
       "type": "framebuffer",
       "name": "veil:first_person:depth"
     },
-    "CracksTexture": {
-      "type": "location",
-      "location": "destroying-minecraft:textures/shaders/planet/crack2.png"
+    "TranslucentAlbedoSampler": {
+      "type": "framebuffer",
+      "name": "destroying-minecraft:translucent",
+      "sampler": 1
     }
   }
 }

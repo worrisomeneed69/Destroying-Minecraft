@@ -21,7 +21,7 @@ public abstract class NoGravityEntityMixin {
     @Redirect(method = "applyGravity", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;add(DDD)Lnet/minecraft/util/math/Vec3d;"))
     private Vec3d reduceGravity(Vec3d instance, double x, double y, double z) {
         WorldDestructionEventsComponent component = InitializeComponents.EVENTS.get(this.getWorld());
-        Vec3d gravityDir = DestroyingMinecraft.getGravityDir();
+        Vec3d gravityDir = WorldDestructionEventsComponent.gravityDir;
         Vec3d velocity = new Vec3d(x, y, z).lerp(new Vec3d(x, y + gravityDir.y, gravityDir.z), component.getGravityLerp());
 //        System.out.println(velocity);
         return instance.add(velocity);

@@ -59,7 +59,7 @@ dependencies {
 //	}
 //	include("foundry.veil:veil-fabric-${project.minecraft_version}:${project.veil_version}")
 
-    modImplementation(rootProject.files('src/main/resources/META-INF/jars/veil-fabric-1.21.1-2.3.1.jar'))
+    modImplementation(rootProject.files('src/main/resources/META-INF/jars/veil-fabric-1.21.1-2.3.2.jar'))
 
     modImplementation(api("gg.moonflower:molang-compiler:${molang_compiler_version}"))
     modImplementation(api("io.github.ocelot:glsl-processor:${glsl_processor_version}"))

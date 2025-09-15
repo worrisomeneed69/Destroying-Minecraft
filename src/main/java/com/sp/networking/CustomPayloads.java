@@ -205,4 +205,21 @@ public class CustomPayloads {
             return ID;
         }
     }
+
+    /////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
+
+    public record LavaSpewPacketPayload(Vector3f position) implements CustomPayload {
+        public static final Id<LavaSpewPacketPayload> ID = new Id<>(DestroyingMinecraft.idOf("lvaspw"));
+
+        public static final PacketCodec<RegistryByteBuf, LavaSpewPacketPayload> CODEC = PacketCodec.tuple(
+                PacketCodecs.VECTOR3F, LavaSpewPacketPayload::position,
+                LavaSpewPacketPayload::new);
+
+
+        @Override
+        public Id<? extends CustomPayload> getId() {
+            return ID;
+        }
+    }
 }

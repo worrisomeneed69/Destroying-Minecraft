@@ -44,6 +44,10 @@
           "type": "framebuffer",
           "name": "veil:dynamic_main",
           "sampler": 2
+        },
+        "OpaqueDepth": {
+          "type": "framebuffer",
+          "name": "veil:dynamic_main:depth"
         }
     }
 }

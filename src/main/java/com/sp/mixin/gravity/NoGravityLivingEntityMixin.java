@@ -34,7 +34,7 @@ public abstract class NoGravityLivingEntityMixin extends Entity {
     private void reduceGravity(LivingEntity instance, double x, double y, double z) {
         if (!this.isInCreativeMode() && !this.isSpectator()) {
             WorldDestructionEventsComponent component = InitializeComponents.EVENTS.get(this.getWorld());
-            Vec3d gravityDir = DestroyingMinecraft.getGravityDir();
+            Vec3d gravityDir = WorldDestructionEventsComponent.gravityDir;
 
             Vec3d velocity = new Vec3d(x, y, z).lerp(new Vec3d(x, y + gravityDir.y, z + gravityDir.z), component.getGravityLerp());
             instance.setVelocity(velocity);
@@ -47,7 +47,7 @@ public abstract class NoGravityLivingEntityMixin extends Entity {
     private void reduceGravityFlutter(LivingEntity instance, double x, double y, double z) {
         if (!this.isInCreativeMode() && !this.isSpectator()) {
             WorldDestructionEventsComponent component = InitializeComponents.EVENTS.get(this.getWorld());
-            Vec3d gravityDir = DestroyingMinecraft.getGravityDir();
+            Vec3d gravityDir = WorldDestructionEventsComponent.gravityDir;
 
             Vec3d velocity = new Vec3d(x, y, z).lerp(new Vec3d(x, y + gravityDir.y, z + gravityDir.z), component.getGravityLerp());
             instance.setVelocity(velocity);

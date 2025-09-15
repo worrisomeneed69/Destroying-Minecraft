@@ -43,7 +43,7 @@ float map(vec3 p){
     return min(opSmoothUnion(torus, opSmoothUnion(cylinder, cone, 20), 0), shockWave) - distortion;
 }
 
-float lqMap(vec3 p){
+float lqMap(vec3 p) {
     vec3 nukePos = p - NUKE_POS;
     float cylinder = sdCylinder(nukePos - vec3(0, 40, 0), 44, 12);
     float torus = sdTorus(nukePos - vec3(0, 80,0), vec2(34, 24));
@@ -69,11 +69,11 @@ vec3 rayMarchCloud(inout vec3 color, in vec3 viewPos, in vec3 rayOrigin, in vec3
 
 
 
-        if(d > 1.2 || accumulation >= 1.0){
+        if(d > 1.2 || accumulation >= 1.0) {
             break;
         }
 
-        else if(length(rayOrigin - rayPos) > 10){
+        else if(length(rayOrigin - rayPos) > 10) {
             break;
         }
     }
@@ -103,7 +103,7 @@ void rayMarchNuke(inout vec3 color, in vec3 viewPos, inout vec3 normal, inout bo
         float d = map(rayPos);
         dist += d;
 
-        if(d <= 0.001) {
+        if(d <= 0.1) {
             hit = true;
             break;
         }

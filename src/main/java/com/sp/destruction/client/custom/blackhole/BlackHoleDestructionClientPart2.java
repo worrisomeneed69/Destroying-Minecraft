@@ -41,7 +41,7 @@ public class BlackHoleDestructionClientPart2 extends ClientDestructionEvent {
     protected KeyframeAnimation initAnimations(World world) {
         SoundManager soundManager = MinecraftClient.getInstance().getSoundManager();
 
-        return new KeyframeAnimation(
+        return new KeyframeAnimation.KeyframeAnimationBuilder(
                 this.duration,
                 new Keyframe(0.0, () -> {
                     soundManager.play(PositionedSoundInstance.master(ModSounds.SNAP_SNAP, 1.0f, 1.0f));
@@ -73,7 +73,7 @@ public class BlackHoleDestructionClientPart2 extends ClientDestructionEvent {
                     CameraShakeInstance cameraShakeInstance = new CameraShakeInstance(0.9f, 0.0f, 40, Easing.LINEAR);
                     CameraShakeManager.addCameraShake(cameraShakeInstance);
                 })
-        );
+        ).build();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.sp.mixin.sodiumcompat;
+package com.sp.mixin.compat.sodium;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.sp.DestroyingMinecraft;
@@ -21,8 +21,7 @@ import java.util.Map;
 public abstract class SodiumShadowMapShaderMixin {
     @Shadow protected abstract GlProgram<ChunkShaderInterface> compileProgram(ChunkShaderOptions options);
 
-    @Unique
-    private final Map<ChunkShaderOptions, GlProgram<ChunkShaderInterface>> shadowPrograms = new Object2ObjectOpenHashMap<>();
+    @Unique private final Map<ChunkShaderOptions, GlProgram<ChunkShaderInterface>> shadowPrograms = new Object2ObjectOpenHashMap<>();
 
     @Redirect(method = "begin", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/ShaderChunkRenderer;compileProgram(Lnet/caffeinemc/mods/sodium/client/render/chunk/shader/ChunkShaderOptions;)Lnet/caffeinemc/mods/sodium/client/gl/shader/GlProgram;"))
     private GlProgram<ChunkShaderInterface> redirectShadowShader(ShaderChunkRenderer instance, ChunkShaderOptions options, @Local(argsOnly = true) TerrainRenderPass pass){
@@ -35,14 +34,13 @@ public abstract class SodiumShadowMapShaderMixin {
             }
 
             return program;
-
         }
 
         return this.compileProgram(options);
     }
 
     @Unique
-    private GlProgram<ChunkShaderInterface> createShadowShader(String path, ChunkShaderOptions options){
+    private GlProgram<ChunkShaderInterface> createShadowShader(String path, ChunkShaderOptions options) {
         ShaderConstants constants = options.constants();
 
         GlShader vertShader = ShaderLoader.loadShader(ShaderType.VERTEX,

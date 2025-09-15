@@ -6,10 +6,12 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.sp.DestroyingMinecraft;
 import com.sp.cca.InitializeComponents;
+import com.sp.cca.custom.entity.PlayerComponent;
 import com.sp.cca.custom.world.WorldDestructionEventsComponent;
 import com.sp.destruction.DestructionEvent;
 import com.sp.destruction.server.ServerDestructionEvent;
 import com.sp.networking.CustomPayloads;
+import com.sp.networking.ServerPacketManager;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
 import com.sp.world.spinningblockexplosion.custom.DirectionalSBE;
 import com.sp.world.spinningblockexplosion.custom.PointSBE;
@@ -20,6 +22,7 @@ import net.minecraft.command.argument.Vec3ArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -38,6 +41,7 @@ public class DestructionCommand {
     public final static int supernovaType = 5;
     public final static int blackHolePart1Type = 6;
     public final static int blackHolePart2Type = 7;
+    public final static int initializeType = 8;
 
     public static void register(CommandDispatcher<ServerCommandSource> serverCommandSourceCommandDispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
         serverCommandSourceCommandDispatcher.register(
@@ -86,6 +90,7 @@ public class DestructionCommand {
                                                                 .then(CommandManager.argument("density", FloatArgumentType.floatArg(0.0f))
                                                                         .then(CommandManager.argument("location", Vec3ArgumentType.vec3())
                                                                             .executes(commandContext -> directionalSpinningBlockExplosion(
+                                                                                    commandContext.getSource().getWorld(),
                                                                                     IntegerArgumentType.getInteger(commandContext, "length"),
                                                                                     IntegerArgumentType.getInteger(commandContext, "width"),
                                                                                     FloatArgumentType.getFloat(commandContext, "angle"),
@@ -103,6 +108,7 @@ public class DestructionCommand {
                                                 .then(CommandManager.argument("density", FloatArgumentType.floatArg(0.0f))
                                                         .then(CommandManager.argument("location", Vec3ArgumentType.vec3())
                                                                 .executes(commandContext -> pointSpinningBlockExplosion(
+                                                                        commandContext.getSource().getWorld(),
                                                                         IntegerArgumentType.getInteger(commandContext, "radius"),
                                                                         FloatArgumentType.getFloat(commandContext, "density"),
                                                                         Vec3ArgumentType.getVec3(commandContext, "location")
@@ -112,6 +118,9 @@ public class DestructionCommand {
                                         )
                                 )
 
+                        )
+                        .then(CommandManager.literal("initialize")
+                                .executes(commandContext -> execute(commandContext, initializeType))
                         )
                         .then(CommandManager.literal("reset")
                                 .executes(DestructionCommand::reset)
@@ -135,6 +144,11 @@ public class DestructionCommand {
                 case supernovaType -> {
                     spawnPointPos = new BlockPos(-1048, 76, 1328);
                 }
+                case supernovaJazz -> {
+                    PlayerComponent component = InitializeComponents.PLAYERS.get(player);
+                    component.resetPlayer();
+                    ServerPacketManager.sendWaitingRoomPacket(player, false);
+                }
                 case orbitalLaserType -> {
                     spawnPointPos = new BlockPos(-1705, 67, 1560);
                 }
@@ -151,6 +165,9 @@ public class DestructionCommand {
             }
             case orbitalLaserType -> {
                 worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraft.laserDestruction, startTime);
+            }
+            case initializeType -> {
+                worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraft.initializeDestruction, startTime);
             }
         }
         return 1;
@@ -198,16 +215,16 @@ public class DestructionCommand {
         return 1;
     }
 
-    private static int directionalSpinningBlockExplosion(int length, int width, float angle, float density, Vec3d position) {
+    private static int directionalSpinningBlockExplosion(ServerWorld world, int length, int width, float angle, float density, Vec3d position) {
         DirectionalSBE explosion = new DirectionalSBE(length, width, angle, density, position);
-        explosion.beginExplosion();
+        explosion.beginExplosion(world);
 
         return 1;
     }
 
-    private static int pointSpinningBlockExplosion(int radius, float density, Vec3d position) {
+    private static int pointSpinningBlockExplosion(ServerWorld world, int radius, float density, Vec3d position) {
         PointSBE explosion = new PointSBE(radius, density, position);
-        explosion.beginExplosion();
+        explosion.beginExplosion(world);
 
         return 1;
     }

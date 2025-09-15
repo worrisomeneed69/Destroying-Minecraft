@@ -6,6 +6,7 @@
 
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DiffuseDepthSampler;
+uniform sampler2D OpaqueDepth;
 uniform sampler2D HandDepthSampler;
 uniform isampler2D MaterialSampler;
 uniform sampler2D PlanetColor;
@@ -206,7 +207,7 @@ vec3 viewToWorldSpaceDir(vec3 direction) {
 
 void main() {
     vec4 mainTexture = texture(DiffuseSampler, texCoord);
-    float depth = texture(DiffuseDepthSampler, texCoord).r;
+    float depth = texture(OpaqueDepth, texCoord).r;
     uint material = texture(MaterialSampler, texCoord).r;
 
     vec3 playerSpace = screenToLocalSpace(texCoord, depth).xyz;

@@ -11,11 +11,12 @@ public class ShaderTimer {
         this.timer = timer;
     }
 
-    public void maxTimer(){
+    public void maxTimer() {
+        this.prevTimer = 1.0f;
         this.timer = 1.0f;
     }
 
-    public void reset(){
+    public void reset() {
         this.prevTimer = 0.0f;
         this.timer = 0.0f;
     }

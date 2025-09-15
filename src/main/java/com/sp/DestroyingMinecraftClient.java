@@ -1,5 +1,6 @@
 package com.sp;
 
+import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.block.entity.ModBlockEntities;
 import com.sp.block.entity.client.PhysicsDoorBlockRenderer;
@@ -7,7 +8,10 @@ import com.sp.block.entity.client.voidblock.GlitchedVoidBlockEntityRenderer;
 import com.sp.block.entity.client.voidblock.VoidBlockEntityRenderer;
 import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.entity.PlayerComponent;
+import com.sp.cca.custom.world.WorldDestructionEventsComponent;
 import com.sp.config.DestroyingMinecraftConfig;
+import com.sp.destruction.DestructionEvent;
+import com.sp.destruction.client.ClientDestructionEvent;
 import com.sp.entity.ModEntities;
 import com.sp.entity.client.model.StarPiercerModel;
 import com.sp.entity.client.renderer.BlockPhysicsEntityRenderer;
@@ -32,20 +36,25 @@ import com.sp.world.destructionevent.custom.BlackHoleDestruction;
 import com.sp.world.playzone.PlayZone;
 import com.sp.world.playzone.PlayZoneManager;
 import foundry.veil.Veil;
+import foundry.veil.api.client.registry.RenderTypeShardRegistry;
 import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.dynamicbuffer.DynamicBufferType;
+import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.post.PostProcessingManager;
+import foundry.veil.api.client.render.rendertype.VeilRenderType;
+import foundry.veil.impl.client.render.dynamicbuffer.DynamicBufferShard;
 import foundry.veil.platform.VeilEventPlatform;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
@@ -54,9 +63,10 @@ import net.minecraft.world.World;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Vector;
 
 public class DestroyingMinecraftClient implements ClientModInitializer {
+    private static final Identifier BLOOM_FRAMEBUFFER = DestroyingMinecraft.idOf("bloom/bloom_start");
+    private static final Identifier TRANSLUCENT_FRAMEBUFFER = DestroyingMinecraft.idOf("translucent");
 	public static boolean shouldRenderDebug = false;
 	public BlockInstanceRenderer blockInstanceRenderer;
 
@@ -70,10 +80,12 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 	public static BloomPostShader bloomPostShader = new BloomPostShader();
 	public static PostProcessingPostShader postProcessingPostShader = new PostProcessingPostShader();
 
+    public static InitializePostShader initializePostShader = new InitializePostShader();
+
 	private static ShaderType prevShaderType;
 	private static final Set<Identifier> removedPipelines = new HashSet<>(1);
-
 	private static boolean enabledDynamicBuffers = false;
+
 
 	@Override
 	public void onInitializeClient() {
@@ -98,8 +110,15 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 		BlockEntityRendererFactories.register(ModBlockEntities.PHYSICS_DOOR_BE, PhysicsDoorBlockRenderer::new);
 //		BlockEntityRendererFactories.register(ModBlockEntities.LIMBO_SQUARE_BE, LimboSquareBlockEntityRenderer::new);
 
-		VeilEventPlatform.INSTANCE.onVeilRenderLevelStage((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, renderTick, deltaTracker, camera, frustum) -> {
-			MinecraftClient client = MinecraftClient.getInstance();
+        RenderTypeShardRegistry.addGenericShard(renderType -> "translucent_target".equals(getOutputName(renderType)), new DynamicBufferShard("translucent", DestroyingMinecraftClient::getTranslucentBuffer));
+
+        VeilEventPlatform.INSTANCE.onVeilRenderLevelStage((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, renderTick, deltaTracker, camera, frustum) -> {
+            if(!enabledDynamicBuffers){
+                this.enableDynamicBuffers();
+                enabledDynamicBuffers = true;
+            }
+
+            MinecraftClient client = MinecraftClient.getInstance();
 			World clientWorld = client.world;
 			RenderSystem.disableDepthTest();
 
@@ -116,8 +135,6 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 			switch (stage) {
 				case AFTER_LEVEL -> {
-//					System.out.println(VeilRenderSystem.renderer().getCameraMatrices().getNearPlane());
-
 					//Only render the shadow map with shaders that need it
 					if (camera != null) {
 						ShadowMapRenderer.renderShadowMap(camera);
@@ -130,23 +147,28 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 						prevShaderType = DestroyingMinecraftConfig.shaderType;
 					}
 				}
-				case AFTER_SKY -> {
-					if (this.blockInstanceRenderer == null) {
-						this.blockInstanceRenderer = new BlockInstanceRenderer();
-					}
 
-					//Only render the black hole terrain when rendering the black hole
-					if (DestroyingMinecraftConfig.shaderType == ShaderType.BLACK_HOLE) {
-						blockInstanceRenderer.render();
-					}
-				}
+                case AFTER_SOLID_BLOCKS -> {
+                    if (this.blockInstanceRenderer == null) {
+                        this.blockInstanceRenderer = new BlockInstanceRenderer();
+                    }
 
-				case AFTER_WEATHER -> {
+                    //Only render the black hole terrain when rendering the black hole
+                    if (DestroyingMinecraftConfig.shaderType == ShaderType.BLACK_HOLE) {
+                        blockInstanceRenderer.render();
+                    }
+                }
+
+                case AFTER_BLOCK_ENTITIES -> {
+
+
+                    TranslucentRenderer.bind(GlConst.GL_DEPTH_BUFFER_BIT);
+
                     if (client.player == null) return;
 
                     PlayerComponent component = InitializeComponents.PLAYERS.get(client.player);
-					if(shouldRenderDebug || !component.isInsideAPlayZone()) {
-						BlackHoleDestruction.renderSelectionDebug(matrixStack.toPoseStack(), bufferSource, camera, frustum);
+                    if(shouldRenderDebug || !component.isInsideAPlayZone()) {
+                        BlackHoleDestruction.renderSelectionDebug(matrixStack.toPoseStack(), bufferSource, camera, frustum);
 
                         for (PlayZone playZone : PlayZoneManager.getActivePlayZones()) {
                             boolean inside = playZone.isPositionInsideZone(client.player.pos);
@@ -169,9 +191,13 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
                             );
 
                         }
-					}
+                    }
 
-					SelectionHandler.renderSelection(matrixStack.toPoseStack(), bufferSource, deltaTracker, camera);
+                    SelectionHandler.renderSelection(matrixStack.toPoseStack(), bufferSource, deltaTracker, camera);
+                }
+
+				case AFTER_WEATHER -> {
+                    TranslucentRenderer.unbind();
 				}
 			}
 
@@ -203,15 +229,22 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
             if (!client.isIntegratedServerRunning()) {
                 PlayZoneManager.clearAllPlayZones();
             }
+
+            for (DestructionEvent event : ClientDestructionEvent.getAllClientInstances()) {
+                event.resetAnimations();
+            }
+
+            if (client.world != null) {
+                WorldDestructionEventsComponent component = InitializeComponents.EVENTS.get(client.world);
+                if (component.getCurrentDestructionEvent() != null) {
+                    component.getCurrentDestructionEvent().resetEvent();
+                }
+                component.setAndStartCurrentDestructionEvent(null, -1);
+            }
 		});
 
 		//Update camera shakes
 		ClientTickEvents.END_CLIENT_TICK.register(minecraftClient -> {
-			if(!enabledDynamicBuffers){
-				this.enableDynamicBuffers();
-				enabledDynamicBuffers = true;
-			}
-
 			CameraShakeManager.instancesTicks();
 		});
 
@@ -255,6 +288,28 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 			}
 		}
 	}
+
+    public static Framebuffer getTranslucentBuffer() {
+        AdvancedFbo translucentBuffer = VeilRenderSystem.renderer().getFramebufferManager().getFramebuffer(TRANSLUCENT_FRAMEBUFFER);
+        if (translucentBuffer != null && !VeilLevelPerspectiveRenderer.isRenderingPerspective()) {
+            return translucentBuffer.toRenderTarget();
+        }
+
+        return MinecraftClient.getInstance().getFramebuffer();
+    }
+
+    public static Framebuffer getBloomBuffer() {
+        AdvancedFbo bloomBuffer = VeilRenderSystem.renderer().getFramebufferManager().getFramebuffer(BLOOM_FRAMEBUFFER);
+        if (bloomBuffer != null && !VeilLevelPerspectiveRenderer.isRenderingPerspective()) {
+            return bloomBuffer.toRenderTarget();
+        }
+
+        return MinecraftClient.getInstance().getFramebuffer();
+    }
+
+    private static String getOutputName(RenderLayer.MultiPhase renderType) {
+        return VeilRenderType.getName(VeilRenderType.getShards(renderType).outputState());
+    }
 
 	private void enableDynamicBuffers() {
 		Identifier bufferId = Veil.veilPath("forced");

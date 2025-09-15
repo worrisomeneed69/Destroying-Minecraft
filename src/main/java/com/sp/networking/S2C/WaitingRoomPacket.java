@@ -11,7 +11,11 @@ public class WaitingRoomPacket {
     public static void receive(CustomPayloads.WaitingRoomPacketPayload payload, ClientPlayNetworking.Context context) {
         context.client().execute(()->{
             PlayerComponent component = InitializeComponents.PLAYERS.get(context.player());
-            context.client().getSoundManager().stopAll();
+            if (payload.setInWaitingRoom()) {
+                context.client().getSoundManager().close();
+            } else {
+                context.client().getSoundManager().reloadSounds();
+            }
             component.setInWaitingRoom(payload.setInWaitingRoom());
             MinecraftClient.getInstance().options.hudHidden = payload.setInWaitingRoom();
         });

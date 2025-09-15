@@ -64,6 +64,9 @@ public class InvokeDestructionPacket {
                     worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraftClient.blackHolePostShader.destruction2, payload.startTime());
                     break;
                 }
+                case initializeType: {
+                    worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraftClient.initializePostShader.getDestructionEvent(), payload.startTime());
+                }
             }
 
         });

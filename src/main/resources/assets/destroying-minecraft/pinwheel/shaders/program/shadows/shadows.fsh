@@ -1,5 +1,6 @@
 #include veil:space_helper
 #include veil:fog
+#include veil:blend
 #veil:buffer veil:camera VeilCamera
 
 #define SHADOW_SAMPLES 1
@@ -8,14 +9,25 @@
 
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DiffuseDepthSampler;
+uniform sampler2D OpaqueDepth;
 uniform sampler2D AlbedoSampler;
 uniform sampler2D ShadowMap;
 uniform sampler2D NormalSampler;
-uniform sampler2D HandDepth;
 uniform sampler2D LightUVSampler;
-uniform sampler2D LightMapSampler;
 uniform sampler2D VanillaLightMapTexture;
 uniform sampler2D BloomSampler;
+uniform sampler2D BloomStartSampler;
+uniform isampler2D MaterialSampler;
+
+uniform sampler2D TranslucentDepth;
+uniform sampler2D TranslucentAlbedoSampler;
+uniform sampler2D TranslucentNormalSampler;
+uniform sampler2D TranslucentUVSampler;
+uniform sampler2D TranslucentLightMapSampler;
+
+uniform sampler2D HandDepth;
+uniform sampler2D HandAlbedoSampler;
+uniform sampler2D HandLightColor;
 
 uniform sampler2D NoiseTex;
 
@@ -36,6 +48,7 @@ out vec4 fragColor;
 
 //const vec3 SkyColor = vec3(0.596078431372549, 0.8, 0.9);
 const vec3 SkyColor = vec3(0.6,0.9,1.0);
+vec3 sunDir = normalize(mat3(IShadowViewMatrix) * vec3(0.0,0.0,1.0));
 
 vec3 projectAndDivide(mat4 projMat, vec3 pos){
     vec4 homogeneousPos = projMat * vec4(pos, 1.0);
@@ -64,27 +77,16 @@ mat2 randRotMat(vec2 coord){
     return mat2(cosTheta, -sinTheta, sinTheta, cosTheta) / 2048.0;
 }
 
-void main() {
-    vec3 cameraPos = VeilCamera.CameraPosition;
-    vec3 BH_POS = cameraPos + vec3(0, 0, -4.2);
-
-    vec3 BH_DIR = normalize(mat3(IShadowViewMatrix) * vec3(0.0,0.0,1.0));
-    vec3 worldNormal = viewToWorldSpaceDir(texture(NormalSampler, texCoord).rgb);
-
-    vec4 color = texture(DiffuseSampler, texCoord);
-    vec3 albedoColor = texture(AlbedoSampler, texCoord).rgb;
-
-    float depth = texture(DiffuseDepthSampler, texCoord).r;
-    float handDepth = texture(HandDepth, texCoord).r;
-
-
-    vec3 flash = flashTimer > 0 ? vec3(0.6) * (1.0 - min(flashTimer, 1.0)) : vec3(0.0);
-    //    vec3 flash = vec3(0.6);
-    if(depth >= 1.0) {
-        fragColor = color;
-        gl_FragDepth = depth;
-        return;
+vec3 overlay(vec3 color1, vec3 color2) {
+    if (color2.r + color2.g + color2.b > 0.0) {
+        color1 = color2;
     }
+
+    return color1;
+}
+
+vec3 getShadow(vec3 albedoColor, float depth, vec3 worldNormal, bool translucent) {
+    vec3 flash = flashTimer > 0 ? vec3(0.6) * (1.0 - min(flashTimer, 1.0)) : vec3(0.0);
 
     vec3 viewPos = screenToViewSpace(texCoord, depth).rgb;
 
@@ -99,11 +101,15 @@ void main() {
     float shadowDepth = shadowScreenPos.z;
 
     vec2 lightUV = texture(LightUVSampler, texCoord).rg;
+    if (translucent) {
+        vec2 translucentLightUV = texture(TranslucentUVSampler, texCoord).rg;
+        lightUV = overlay(vec3(lightUV, 0.0), vec3(translucentLightUV, 0.0)).rg;
+    }
 
     vec3 blockLight = texture(VanillaLightMapTexture, vec2(lightUV.x, 1.0/32.0)).rgb;
     vec3 skyLight = texture(VanillaLightMapTexture, vec2(1.0/32.0, lightUV.y)).rgb;
 
-    float lightDir = dot(worldNormal, BH_DIR);
+    float lightDir = dot(worldNormal, sunDir);
 
     float shadowSum = SHADOW_STRENGTH;
     if (shadowScreenPos.x >= 0.0 && shadowScreenPos.x <= 1.0 && shadowScreenPos.y >= 0.0 && shadowScreenPos.y <= 1.0 ) {
@@ -128,25 +134,71 @@ void main() {
         shadowSum = 1.0;
     }
 
-    vec3 outputColor;
+    vec3 outputColor = albedoColor.rgb;
     if (flashTimer > 0.0) {
-        outputColor = albedoColor.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)) + flash*lightUV.y;
+        outputColor = outputColor.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)) + flash*lightUV.y;
     }
     else {
-        outputColor = albedoColor.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)*(1.0 - supernovaTimer));
+        outputColor = outputColor.rgb * (blockLight + skyLight * max(shadowSum, SHADOW_STRENGTH)*(1.0 - supernovaTimer));
     }
 
-    outputColor += texture(BloomSampler, texCoord).rgb;
+    return outputColor;
+}
 
+void main() {
+    vec4 sky = texture(DiffuseSampler, texCoord);
+    vec3 albedoColor = texture(AlbedoSampler, texCoord).rgb;
+    vec4 translucentAlbedoColor = texture(TranslucentAlbedoSampler, texCoord);
+
+    float depth = texture(OpaqueDepth, texCoord).r;
+    float translucentDepth = texture(TranslucentDepth, texCoord).r;
+    float handDepth = texture(HandDepth, texCoord).r;
+    uint material = texture(MaterialSampler, texCoord).r;
+
+    ///EARLY EXITS///
+    //Hand
     if (handDepth < 1.0) {
-        outputColor = color.rgb;
+        fragColor = texture(HandAlbedoSampler, texCoord) * texture(HandLightColor, texCoord);
+        gl_FragDepth = handDepth;
+        return;
+    }
+    //BlackHole Terrain
+    if (material == 9) {
+        fragColor = vec4(albedoColor, 1.0) * (dot(sunDir, viewToWorldSpaceDir(texture(NormalSampler, texCoord).rgb)) * 0.5 + 0.7);
+//        fragColor = vec4(viewToWorldSpaceDir(texture(NormalSampler, texCoord).rgb), 1.0);
+        gl_FragDepth = translucentDepth;
+        return;
+    }
+    //Only sky
+    if (translucentDepth >= 1.0) {
+        fragColor = sky;
+        gl_FragDepth = translucentDepth;
+        return;
     }
 
 
     float height = viewDirFromUv(texCoord).y;
+
+    ///OPAQUE///
+    vec3 outputColor = getShadow(albedoColor, depth, viewToWorldSpaceDir(texture(NormalSampler, texCoord).rgb), false);
+    //Opaque fog
+    outputColor = linear_fog(vec4(outputColor, 1.0), length(screenToViewSpace(texCoord, depth).rgb), FogEnd - 30, FogEnd, vec4(vec3(SkyColor - height * 0.7), 1.0)).rgb;
+
+    //Sky thats behind translucent objects
+    if (depth >= 1.0) {
+        outputColor = sky.rgb;
+    }
+
+    ///TRANSLUCENT///
+    vec3 translucentShadow = getShadow(translucentAlbedoColor.rgb, translucentDepth, viewToWorldSpaceDir(texture(TranslucentNormalSampler, texCoord).rgb), true);
+    outputColor = mix(outputColor, translucentShadow, translucentAlbedoColor.a);
+    outputColor += texture(BloomSampler, texCoord).rgb;
+    //Translucent fog
+    outputColor = linear_fog(vec4(outputColor, 1.0), length(screenToViewSpace(texCoord, translucentDepth).rgb), FogEnd - 30, FogEnd, vec4(vec3(SkyColor - height * 0.7), 1.0)).rgb;
+
+
     fragColor = vec4(outputColor, 1.0);
-//    fragColor = linear_fog(vec4(outputColor, 1.0), length(viewPos), FogEnd - 30, FogEnd, vec4(vec3(SkyColor - height * 0.7), 1.0));
-    gl_FragDepth = depth;
+    gl_FragDepth = translucentDepth;
 
 
 

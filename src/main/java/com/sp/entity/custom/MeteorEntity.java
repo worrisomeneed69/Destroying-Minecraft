@@ -1,17 +1,15 @@
 package com.sp.entity.custom;
 
-import com.sp.render.camerashake.CameraShakeManager;
-import com.sp.render.camerashake.custom.PointCameraShake;
 import com.sp.sounds.ModSounds;
 import com.sp.util.MathUtil;
 import com.sp.world.spinningblockexplosion.custom.PointSBE;
-import foundry.veil.api.client.util.Easing;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Vec3d;
@@ -77,9 +75,11 @@ public class MeteorEntity extends PersistentProjectileEntity {
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
         this.playSound(ModSounds.METEOR_IMPACT, 100.0F, 1.2F / (this.random.nextFloat() * 0.2F + 0.9F));
-        PointSBE explosion = new PointSBE(this.random.nextBetween(4, 7), 0.2f, this.getPos());
-        explosion.beginExplosion();
-        discard();
+        if (!this.getWorld().isClient) {
+            PointSBE explosion = new PointSBE(this.random.nextBetween(4, 7), 0.2f, this.getPos());
+            explosion.beginExplosion((ServerWorld) this.getWorld());
+            discard();
+        }
     }
 
     @Override

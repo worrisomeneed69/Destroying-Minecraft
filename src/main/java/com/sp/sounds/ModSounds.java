@@ -56,6 +56,7 @@ public class ModSounds {
 
 
     //Laser
+    public static final SoundEvent LAVA_SPEW = registerSoundEvent("lava_spew");
     public static final SoundEvent LASER_CRACKING_INITIAL = registerSoundEvent("laser_cracking_initial");
     public static final SoundEvent LASER_CRACKING_LOOP = registerSoundEvent("laser_cracking_loop");
     public static final SoundEvent LASER_LANDING = registerSoundEvent("laser_landing");

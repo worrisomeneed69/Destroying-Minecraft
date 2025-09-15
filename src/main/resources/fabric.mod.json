@@ -38,7 +38,8 @@
 			"destroying-minecraft:players"
 		],
 		"loom:injected_interfaces": {
-			"foundry/veil/api/client/render/shader/program/ShaderProgram": ["com/sp/mixin/BetterUniformsMixin"]
+			"foundry/veil/api/client/render/shader/program/ShaderProgram": ["com/sp/mixin/BetterUniformsMixin"],
+            "foundry/veil/api/quasar/particle/RenderStyle/Billboard": ["com/sp/mixin/BetterUniformsMixin"]
 		}
 	},
 	"depends": {
@@ -51,7 +52,7 @@
 	},
     "jars": [
       {
-        "file": "META-INF/jars/veil-fabric-1.21.1-2.3.1.jar"
+        "file": "META-INF/jars/veil-fabric-1.21.1-2.3.2.jar"
       }
     ]
 }

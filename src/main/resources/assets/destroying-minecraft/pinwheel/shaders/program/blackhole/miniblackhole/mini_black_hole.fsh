@@ -11,7 +11,7 @@ uniform float GameTime;
 in vec2 texCoord;
 out vec4 fragColor;
 
-vec3 BLACK_HOLE_POS = vec3(-18.5, 282.5, -14.5);
+vec3 BLACK_HOLE_POS = vec3(-34.0, 277.65, -67.25);
 float BLACK_HOLE_INNER_RADIUS = 1.4;
 float BLACK_HOLE_OUTER_RADIUS = 2.5;
 

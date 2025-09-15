@@ -23,7 +23,7 @@ public abstract class SetLayingDownDirectionMixin extends Entity {
 
     @Inject(method = "getSleepingDirection", at = @At("RETURN"), cancellable = true)
     private void setDirection(CallbackInfoReturnable<Direction> cir) {
-        if ((LivingEntity) (Object) this instanceof LayingDownPlayerEntity layingDownPlayerEntity) {
+        if ((LivingEntity) (Object) this instanceof LayingDownPlayerEntity layingDownPlayerEntity && layingDownPlayerEntity.isLayingDown()) {
             BlockPos layingDownBlockPos = layingDownPlayerEntity.getLayingDownPos().orElse(null);
             cir.setReturnValue(layingDownBlockPos != null ? ChairBlock.getDirection(this.getWorld(), layingDownBlockPos) : null);
         }

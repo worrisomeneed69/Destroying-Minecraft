@@ -28,7 +28,7 @@ public class SupernovaJazz extends ClientDestructionEvent {
     protected KeyframeAnimation initAnimations(World world) {
         SoundManager soundManager = MinecraftClient.getInstance().getSoundManager();
 
-        return new KeyframeAnimation(
+        return new KeyframeAnimation.KeyframeAnimationBuilder(
                 this.duration,
                 new Keyframe(0.0, () -> {
                     BlackScreenManager.setBlackScreen(true);
@@ -43,6 +43,6 @@ public class SupernovaJazz extends ClientDestructionEvent {
                 new Keyframe(362.0 / this.duration, () -> {
                     BlackScreenManager.setBlackScreen(false);
                 })
-        );
+        ).build();
     }
 }

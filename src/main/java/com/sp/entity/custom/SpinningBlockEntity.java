@@ -50,7 +50,7 @@ public class SpinningBlockEntity extends Entity {
             if(!acceleration.equals(Vec3d.ZERO)) this.addVelocity(acceleration);
             if (component.shouldApplyGravity()) {
                 WorldDestructionEventsComponent component = InitializeComponents.EVENTS.get(this.getWorld());
-                Vec3d gravityDir = DestroyingMinecraft.getGravityDir();
+                Vec3d gravityDir = WorldDestructionEventsComponent.gravityDir;
                 Vec3d velocity = new Vec3d(0, -0.07, 0).lerp(new Vec3d(0, -0.07 + gravityDir.y, gravityDir.z), component.getGravityLerp());
                 this.addVelocity(velocity);
             }

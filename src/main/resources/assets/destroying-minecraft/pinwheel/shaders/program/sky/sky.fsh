@@ -1,5 +1,6 @@
 #include veil:space_helper
 #include veil:blend
+#include veil:fog
 #include destroying-minecraft:ray_march
 #include destroying-minecraft:noise
 #veil:buffer veil:camera VeilCamera
@@ -8,7 +9,11 @@
 
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DiffuseDepthSampler;
+uniform sampler2D OpaqueDepth;
+uniform sampler2D TranslucentDepth;
 uniform sampler2D StarsTexture;
+
+uniform sampler2D HandDepth;
 
 uniform float GameTime;
 uniform mat4 sunMat;
@@ -17,6 +22,10 @@ uniform float flashTimer;
 uniform float explosionTimer;
 uniform float laserLength;
 uniform int flashFrame;
+
+uniform float FogStart;
+uniform float FogEnd;
+uniform vec4 FogColor;
 
 
 in vec2 texCoord;
@@ -33,6 +42,7 @@ float easeInExpo(float x) {
 }
 
 const vec3 SkyColor = vec3(0.3,0.55,1.4);
+const vec3 SkyColor2 = vec3(0.6,0.9,1.0);
 //const vec3 SkyColor = vec3(0.0,0.0,0.0);
 
 const int ITERATIONS = 75;
@@ -99,8 +109,8 @@ vec3 rayMarchSupernova() {
     vec3 centerPos = cameraPos + getLightAngle() * 3;
 //    vec3 centerPos = vec3(-811, 80, 234);
 
-    vec3 color = texture(DiffuseSampler, texCoord).rgb;
-    float depth = texture(DiffuseDepthSampler, texCoord).r;
+    vec3 color = vec3(0.0);
+    float depth = texture(OpaqueDepth, texCoord).r;
 
     vec3 playerSpace = screenToLocalSpace(texCoord, depth).xyz;
     float worldDepth = length(playerSpace);
@@ -188,20 +198,25 @@ void rayMarchLaser(inout vec3 color, vec3 playerPos, vec3 sunDir) {
         }
 
     }
-
 }
 
 void main() {
-    vec3 color = texture(DiffuseSampler, texCoord).rgb;
-    float depth = texture(DiffuseDepthSampler, texCoord).r;
+    vec3 color = vec3(0.0);
+    float depth = texture(OpaqueDepth, texCoord).r;
+    float handDepth = texture(HandDepth, texCoord).r;
 
     vec3 sunDir = getLightAngle();
     vec3 rd = viewDirFromUv(texCoord);
     float time = supernovaTimer;
 
+//    if (handDepth < 1.0) {
+//        fragColor = texture(HandAlbedoSampler, texCoord) * texture(HandLightColor, texCoord);
+//        return;
+//    }
+
     float light = smoothstep(0.998 + 0.002 * time, 1.0, dot(rd, sunDir));
     rd += rand(texCoord + GameTime) * 0.01;
-    if(depth >= 1.0){
+    if(depth >= 1.0 && handDepth >= 1.0) {
         color = mix(vec3(SkyColor - rd.y * 0.7), texture(StarsTexture, viewDirFromUv(texCoord).zy*0.5).rgb*(0.75 - explosionTimer), time)*2;
         color += vec3(light * 10);
 
@@ -232,6 +247,4 @@ void main() {
             fragColor.rgb = vec3(1.0);
         }
     }
-//    fragColor.rgb = vec3(getLuminance(fragtColor.rgb));
-//    fragColor.rgb = 1.0 - fragColor.rgb;
 }

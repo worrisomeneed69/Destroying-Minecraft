@@ -1,7 +1,7 @@
 package com.sp.world.playzone;
 
-import com.sp.DestroyingMinecraft;
 import com.sp.cca.InitializeComponents;
+import com.sp.networking.ServerPacketManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -14,13 +14,14 @@ public class PlayZoneManager {
     public static void addPlayZone(World world, PlayZone playZone) {
         if (activePlayZones.stream().noneMatch(playZone1 -> playZone1.getId() == playZone.getId())) {
             activePlayZones.add(playZone);
-        }
 
-        if (!world.isClient) {
-            for (PlayerEntity player : world.getPlayers()) {
-                DestroyingMinecraft.sendUpdatePlayZonePacket(player, playZone, false);
+
+            if (!world.isClient) {
+                for (PlayerEntity player : world.getPlayers()) {
+                    ServerPacketManager.sendUpdatePlayZonePacket(player, playZone, false);
+                }
+                InitializeComponents.EVENTS.get(world).sync();
             }
-            InitializeComponents.EVENTS.get(world).sync();
         }
     }
 
@@ -31,7 +32,7 @@ public class PlayZoneManager {
                 activePlayZones.remove(playZone);
                 playZonesRemoved++;
                 for (PlayerEntity player : world.getPlayers()) {
-                    DestroyingMinecraft.sendUpdatePlayZonePacket(player, playZone, true);
+                    ServerPacketManager.sendUpdatePlayZonePacket(player, playZone, true);
                 }
             }
         }

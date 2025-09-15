@@ -12,6 +12,7 @@ import io.github.ocelot.glslprocessor.api.node.GlslNode;
 import io.github.ocelot.glslprocessor.api.node.GlslNodeList;
 import io.github.ocelot.glslprocessor.api.node.GlslTree;
 import io.github.ocelot.glslprocessor.api.visitor.GlslNodeStringWriter;
+import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -38,6 +39,7 @@ public class SodiumShaderPreProcessorMixin {
                 treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression("flat out int material"));
                 mainBody.add(GlslParser.parseExpression("material = 2"));
                 modified = true;
+                MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(modified); //Use the modified variable so it doesn't get thrown out
             }
 
             if (ctx.isFragment()) {
@@ -45,6 +47,7 @@ public class SodiumShaderPreProcessorMixin {
                 treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression(tempOutput));
                 mainBody.add(1, GlslParser.parseExpression(sourceName + " = ivec4(material, 0, 0, 1)"));
                 modified = true;
+                MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(modified); //Use the modified variable so it doesn't get thrown out
             }
         }
     }

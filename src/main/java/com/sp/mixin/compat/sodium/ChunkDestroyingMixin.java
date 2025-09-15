@@ -1,4 +1,4 @@
-package com.sp.mixin.sodiumcompat;
+package com.sp.mixin.compat.sodium;
 
 import com.sp.destruction.client.custom.supernova.SupernovaDestructionClient;
 import net.caffeinemc.mods.sodium.client.render.chunk.RenderSection;

@@ -5,6 +5,7 @@ import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.world.WorldDestructionEventsComponent;
 import com.sp.destruction.server.ServerDestructionEvent;
 import com.sp.entity.custom.BlockPhysicsEntity;
+import com.sp.networking.ServerPacketManager;
 import com.sp.sounds.ModSounds;
 import com.sp.util.keyframes.Keyframe;
 import com.sp.util.keyframes.KeyframeAnimation;
@@ -332,7 +333,6 @@ public class BlackHoleDestructionServerPart2 extends ServerDestructionEvent {
     @Override
     public void resetEvent() {
         if (entity != null) {
-            System.out.println("NOT WORKING");
             entity.discard();
             entity = null;
         }
@@ -343,51 +343,47 @@ public class BlackHoleDestructionServerPart2 extends ServerDestructionEvent {
     protected KeyframeAnimation initAnimations(World world) {
         WorldDestructionEventsComponent component = InitializeComponents.EVENTS.get(world);
 
-        return new KeyframeAnimation(
-                this.duration,
-                (globalTime, localTime) -> {
-                    double clampedGlobalTime = Math.floor(globalTime * 10) * 0.1;
-                    if (clampedGlobalTime != prevGravityLerp) {
-                        component.setGravityLerp(clampedGlobalTime);
-                        component.syncLight();
-                        prevGravityLerp = clampedGlobalTime;
+        return new KeyframeAnimation.KeyframeAnimationBuilder(
+            this.duration,
 
-                        BRAAMS.forEach((aDouble, soundEvent) -> {
-                            if (MathHelper.approximatelyEquals(clampedGlobalTime, aDouble)) {
-                                for (PlayerEntity player : world.getPlayers()) {
-                                    DestroyingMinecraft.sendBraamPacket(player, soundEvent);
-                                }
-                            }
-                        });
+            new Keyframe(0.0),
+
+            new Keyframe(135.0 / this.duration, () -> {
+                entity = BlockPhysicsEntity.ofBlocks(world, initialBPEPositions);
+                entity.setVelocity(0, 0.06, -0.2);
+                entity.component.setRotationSpeed(0.5f, 0, 0);
+                entity.component.sync();
+                entity.velocityDirty = true;
+                entity.velocityModified = true;
+            }),
+
+            new Keyframe(155.0 / this.duration, () -> {
+                BlackHoleDestruction.setStartDestruction(true);
+            })
+        ).globalAction((globalTime, localTime) -> {
+            double clampedGlobalTime = Math.floor(globalTime * 10) * 0.1;
+            if (clampedGlobalTime != prevGravityLerp) {
+                component.setGravityLerp(clampedGlobalTime);
+                component.syncLight();
+                prevGravityLerp = clampedGlobalTime;
+
+                BRAAMS.forEach((aDouble, soundEvent) -> {
+                    if (MathHelper.approximatelyEquals(clampedGlobalTime, aDouble)) {
+                        for (PlayerEntity player : world.getPlayers()) {
+                            ServerPacketManager.sendBraamPacket(player, soundEvent);
+                        }
                     }
-                },
+                });
+            }
+        }).endAction(() -> {
+            prevGravityLerp = 0.0;
+            component.setGravityLerp(1.2);
+            component.syncLight();
 
-                //End action
-                () -> {
-                    prevGravityLerp = 0.0;
-                    component.setGravityLerp(1.2);
-                    component.syncLight();
-
-                    for (PlayerEntity player : world.getPlayers()) {
-                        DestroyingMinecraft.sendBraamPacket(player, ModSounds.BLACK_HOLE_BRAAM_FINAL);
-                    }
-                },
-
-                new Keyframe(0.0),
-
-                new Keyframe(135.0 / this.duration, () -> {
-                    entity = BlockPhysicsEntity.ofBlocks(world, initialBPEPositions);
-                    entity.setVelocity(0, 0.06, -0.2);
-                    entity.component.setRotationSpeed(0.5f, 0, 0);
-                    entity.component.sync();
-                    entity.velocityDirty = true;
-                    entity.velocityModified = true;
-                }),
-
-                new Keyframe(155.0 / this.duration, () -> {
-                    BlackHoleDestruction.setStartDestruction(true);
-                })
-        );
+            for (PlayerEntity player : world.getPlayers()) {
+                ServerPacketManager.sendBraamPacket(player, ModSounds.BLACK_HOLE_BRAAM_FINAL);
+            }
+        }).build();
     }
 
 }

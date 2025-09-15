@@ -128,6 +128,8 @@ public class ShadowMapRenderer {
     }
 
     public static void setShadowUniforms(ShaderProgram access) {
+        if (currentCamera == null) return;
+
         Matrix4f viewMat = ShadowMapRenderer.createShadowModelView(currentCamera.getPos().x, currentCamera.getPos().y, currentCamera.getPos().z, true).peek().getPositionMatrix();
 
         BetterUniforms.setMatrix(access, "shadowViewMatrix", viewMat);

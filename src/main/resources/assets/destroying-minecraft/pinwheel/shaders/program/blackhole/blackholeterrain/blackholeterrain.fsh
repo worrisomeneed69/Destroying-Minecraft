@@ -13,6 +13,7 @@ layout (location = 1) out vec4 Albedo;
 layout (location = 2) out vec3 OutNormal;
 layout (location = 3) out vec2 LightUV;
 layout (location = 4) out vec3 LightColor;
+layout (location = 6) out ivec4 Material;
 
 void main() {
 	vec4 color = vec4(0.0);
@@ -26,11 +27,12 @@ void main() {
 		color = texture(Sampler3, texCoord);
 	}
 
-	color *= brightness;
+//	color *= brightness;
 
 	fragColor = color;
 	Albedo = color;
 	OutNormal = normal;
 	LightUV = vec2(0.0, 1.0);
 	LightColor = vec3(1.0);
+    Material = ivec4(9, 0, 0, 1);
 }

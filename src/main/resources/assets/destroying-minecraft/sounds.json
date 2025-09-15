@@ -178,6 +178,14 @@
       "destroying-minecraft:count_down"
     ]
   },
+  "lava_spew": {
+    "sounds": [
+      "destroying-minecraft:cracks/lava/lava_spew1",
+      "destroying-minecraft:cracks/lava/lava_spew2",
+      "destroying-minecraft:cracks/lava/lava_spew3",
+      "destroying-minecraft:cracks/lava/lava_spew4"
+    ]
+  },
   "laser_cracking_initial": {
     "sounds": [
       "destroying-minecraft:cracks/laser_cracking_initial"
