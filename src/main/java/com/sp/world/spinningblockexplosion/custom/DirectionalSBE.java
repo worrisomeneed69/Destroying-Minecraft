@@ -36,7 +36,7 @@ public class DirectionalSBE extends SpinningBlockExplosion {
             for (int x = -width; x < width; x++) {
                 if(this.random.nextFloat() < blockDensity) {
                     SpinningBlockEntity spinningBlockEntity = ModEntities.SPINNING_BLOCK.create(world);
-                    if (spinningBlockEntity == null) return;
+                    if (spinningBlockEntity == null) continue;
 
                     SpinningBlockComponent component = InitializeComponents.SPINNING_BLOCK.get(spinningBlockEntity);
 
@@ -52,7 +52,7 @@ public class DirectionalSBE extends SpinningBlockExplosion {
                 }
             }
             this.delay = 0;
-            this.progress++;
+            this.progress += 2;
         } else {
             this.delay--;
         }

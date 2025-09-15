@@ -1,6 +1,5 @@
 package com.sp.destruction.server.custom;
 
-import com.sp.DestroyingMinecraft;
 import com.sp.destruction.server.ServerDestructionEvent;
 import com.sp.networking.ServerPacketManager;
 import com.sp.util.keyframes.Keyframe;
@@ -14,7 +13,7 @@ import net.minecraft.world.World;
 public class SupernovaDestructionServer extends ServerDestructionEvent {
 
     public SupernovaDestructionServer() {
-        super(2900);
+        super(2930);
     }
 
     @Override
@@ -25,7 +24,7 @@ public class SupernovaDestructionServer extends ServerDestructionEvent {
                 new Keyframe(0.0),
 
                 new Keyframe(2880.0/this.duration, () -> {
-                    DirectionalSBE explosion = new DirectionalSBE(50, 50, -90, 0.5f, new Vec3d(-1038, 77, 1325));
+                    DirectionalSBE explosion = new DirectionalSBE(50, 80, -90, 0.2f, new Vec3d(-1038, 77, 1325));
                     explosion.beginExplosion((ServerWorld) world);
                 })
         ).endAction(() -> {

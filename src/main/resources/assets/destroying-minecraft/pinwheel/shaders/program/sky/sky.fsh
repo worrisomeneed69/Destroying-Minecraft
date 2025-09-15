@@ -20,8 +20,7 @@ uniform mat4 sunMat;
 uniform float supernovaTimer;
 uniform float flashTimer;
 uniform float explosionTimer;
-uniform float laserLength;
-uniform int flashFrame;
+
 
 uniform float FogStart;
 uniform float FogEnd;
@@ -58,7 +57,6 @@ const vec3 color2 = vec3(0.7607843137254902, 0.8666666666666667, 0.8941176470588
 const vec3 color3 = vec3(0.07450980392156863, 0.21568627450980393, 0.4117647058823529);
 const vec3 color4 = vec3(0.788235294117647, 0.21568627450980393, 0.2980392156862745);
 
-const vec3 centerPos = vec3(-967, 81.2, 1290.5);
 
 //Attenuation formula https://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula
 float attenuation(float value, float a, float b) {
@@ -166,39 +164,7 @@ vec3 rayMarchSupernova() {
     return color;
 }
 
-float mapLaser(vec3 p, vec3 sunDir) {
-    vec3 rayPos = p;
-    float length = laserLength * 20000;
 
-    if (length <= 0.0) return 5000.0;
-    rayPos -= vec3(centerPos.x, centerPos.y, centerPos.z);
-    float angle = atan2(sunDir.x, sunDir.y);
-    rayPos.xy *= rot2D(angle * 180/3.141592);
-    rayPos.y -= length;
-    float d = sdCylinder(rayPos, length, 0.5);
-    d -= (sin(p.y*1 + rand(vec2(GameTime*1000, 745))*100)*0.5 + 0.5)*0.1;
-    return d;
-}
-
-void rayMarchLaser(inout vec3 color, vec3 playerPos, vec3 sunDir) {
-    vec3 rayOrigin = VeilCamera.CameraPosition + VeilCamera.CameraBobOffset;
-    vec3 rayDir = viewDirFromUv(texCoord);
-    float dist = 0.0;
-
-    for(int i = 0; i < 200; i++) {
-        vec3 rayPos = rayOrigin + rayDir * dist;
-        float d = mapLaser(rayPos, sunDir);
-        dist += d;
-
-        if(d < 0.01) {
-            color = vec3(10.0, 1.0, 1.0);
-            break;
-        } else if(dist > length(playerPos) || dist > 700.0) {
-            break;
-        }
-
-    }
-}
 
 void main() {
     vec3 color = vec3(0.0);
@@ -208,11 +174,6 @@ void main() {
     vec3 sunDir = getLightAngle();
     vec3 rd = viewDirFromUv(texCoord);
     float time = supernovaTimer;
-
-//    if (handDepth < 1.0) {
-//        fragColor = texture(HandAlbedoSampler, texCoord) * texture(HandLightColor, texCoord);
-//        return;
-//    }
 
     float light = smoothstep(0.998 + 0.002 * time, 1.0, dot(rd, sunDir));
     rd += rand(texCoord + GameTime) * 0.01;
@@ -235,16 +196,7 @@ void main() {
         fragColor = vec4(color, 1.0);
     }
 
-    if (laserLength > 0.0) {
-        vec3 playerPos = screenToLocalSpace(texCoord, depth).rgb;
-        rayMarchLaser(fragColor.rgb, playerPos, sunDir);
-    }
 
-    if (flashFrame == 1) {
-        if (getBrightness(fragColor.rgb) > 0.3) {
-            fragColor.rgb = vec3(0.0);
-        } else {
-            fragColor.rgb = vec3(1.0);
-        }
-    }
+
+
 }

@@ -1,6 +1,5 @@
 package com.sp.destruction.server.custom;
 
-import com.sp.DestroyingMinecraft;
 import com.sp.destruction.server.ServerDestructionEvent;
 import com.sp.entity.ModEntities;
 import com.sp.entity.custom.MeteorEntity;
@@ -67,7 +66,7 @@ public class PlanetDestructionServer extends ServerDestructionEvent {
 
             new Keyframe(1800.0 / this.duration),
 
-            new Keyframe(2350.0/this.duration, () -> {
+            new Keyframe(2300.0/this.duration, () -> {
                 Vec3d averagePlayerPos = Vec3d.ZERO;
                 List<PlayerEntity> players = (List<PlayerEntity>) world.getPlayers();
                 int numOfTargetedPlayers = 0;

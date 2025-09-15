@@ -35,7 +35,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
     public static int destructionDistance = Integer.MAX_VALUE;
 
     public SupernovaDestructionClient() {
-        super(2900);
+        super(2930);
     }
 
     @Override
@@ -153,19 +153,19 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                             )
                     );
                 }, (globalTime, localTime) -> {
-                    destructionDistance = 300 - (int) (((globalTime - (2830.0/this.duration)) / 0.04)*300);
+                    destructionDistance = 300 - (int) (((globalTime - (2880.0/this.duration)) / 0.015)*300);
 
-                    if (localTime < 0.35) {
+                    if (localTime < 0.335) {
                         //Sun implosion
-                        implodeTimer.setTimer(Easing.EASE_IN_CUBIC.ease((float) (localTime * 2.85f)));
+                        implodeTimer.setTimer(Easing.EASE_IN_CUBIC.ease((float) (localTime * (1/0.335f))));
                     } else {
                         //Flash, then fade to supernova
                         implodeTimer.maxTimer();
-                        flashTimer.setTimer(Math.clamp(Easing.EASE_IN_OUT_CUBIC.ease((float) ((localTime - 0.35f) / 0.41f)), 0.0f, 1.0f));
-                        explosionTimer.setTimer((float) ((localTime - 0.35f) / (0.8f)));
+                        flashTimer.setTimer(Math.clamp(Easing.EASE_IN_OUT_CUBIC.ease((float) ((localTime - 0.335f) / 0.38f)), 0.0f, 1.0f));
+                        explosionTimer.setTimer((float) ((localTime - 0.335f) / (0.77f)));
                     }
 
-                    if (globalTime >= 0.998) {
+                    if (globalTime >= 0.99) {
                         CameraShakeInstance shakeInstance = new CameraShakeInstance(
                                 1.0f,
                                 0.0f,
@@ -176,10 +176,6 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                     }
                 })
 
-        ).endAction(() -> {
-            //Avoid lag
-            this.setActive(false, -1);
-            this.resetEvent();
-        }).build();
+        ).build();
     }
 }

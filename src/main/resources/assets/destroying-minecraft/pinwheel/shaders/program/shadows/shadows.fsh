@@ -1,6 +1,8 @@
 #include veil:space_helper
 #include veil:fog
 #include veil:blend
+#include destroying-minecraft:ray_march
+#include destroying-minecraft:noise
 #veil:buffer veil:camera VeilCamera
 
 #define SHADOW_SAMPLES 1
@@ -35,9 +37,12 @@ uniform vec2 ScreenSize;
 uniform mat4 shadowViewMatrix;
 uniform mat4 IShadowViewMatrix;
 uniform mat4 shadowProjMat;
+uniform float GameTime;
 uniform float supernovaTimer;
 uniform float flashTimer;
 uniform float explosionTimer;
+uniform float laserLength;
+uniform int flashFrame;
 
 uniform float FogStart;
 uniform float FogEnd;
@@ -49,6 +54,7 @@ out vec4 fragColor;
 //const vec3 SkyColor = vec3(0.596078431372549, 0.8, 0.9);
 const vec3 SkyColor = vec3(0.6,0.9,1.0);
 vec3 sunDir = normalize(mat3(IShadowViewMatrix) * vec3(0.0,0.0,1.0));
+const vec3 laserPos = vec3(-967, 81.2, 1290.5);
 
 vec3 projectAndDivide(mat4 projMat, vec3 pos){
     vec4 homogeneousPos = projMat * vec4(pos, 1.0);
@@ -145,6 +151,53 @@ vec3 getShadow(vec3 albedoColor, float depth, vec3 worldNormal, bool translucent
     return outputColor;
 }
 
+float mapLaser(vec3 p) {
+    vec3 rayPos = p;
+    float length = 1 * 20000;
+
+    if (length <= 0.0) return 5000.0;
+    rayPos -= laserPos;
+    float angle = atan2(sunDir.x, sunDir.y);
+    rayPos.xy *= rot2D(angle * 180/3.141592);
+    rayPos.y -= length;
+    float d = sdCylinder(rayPos, length, 0.5);
+    d -= (sin(p.y*1 + rand(vec2(GameTime*1000, 745))*100)*0.5 + 0.5)*0.1;
+    return d;
+}
+
+void rayMarchLaser(inout vec3 color, vec3 playerPos, out vec3 rayPos, out bool hit) {
+    vec3 rayOrigin = VeilCamera.CameraPosition + VeilCamera.CameraBobOffset;
+    vec3 rayDir = viewDirFromUv(texCoord);
+    float dist = 0.0;
+
+    for(int i = 0; i < 200; i++) {
+        rayPos = rayOrigin + rayDir * dist;
+        float d = mapLaser(rayPos);
+        dist += d;
+
+        if(d < 0.01) {
+            color = vec3(10.0, 1.0, 1.0);
+            hit = true;
+            break;
+        } else if (dist > length(playerPos) || dist > 700.0) {
+            break;
+        }
+
+    }
+}
+
+float getBrightness(vec3 color) {
+    return (color.r + color.g + color.b) / 3;
+}
+//vec3 worldToScreenSpace2(vec4 pos) {
+//    vec4 viewSpacePos = VeilCamera.ViewMat * (pos - vec4(VeilCamera.CameraPosition, 0.0));
+//    vec4 clipSpace = VeilCamera.ProjMat * (viewSpacePos / viewSpacePos.w);
+//    clipSpace.xyz /= clipSpace.w;
+//    clipSpace.xyz = clipSpace.xyz * 0.5 + 0.5;
+//    return vec3(clipSpace.xy, clipSpace.z);
+//}
+
+
 void main() {
     vec4 sky = texture(DiffuseSampler, texCoord);
     vec3 albedoColor = texture(AlbedoSampler, texCoord).rgb;
@@ -155,47 +208,67 @@ void main() {
     float handDepth = texture(HandDepth, texCoord).r;
     uint material = texture(MaterialSampler, texCoord).r;
 
+    vec3 outputColor = albedoColor.rgb;
+
+
+
     ///EARLY EXITS///
     //Hand
     if (handDepth < 1.0) {
-        fragColor = texture(HandAlbedoSampler, texCoord) * texture(HandLightColor, texCoord);
+        outputColor = texture(HandAlbedoSampler, texCoord).rgb * texture(HandLightColor, texCoord).rgb;
         gl_FragDepth = handDepth;
-        return;
     }
     //BlackHole Terrain
-    if (material == 9) {
-        fragColor = vec4(albedoColor, 1.0) * (dot(sunDir, viewToWorldSpaceDir(texture(NormalSampler, texCoord).rgb)) * 0.5 + 0.7);
-//        fragColor = vec4(viewToWorldSpaceDir(texture(NormalSampler, texCoord).rgb), 1.0);
+    else if (material == 9) {
+        outputColor = albedoColor * (dot(sunDir, viewToWorldSpaceDir(texture(NormalSampler, texCoord).rgb)) * 0.5 + 0.7);
         gl_FragDepth = translucentDepth;
-        return;
     }
     //Only sky
-    if (translucentDepth >= 1.0) {
-        fragColor = sky;
-        gl_FragDepth = translucentDepth;
-        return;
-    }
-
-
-    float height = viewDirFromUv(texCoord).y;
-
-    ///OPAQUE///
-    vec3 outputColor = getShadow(albedoColor, depth, viewToWorldSpaceDir(texture(NormalSampler, texCoord).rgb), false);
-    //Opaque fog
-    outputColor = linear_fog(vec4(outputColor, 1.0), length(screenToViewSpace(texCoord, depth).rgb), FogEnd - 30, FogEnd, vec4(vec3(SkyColor - height * 0.7), 1.0)).rgb;
-
-    //Sky thats behind translucent objects
-    if (depth >= 1.0) {
+    else if (translucentDepth >= 1.0) {
         outputColor = sky.rgb;
+        gl_FragDepth = translucentDepth;
+    }
+    else {
+        float height = viewDirFromUv(texCoord).y;
+
+        ///OPAQUE///
+        outputColor = getShadow(outputColor, depth, viewToWorldSpaceDir(texture(NormalSampler, texCoord).rgb), false);
+        //Opaque fog
+        outputColor = linear_fog(vec4(outputColor, 1.0), length(screenToViewSpace(texCoord, depth).rgb), FogEnd - 30, FogEnd, vec4(vec3(SkyColor - height * 0.7), 1.0)).rgb;
+
+        //Sky thats behind translucent objects
+        if (depth >= 1.0) {
+            outputColor = sky.rgb;
+        }
+
+        ///TRANSLUCENT///
+        vec3 translucentShadow = getShadow(translucentAlbedoColor.rgb, translucentDepth, viewToWorldSpaceDir(texture(TranslucentNormalSampler, texCoord).rgb), true);
+        outputColor = mix(outputColor, translucentShadow, translucentAlbedoColor.a);
+        outputColor += texture(BloomSampler, texCoord).rgb;
+        //Translucent fog
+        outputColor = linear_fog(vec4(outputColor, 1.0), length(screenToViewSpace(texCoord, translucentDepth).rgb), FogEnd - 30, FogEnd, vec4(vec3(SkyColor - height * 0.7), 1.0)).rgb;
     }
 
-    ///TRANSLUCENT///
-    vec3 translucentShadow = getShadow(translucentAlbedoColor.rgb, translucentDepth, viewToWorldSpaceDir(texture(TranslucentNormalSampler, texCoord).rgb), true);
-    outputColor = mix(outputColor, translucentShadow, translucentAlbedoColor.a);
-    outputColor += texture(BloomSampler, texCoord).rgb;
-    //Translucent fog
-    outputColor = linear_fog(vec4(outputColor, 1.0), length(screenToViewSpace(texCoord, translucentDepth).rgb), FogEnd - 30, FogEnd, vec4(vec3(SkyColor - height * 0.7), 1.0)).rgb;
+    //Supernova Laser
+    if (laserLength > 0.0) {
+        vec3 rayPos = vec3(0.0);
+        bool hit = false;
+        vec3 playerPos = screenToLocalSpace(texCoord, depth).rgb;
+        rayMarchLaser(outputColor, playerPos, rayPos, hit);
+        if (hit) {
+            translucentDepth = worldToScreenSpace(vec4(rayPos + VeilCamera.CameraPosition, 1.0)).b;
+            depth = translucentDepth;
+        }
+    }
 
+
+    if (flashFrame == 1) {
+        if (getBrightness(outputColor.rgb) > 0.3) {
+            outputColor = vec3(0.0);
+        } else {
+            outputColor = vec3(1.0);
+        }
+    }
 
     fragColor = vec4(outputColor, 1.0);
     gl_FragDepth = translucentDepth;

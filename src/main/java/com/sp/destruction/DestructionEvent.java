@@ -54,7 +54,7 @@ public abstract class DestructionEvent {
     }
 
     public void setProgress(int progress) {
-        if (this.isClient()) {
+        if (this.isClient() && this.animation != null) {
             animation.skippedTime = progress;
         }
     }
