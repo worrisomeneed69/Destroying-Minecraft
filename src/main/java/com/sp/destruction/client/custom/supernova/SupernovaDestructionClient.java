@@ -1,5 +1,6 @@
 package com.sp.destruction.client.custom.supernova;
 
+import com.sp.DestroyingMinecraftClient;
 import com.sp.destruction.client.ClientDestructionEvent;
 import com.sp.entity.custom.StarPiercerEntity;
 import com.sp.render.camerashake.CameraShakeManager;
@@ -32,7 +33,6 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
     private static float laserLength;
     private static final List<StarPiercerEntity> starPiercers = new ArrayList<>();
     private static int flashFrame = -1;
-    public static int destructionDistance = Integer.MAX_VALUE;
 
     public SupernovaDestructionClient() {
         super(2930);
@@ -45,7 +45,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
         explosionTimer.reset();
         laserLength = 0;
         starPiercers.forEach(StarPiercerEntity::reset);
-        destructionDistance = Integer.MAX_VALUE;
+        DestroyingMinecraftClient.destructionDistance = Integer.MAX_VALUE;
         super.resetEvent();
     }
 
@@ -153,7 +153,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                             )
                     );
                 }, (globalTime, localTime) -> {
-                    destructionDistance = 300 - (int) (((globalTime - (2880.0/this.duration)) / 0.015)*300);
+                    DestroyingMinecraftClient.destructionDistance = 300 - (int) (((globalTime - (2880.0/this.duration)) / 0.015)*300);
 
                     if (localTime < 0.335) {
                         //Sun implosion

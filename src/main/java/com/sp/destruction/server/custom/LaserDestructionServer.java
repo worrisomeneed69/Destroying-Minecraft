@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 
 public class LaserDestructionServer extends ServerDestructionEvent {
     private static final Random random = Random.create();
-    private static final Vec3d centerPos = new Vec3d(-1709.5, 66, 1575.5);
+    private static final Vec3d centerPos = new Vec3d(-1716.5, 66, 1563.5);
     private static final float radius = 23;
     private static int lavaSpewDelay = 200;
 
@@ -69,7 +69,7 @@ public class LaserDestructionServer extends ServerDestructionEvent {
                 }
 
                 if (playerCount <= 1) {
-                    this.skipKeyframe();
+//                    this.skipKeyframe();
                 }
             }),
 

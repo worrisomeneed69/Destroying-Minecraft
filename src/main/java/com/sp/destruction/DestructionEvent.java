@@ -80,12 +80,12 @@ public abstract class DestructionEvent {
     }
 
     public void setActive(boolean active, long startTime) {
-//        if (active) {
-//            //Sync up with the server after packets arrive at the clients
-//            if (this.animation != null) {
-//                this.animation.startTime = Math.toIntExact((System.currentTimeMillis() - startTime) / 50);
-//            }
-//        }
+        if (active) {
+            //Sync up with the server after packets arrive at the clients
+            if (this.animation != null) {
+                this.animation.startTime = startTime;
+            }
+        }
         this.active = active;
     }
 }

@@ -1,5 +1,6 @@
 package com.sp.destruction.client.custom;
 
+import com.sp.DestroyingMinecraftClient;
 import com.sp.destruction.client.ClientDestructionEvent;
 import com.sp.render.camerashake.CameraShakeManager;
 import com.sp.render.camerashake.custom.CameraShakeInstance;
@@ -30,6 +31,7 @@ public class PlanetDestructionClient extends ClientDestructionEvent {
 
     @Override
     public void resetEvent() {
+        DestroyingMinecraftClient.destructionDistance = Integer.MAX_VALUE;
         planetFallTimer.reset();
         flashTimer.reset();
         if (ambientSound != null) {
@@ -118,7 +120,11 @@ public class PlanetDestructionClient extends ClientDestructionEvent {
                     CameraShakeManager.addCameraShake(cameraShakeInstance);
                 }, (globalTime, localTime) -> {
                     flashTimer.setTimer(1.0f);
-                })
+                }),
+
+                new Keyframe(2300.0f / this.duration, ((globalTime, localTime) -> {
+                    DestroyingMinecraftClient.destructionDistance = (int) ((1.0f - localTime) * 300);
+                }))
         ).globalAction((globalTime, localTime) -> {
             planetFallTimer.setTimer((float) globalTime);
         }).build();

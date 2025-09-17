@@ -133,7 +133,7 @@ public class DestructionCommand {
         WorldDestructionEventsComponent worldComponent = InitializeComponents.EVENTS.get(context.getSource().getWorld());
         BlockPos spawnPointPos = BlockPos.ORIGIN;
 
-        long startTime = System.currentTimeMillis();
+        long startTime = context.getSource().getWorld().getTime();
         for(ServerPlayerEntity player : playerList) {
             ServerPlayNetworking.send(player, new CustomPayloads.DestructionPayload(type, startTime));
 
@@ -181,15 +181,15 @@ public class DestructionCommand {
 
     private static int blackHoleExecute(CommandContext<ServerCommandSource> context, int part) {
         WorldDestructionEventsComponent worldComponent = InitializeComponents.EVENTS.get(context.getSource().getWorld());
-
+        long startTime = context.getSource().getWorld().getTime();
         switch (part) {
-            case blackHolePart1Type -> worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraft.blackHoleDestructionPart1, System.currentTimeMillis());
-            case blackHolePart2Type -> worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraft.blackHoleDestructionPart2, System.currentTimeMillis());
+            case blackHolePart1Type -> worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraft.blackHoleDestructionPart1, startTime);
+            case blackHolePart2Type -> worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraft.blackHoleDestructionPart2, startTime);
         }
 
         for(ServerPlayerEntity player : context.getSource().getWorld().getPlayers()) {
             player.setSpawnPoint(context.getSource().getWorld().getRegistryKey(), new BlockPos(-1150, 71, 363), 0, true, false);
-            ServerPlayNetworking.send(player, new CustomPayloads.DestructionPayload(part, System.currentTimeMillis()));
+            ServerPlayNetworking.send(player, new CustomPayloads.DestructionPayload(part, startTime));
         }
 
         return 1;

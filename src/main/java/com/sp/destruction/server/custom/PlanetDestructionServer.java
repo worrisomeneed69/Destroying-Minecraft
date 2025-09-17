@@ -66,7 +66,7 @@ public class PlanetDestructionServer extends ServerDestructionEvent {
 
             new Keyframe(1800.0 / this.duration),
 
-            new Keyframe(2300.0/this.duration, () -> {
+            new Keyframe(2350.0/this.duration, () -> {
                 Vec3d averagePlayerPos = Vec3d.ZERO;
                 List<PlayerEntity> players = (List<PlayerEntity>) world.getPlayers();
                 int numOfTargetedPlayers = 0;
@@ -80,7 +80,7 @@ public class PlanetDestructionServer extends ServerDestructionEvent {
 
                 averagePlayerPos = averagePlayerPos.multiply(1.0f / numOfTargetedPlayers);
 
-                DirectionalSBE directionalSBE = new DirectionalSBE(50, 50, -90, 0.5f, new Vec3d(averagePlayerPos.x, 67, averagePlayerPos.z));
+                DirectionalSBE directionalSBE = new DirectionalSBE(50, 50, -90, 0.2f, new Vec3d(averagePlayerPos.x, 67, averagePlayerPos.z));
                 directionalSBE.beginExplosion((ServerWorld) world);
             })
         ).endAction(() -> {

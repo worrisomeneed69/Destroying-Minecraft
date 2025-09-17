@@ -15,9 +15,9 @@
     "gravity.SlowLimbMovementsMixin",
     "layingdown.ClampPlayerYawMixin",
     "layingdown.LyingDownPlayerEntityMixin",
-    "layingdown.OnDisconnectMixin",
     "layingdown.SetLayingDownDirectionMixin",
     "layingdown.SetSleepingPoseMixin",
+    "layingdown.WakeUpPlayerMixin",
     "materialsampler.linux.LinuxFixMixin",
     "multipledeathvariants.DamageTrackerMixin",
     "multipledeathvariants.DeathMessageTypeMixin"
@@ -33,7 +33,6 @@
     "GameRendererMixin",
     "NoDirectionalBrightnessMixin",
     "PostProcessingManagerAccessor",
-    "QuasarFix",
     "SetShadowUniformMixin",
     "VeilLevelPerspectiveRendererMixin",
     "WorldRendererAccessor",
@@ -54,6 +53,8 @@
     "layingdown.render.RenderSelfMixin",
     "materialsampler.DynamicBufferProcessorMixin",
     "materialsampler.DynamicBufferTypeMixin",
-    "materialsampler.sodium.SodiumShaderPreProcessorMixin"
+    "materialsampler.sodium.SodiumShaderPreProcessorMixin",
+    "quasar.ParticleSystemManagerMixin",
+    "quasar.QuasarFix"
   ]
 }

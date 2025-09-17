@@ -6,6 +6,7 @@ import com.sp.entity.custom.StarPiercerEntity;
 import com.sp.render.CustomRenderLayersAndVertexFormats;
 import com.sp.render.ShadowMapRenderer;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -69,6 +70,11 @@ public class StarPiercerEntityRenderer extends EntityRenderer<StarPiercerEntity>
         this.model.render(matrices, vertexConsumers.getBuffer(renderLayer), light, OverlayTexture.DEFAULT_UV);
         super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
         matrices.pop();
+    }
+
+    @Override
+    public boolean shouldRender(StarPiercerEntity entity, Frustum frustum, double x, double y, double z) {
+        return true;
     }
 
     @Override

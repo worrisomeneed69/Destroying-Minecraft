@@ -1,5 +1,6 @@
 package com.sp.mixin.compat.sodium;
 
+import com.sp.DestroyingMinecraftClient;
 import com.sp.destruction.client.custom.supernova.SupernovaDestructionClient;
 import net.caffeinemc.mods.sodium.client.render.chunk.RenderSection;
 import net.caffeinemc.mods.sodium.client.render.chunk.occlusion.OcclusionCuller;
@@ -19,7 +20,7 @@ public class ChunkDestroyingMixin {
         PlayerEntity player = MinecraftClient.getInstance().player;
         if (player != null) {
             int distToPlayer = section.getCenterX() - player.getBlockX();
-            boolean bl = distToPlayer <= SupernovaDestructionClient.destructionDistance;
+            boolean bl = distToPlayer <= DestroyingMinecraftClient.destructionDistance;
             cir.setReturnValue(cir.getReturnValue() && bl);
         }
 

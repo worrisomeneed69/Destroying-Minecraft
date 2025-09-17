@@ -1,4 +1,4 @@
-package com.sp.mixin;
+package com.sp.mixin.quasar;
 
 import foundry.veil.Veil;
 import foundry.veil.api.client.render.rendertype.VeilRenderType;

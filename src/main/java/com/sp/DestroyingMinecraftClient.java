@@ -86,6 +86,8 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 	private static final Set<Identifier> removedPipelines = new HashSet<>(1);
 	private static boolean enabledDynamicBuffers = false;
 
+    public static int destructionDistance = Integer.MAX_VALUE;
+
 
 	@Override
 	public void onInitializeClient() {
@@ -148,7 +150,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 					}
 				}
 
-                case AFTER_SOLID_BLOCKS -> {
+                case AFTER_BLOCK_ENTITIES -> {
                     if (this.blockInstanceRenderer == null) {
                         this.blockInstanceRenderer = new BlockInstanceRenderer();
                     }
@@ -157,10 +159,6 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
                     if (DestroyingMinecraftConfig.shaderType == ShaderType.BLACK_HOLE) {
                         blockInstanceRenderer.render();
                     }
-                }
-
-                case AFTER_BLOCK_ENTITIES -> {
-
 
                     TranslucentRenderer.bind(GlConst.GL_DEPTH_BUFFER_BIT);
 

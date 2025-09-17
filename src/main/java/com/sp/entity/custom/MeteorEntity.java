@@ -45,8 +45,8 @@ public class MeteorEntity extends PersistentProjectileEntity {
             );
 
             float distanceToGround = (float) hitResult.getBlockPos().toCenterPos().squaredDistanceTo(this.getPos());
-            if (this.age > 200 || distanceToGround < 4.0f) {
-                this.onBlockHit(null);
+            if (this.age > 200 || distanceToGround <= 4.0f) {
+                this.onBlockHit(hitResult);
             }
 
         } else {

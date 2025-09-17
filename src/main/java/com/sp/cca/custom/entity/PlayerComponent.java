@@ -195,7 +195,7 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
 
         if (component.getCurrentDestructionEvent() == null ||
             !component.getCurrentDestructionEvent().equals(DestroyingMinecraft.blackHoleDestructionPart2) ||
-            this.player.getPos().z > 46.0f
+            this.player.getPos().z > 46.0f || this.player.getPos().y < 250.0f
         ) {
             if (this.shouldGlitch) {
                 this.shouldGlitch = false;
@@ -252,7 +252,7 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
 
         Vec3d playerPos = this.player.getPos();
 
-        float holeSize = (float) (1.0 - Vector2d.distance(-1709, 1575, playerPos.x, playerPos.z)/time);
+        float holeSize = (float) (1.0 - Vector2d.distance(-1716, 1563, playerPos.x, playerPos.z)/time);
 
         float noise = Noise.getCrackNoise(new Vec3d(playerPos.x, 4, playerPos.z));
         this.isInHole = noise < holeSize;
