@@ -2,7 +2,7 @@ package com.sp.destruction.client.custom;
 
 import com.sp.destruction.client.ClientDestructionEvent;
 import com.sp.util.BetterUniforms;
-import com.sp.util.ShaderTimer;
+import com.sp.util.timer.ShaderTimer;
 import com.sp.util.keyframes.Keyframe;
 import com.sp.util.keyframes.KeyframeAnimation;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;

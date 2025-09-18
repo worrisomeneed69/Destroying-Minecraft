@@ -101,10 +101,10 @@ public class CustomRenderLayersAndVertexFormats {
                         false,
                         RenderLayer.MultiPhaseParameters.builder()
                                 .texture(RenderPhase.Textures.create()
-                                        .add(texture, false, false)
+                                        .add(texture, false, true)
                                         .add(bloomTexture, false, false)
                                         .add(bloomTexture, false, false)
-                                        .add(bloomTexture, false, false)
+                                        .add(bloomTexture, false, false) //The first texture gets replaced by who knows what, and the second texture gets replaced by the lightmap sampler. Hence why I do this 3 times
                                         .build())
                                 .transparency(NO_TRANSPARENCY)
                                 .lightmap(ENABLE_LIGHTMAP)

@@ -5,7 +5,7 @@ import com.sp.render.camerashake.CameraShakeManager;
 import com.sp.render.camerashake.custom.CameraShakeInstance;
 import com.sp.sounds.ModSounds;
 import com.sp.util.BetterUniforms;
-import com.sp.util.ShaderTimer;
+import com.sp.util.timer.ShaderTimer;
 import com.sp.util.keyframes.Keyframe;
 import com.sp.util.keyframes.KeyframeAnimation;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
@@ -16,7 +16,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.client.sound.SoundManager;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.world.World;
 

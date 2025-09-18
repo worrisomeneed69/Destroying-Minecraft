@@ -5,6 +5,10 @@ import com.sp.entity.client.model.StarPiercerModel;
 import com.sp.entity.custom.StarPiercerEntity;
 import com.sp.render.CustomRenderLayersAndVertexFormats;
 import com.sp.render.ShadowMapRenderer;
+import com.sp.util.BetterUniforms;
+import com.sp.util.timer.MsTimer;
+import foundry.veil.api.client.render.VeilRenderSystem;
+import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.OverlayTexture;
@@ -24,6 +28,8 @@ import java.util.Optional;
 public class StarPiercerEntityRenderer extends EntityRenderer<StarPiercerEntity> {
     private static final Identifier TEXTURE = DestroyingMinecraft.idOf("textures/entity/starpiercer_texture.png");
     private static final Identifier LIGHTS_TEXTURE = DestroyingMinecraft.idOf("textures/entity/starpiercer_lights_texture.png");
+    private static final Identifier STAR_PIERCER_SHADER = DestroyingMinecraft.idOf("star_piercer/star_piercer");
+    private static final MsTimer bloomTimer = new MsTimer();
     private final StarPiercerModel model;
     private float speed = 0;
 
@@ -52,19 +58,34 @@ public class StarPiercerEntityRenderer extends EntityRenderer<StarPiercerEntity>
             this.model.starpiercer.yaw = yaw2 + (float) Math.toRadians(90);
         }
 
+        ShaderProgram shader = VeilRenderSystem.setShader(STAR_PIERCER_SHADER);
+        if (shader == null) return;
+
+        float bloomTime = 0;
         if (!MinecraftClient.getInstance().isPaused()) {
+            bloomTimer.resume();
+
             if (entity.isStartingUp()) {
-                this.speed += 0.000032222f * MinecraftClient.getInstance().getRenderTickCounter().getLastFrameDuration();
-                this.speed = Math.min(this.speed, 0.07f);
+                bloomTimer.start();
+                bloomTime = (float) (bloomTimer.getTime() - 34000L) / 10000;  // 34 second delay before glowing, 10 second duration
+
+                this.speed += 0.000072222f * MinecraftClient.getInstance().getRenderTickCounter().getLastFrameDuration();
+                this.speed = Math.min(this.speed, 0.15f);
                 this.model.barrel.roll += this.speed;
             } else if (entity.isPoweringDown()) {
-                this.speed -= 0.000032222f * MinecraftClient.getInstance().getRenderTickCounter().getLastFrameDuration();
+                bloomTime = 1.0f - (float) (bloomTimer.getTime() - 60000L) / 20000;
+                this.speed -= 0.000052222f * MinecraftClient.getInstance().getRenderTickCounter().getLastFrameDuration();
                 this.speed = Math.max(this.speed, 0.00f);
                 this.model.barrel.roll += this.speed;
             } else {
                 this.speed = 0.0f;
+                bloomTimer.stop();
             }
+        } else {
+            bloomTimer.pause();
         }
+
+        BetterUniforms.setFloat(shader, "bloomTime", Math.clamp(bloomTime, 0.0f, 1.0f));
 
         RenderLayer renderLayer = CustomRenderLayersAndVertexFormats.ENTITY_BLOOM.apply(TEXTURE, LIGHTS_TEXTURE);
         this.model.render(matrices, vertexConsumers.getBuffer(renderLayer), light, OverlayTexture.DEFAULT_UV);

@@ -5,6 +5,7 @@ import com.sp.DestroyingMinecraft;
 import com.sp.sounds.ModSounds;
 import com.sp.util.keyframes.Keyframe;
 import com.sp.util.keyframes.KeyframeAnimation;
+import com.sp.util.timer.MsTimer;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -13,7 +14,6 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 
 public class DestructionTitleRenderCallback implements HudRenderCallback {
     private static final DestructionTitle ORBITAL_LASER = new DestructionTitle(DestroyingMinecraft.idOf("orbital_laser.png"), 1024, 134);
@@ -26,7 +26,7 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
     public static DestructionTitleAnimation SUPERNOVA_ANIMATION;
     public static DestructionTitleAnimation BLACK_HOLE_ANIMATION;
 
-    private static long startTime = -1L;
+    private static final MsTimer timer = new MsTimer();
     private static DestructionTitleAnimation currentDestructionTitle;
     private static boolean renderTitle;
     private static boolean initAnimations;
@@ -36,14 +36,14 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
 
 
         currentDestructionTitle = destructionTitle;
-        startTime = Util.getMeasuringTimeMs();
+        timer.start();
         renderTitle = true;
     }
 
     @Override
     public void onHudRender(DrawContext drawContext, RenderTickCounter renderTickCounter) {
         if (!initAnimations) {
-            this.initializeAnimations(drawContext, renderTickCounter);
+            this.initializeAnimations(drawContext);
             initAnimations = true;
         }
         if (!renderTitle || currentDestructionTitle == null) return;
@@ -51,21 +51,26 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
 
 
         RenderSystem.enableBlend();
-        float time = (float) (Util.getMeasuringTimeMs() - startTime) / currentDestructionTitle.duration();
-
+        float time = (float) timer.getTime() / currentDestructionTitle.duration();
         currentDestructionTitle.keyframeAnimation().updateKeyframeAnimation(time);
+
+        if (!MinecraftClient.getInstance().isPaused()) {
+            timer.resume();
+        } else {
+            timer.pause();
+        }
 
         RenderSystem.disableBlend();
 
         if (time >= 1.0) {
+            timer.stop();
             currentDestructionTitle.keyframeAnimation().resetAnimation();
             renderTitle = false;
-            startTime = -1L;
             currentDestructionTitle = null;
         }
     }
 
-    private void initializeAnimations(DrawContext drawContext, RenderTickCounter renderTickCounter) {
+    private void initializeAnimations(DrawContext drawContext) {
         MinecraftClient client = MinecraftClient.getInstance();
         ORBITAL_LASER_ANIMATION = new DestructionTitleAnimation(new KeyframeAnimation.KeyframeAnimationBuilder(
                 200,

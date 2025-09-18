@@ -14,6 +14,7 @@ import io.github.ocelot.glslprocessor.api.grammar.GlslVersionStatement;
 import io.github.ocelot.glslprocessor.api.node.GlslNode;
 import io.github.ocelot.glslprocessor.api.node.GlslNodeList;
 import io.github.ocelot.glslprocessor.api.node.GlslTree;
+import io.github.ocelot.glslprocessor.api.node.branch.GlslIfNode;
 import io.github.ocelot.glslprocessor.api.node.constant.GlslConstantNode;
 import io.github.ocelot.glslprocessor.api.node.expression.GlslAssignmentNode;
 import io.github.ocelot.glslprocessor.api.node.expression.GlslOperationNode;
@@ -22,6 +23,8 @@ import io.github.ocelot.glslprocessor.api.node.function.GlslInvokeFunctionNode;
 import io.github.ocelot.glslprocessor.api.node.variable.GlslNewFieldNode;
 import io.github.ocelot.glslprocessor.api.node.variable.GlslVariableNode;
 import io.github.ocelot.glslprocessor.api.visitor.GlslNodeStringWriter;
+import io.github.ocelot.glslprocessor.impl.GlslParserImpl;
+import io.github.ocelot.glslprocessor.impl.GlslTokenReader;
 import io.github.ocelot.glslprocessor.lib.anarres.cpp.LexerException;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormatElement;
@@ -192,6 +195,13 @@ public class DynamicBufferProcessorMixin {
                             modified = true;
 //                            }
                         }
+                    } else if ("rendertype_clouds".equals(shaderName)) {
+                        if (ctx.isFragment()) {
+                            treeBody.add(GlslInjectionPoint.BEFORE_MAIN, GlslParser.parseExpression(output));
+                            mainFunctionBody.add(new GlslAssignmentNode(new GlslVariableNode(sourceName), GlslParser.parseExpression("ivec4(12, 0, 0, 1)"), GlslAssignmentNode.Operand.EQUAL));
+                            modified = true;
+//                            }
+                        }
                     }
 
                 }
@@ -291,6 +301,28 @@ public class DynamicBufferProcessorMixin {
                         modified = true;
                     }
                 }
+            }
+
+            //Shadow distortions
+            if (ctx.isVertex()) {
+                treeBody.add(GlslInjectionPoint.BEFORE_DECLARATIONS, GlslParser.parseExpression("uniform int renderingShadow"));
+                GlslTokenReader reader = new GlslTokenReader("vec3 distort(in vec3 shadowPosition) {\n" +
+                        "    const float bias0 = 0.95;\n" +
+                        "    const float bias1 = 1.0 - bias0;\n" +
+                        "\n" +
+                        "    float factorDistance = length(shadowPosition.xy);\n" +
+                        "\n" +
+                        "    float distortFactor = factorDistance * bias0 + bias1;\n" +
+                        "\n" +
+                        "    return shadowPosition * vec3(vec2(1.0 / distortFactor), 0.2);\n" +
+                        "}");
+
+                treeBody.add(GlslInjectionPoint.AFTER_FUNCTIONS, GlslParserImpl.parseFunctionDefinition(reader));
+
+                GlslTokenReader reader2 = new GlslTokenReader("(renderingShadow == 1)");
+                List<GlslNode> nodeList = new ArrayList<>();
+                nodeList.add(new GlslAssignmentNode(new GlslVariableNode("gl_Position.xyz"), new GlslVariableNode("distort(gl_Position.xyz)"), GlslAssignmentNode.Operand.EQUAL));
+                mainFunctionBody.add(mainFunctionBody.size(), new GlslIfNode(GlslParserImpl.parseCondition(reader2), nodeList, Collections.emptyList()));
             }
         }
 

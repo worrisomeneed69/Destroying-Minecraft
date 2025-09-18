@@ -1,4 +1,4 @@
-package com.sp.util;
+package com.sp.util.timer;
 
 import net.minecraft.util.math.MathHelper;
 

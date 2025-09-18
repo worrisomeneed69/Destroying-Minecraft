@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Optional;
@@ -91,6 +92,16 @@ public abstract class LyingDownPlayerEntityMixin extends LivingEntity implements
                 this.setVelocity(0, 0, 0);
             }
         }
+    }
+
+    @Redirect(method = "updatePose", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isSleeping()Z"))
+    private boolean test(PlayerEntity instance) {
+        boolean isSleeping = instance.isSleeping();
+        if (instance instanceof LayingDownPlayerEntity layingDownPLayerEntity) {
+            return isSleeping || layingDownPLayerEntity.isLayingDown();
+        }
+
+        return isSleeping;
     }
 
     @Override

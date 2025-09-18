@@ -4,9 +4,10 @@ uniform sampler2D Sampler0;
 uniform sampler2D Sampler3;
 
 uniform vec4 ColorModulator;
+uniform vec4 FogColor;
 uniform float FogStart;
 uniform float FogEnd;
-uniform vec4 FogColor;
+uniform float bloomTime;
 
 in float vertexDistance;
 in vec4 vertexColor;
@@ -31,5 +32,5 @@ void main() {
 	OutNormal = normal;
 	LightUV = lightUV;
 	LightColor = lightMapColor.rgb;
-	Bloom = texture(Sampler3, texCoord0).rgb*15;
+	Bloom = texture(Sampler3, texCoord0).rgb * bloomTime * 15;
 }

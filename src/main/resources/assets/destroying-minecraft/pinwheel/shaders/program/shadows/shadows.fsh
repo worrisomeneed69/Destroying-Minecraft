@@ -25,7 +25,7 @@ uniform sampler2D TranslucentDepth;
 uniform sampler2D TranslucentAlbedoSampler;
 uniform sampler2D TranslucentNormalSampler;
 uniform sampler2D TranslucentUVSampler;
-uniform sampler2D TranslucentLightMapSampler;
+uniform isampler2D TranslucentMaterialSampler;
 
 uniform sampler2D HandDepth;
 uniform sampler2D HandAlbedoSampler;
@@ -54,7 +54,7 @@ out vec4 fragColor;
 //const vec3 SkyColor = vec3(0.596078431372549, 0.8, 0.9);
 const vec3 SkyColor = vec3(0.6,0.9,1.0);
 vec3 sunDir = normalize(mat3(IShadowViewMatrix) * vec3(0.0,0.0,1.0));
-const vec3 laserPos = vec3(-967, 81.2, 1290.5);
+const vec3 laserPos = vec3(-990, 80, 1305.5);
 
 vec3 projectAndDivide(mat4 projMat, vec3 pos){
     vec4 homogeneousPos = projMat * vec4(pos, 1.0);
@@ -153,7 +153,7 @@ vec3 getShadow(vec3 albedoColor, float depth, vec3 worldNormal, bool translucent
 
 float mapLaser(vec3 p) {
     vec3 rayPos = p;
-    float length = 1 * 20000;
+    float length = laserLength * 20000;
 
     if (length <= 0.0) return 5000.0;
     rayPos -= laserPos;
@@ -189,14 +189,6 @@ void rayMarchLaser(inout vec3 color, vec3 playerPos, out vec3 rayPos, out bool h
 float getBrightness(vec3 color) {
     return (color.r + color.g + color.b) / 3;
 }
-//vec3 worldToScreenSpace2(vec4 pos) {
-//    vec4 viewSpacePos = VeilCamera.ViewMat * (pos - vec4(VeilCamera.CameraPosition, 0.0));
-//    vec4 clipSpace = VeilCamera.ProjMat * (viewSpacePos / viewSpacePos.w);
-//    clipSpace.xyz /= clipSpace.w;
-//    clipSpace.xyz = clipSpace.xyz * 0.5 + 0.5;
-//    return vec3(clipSpace.xy, clipSpace.z);
-//}
-
 
 void main() {
     vec4 sky = texture(DiffuseSampler, texCoord);
@@ -207,6 +199,7 @@ void main() {
     float translucentDepth = texture(TranslucentDepth, texCoord).r;
     float handDepth = texture(HandDepth, texCoord).r;
     uint material = texture(MaterialSampler, texCoord).r;
+    uint translucentMaterial = texture(TranslucentMaterialSampler, texCoord).r;
 
     vec3 outputColor = albedoColor.rgb;
 
@@ -232,19 +225,26 @@ void main() {
         float height = viewDirFromUv(texCoord).y;
 
         ///OPAQUE///
-        outputColor = getShadow(outputColor, depth, viewToWorldSpaceDir(texture(NormalSampler, texCoord).rgb), false);
+        vec3 opaqueColor = outputColor;
+        opaqueColor = getShadow(opaqueColor, depth, viewToWorldSpaceDir(texture(NormalSampler, texCoord).rgb), false);
         //Opaque fog
-        outputColor = linear_fog(vec4(outputColor, 1.0), length(screenToViewSpace(texCoord, depth).rgb), FogEnd - 30, FogEnd, vec4(vec3(SkyColor - height * 0.7), 1.0)).rgb;
+        opaqueColor = linear_fog(vec4(opaqueColor, 1.0), length(screenToViewSpace(texCoord, depth).rgb), FogEnd - 30, FogEnd, vec4(vec3(SkyColor - height * 0.7), 1.0)).rgb;
+        opaqueColor += texture(BloomSampler, texCoord).rgb;
 
         //Sky thats behind translucent objects
         if (depth >= 1.0) {
-            outputColor = sky.rgb;
+            opaqueColor = sky.rgb;
         }
 
+
         ///TRANSLUCENT///
-        vec3 translucentShadow = getShadow(translucentAlbedoColor.rgb, translucentDepth, viewToWorldSpaceDir(texture(TranslucentNormalSampler, texCoord).rgb), true);
-        outputColor = mix(outputColor, translucentShadow, translucentAlbedoColor.a);
-        outputColor += texture(BloomSampler, texCoord).rgb;
+        vec3 translucentColor = translucentAlbedoColor.rgb;
+
+        //Not Clouds
+        if (translucentMaterial != 12) {
+            translucentColor = getShadow(translucentAlbedoColor.rgb, translucentDepth, viewToWorldSpaceDir(texture(TranslucentNormalSampler, texCoord).rgb), true);
+        }
+        outputColor = mix(opaqueColor, translucentColor, translucentAlbedoColor.a);
         //Translucent fog
         outputColor = linear_fog(vec4(outputColor, 1.0), length(screenToViewSpace(texCoord, translucentDepth).rgb), FogEnd - 30, FogEnd, vec4(vec3(SkyColor - height * 0.7), 1.0)).rgb;
     }

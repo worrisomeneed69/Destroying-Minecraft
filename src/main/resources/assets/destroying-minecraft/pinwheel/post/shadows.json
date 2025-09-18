@@ -79,10 +79,10 @@
           "name": "destroying-minecraft:translucent",
           "sampler": 3
         },
-        "TranslucentLightMapSampler": {
+        "TranslucentMaterialSampler": {
           "type": "framebuffer",
           "name": "destroying-minecraft:translucent",
-          "sampler": 4
+          "sampler": 6
         },
         "TranslucentDepth": {
           "type": "framebuffer",
