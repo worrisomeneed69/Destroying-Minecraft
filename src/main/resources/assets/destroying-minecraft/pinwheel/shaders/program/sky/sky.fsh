@@ -44,9 +44,9 @@ const vec3 SkyColor = vec3(0.3,0.55,1.4);
 const vec3 SkyColor2 = vec3(0.6,0.9,1.0);
 //const vec3 SkyColor = vec3(0.0,0.0,0.0);
 
-const int ITERATIONS = 75;
-const float CONTRAST = 5;
-const float farPlane = 5.0;
+const int ITERATIONS = 50;
+const float CONTRAST = 3;
+const float farPlane = 4.0;
 
 const vec3 RED_STRENGTH   = vec3(4,3,3);
 const vec3 GREEN_STRENGTH = vec3(3,1,4);
@@ -105,7 +105,6 @@ float contrast(float color) {
 vec3 rayMarchSupernova() {
     vec3 cameraPos = VeilCamera.CameraPosition;
     vec3 centerPos = cameraPos + getLightAngle() * 3;
-//    vec3 centerPos = vec3(-811, 80, 234);
 
     vec3 color = vec3(0.0);
     float depth = texture(OpaqueDepth, texCoord).r;
@@ -119,11 +118,9 @@ vec3 rayMarchSupernova() {
     vec3 rayPos = cameraPos + rand(texCoord + GameTime) * 0.01;
 
     vec3 fog = vec3(0.0);
-//    bool hit = false;
     for(int i = 0; i < ITERATIONS; i++) {
         rayPos += rd;
         float time = min(explosionTimer, 1.0)*2;
-//        float time = 0.5f*2;
 
         vec3 diskRayPos = rayPos - centerPos;
         float radius = (2.0 - time) * length(diskRayPos);
@@ -136,18 +133,19 @@ vec3 rayMarchSupernova() {
         float cone = getCone(diskRayPos, 1);
 
         if(disk > 0.01 || disk2 > 0.01 || cone > 0.01) {
-            float noise = fbm(polarPos * 4, 4);
-            float red = clamp(contrast(fbm(vec3(noise)* RED_STRENGTH, 4)), 0.0, 1.0);
-            float green = clamp(contrast(fbm(vec3(noise) * GREEN_STRENGTH, 4)), 0.0, 1.0);
-            float blue = clamp(contrast(fbm(vec3(noise) * BLUE_STRENGTH, 4)), 0.0, 1.0);
+            vec3 noise = vec3(noise(polarPos * 10), noise(polarPos * 5), noise(polarPos * 15)) * 0.7;
+//            float noise = fbm(polarPos * 10, 5);
+
+            float red = clamp(contrast(noise.r), 0.0, 1.0);
+            float green = clamp(contrast(noise.g), 0.0, 1.0);
+            float blue = clamp(contrast(noise.b), 0.0, 1.0);
             vec3 noise1 = ((red * color1) + (green * color2) + (blue * color3)) * attenuate;
 
             vec3 noise2 = (blue * color4) * attenuate * attenuate;
 
-            fog += noise1 * disk*0.7;
-            fog += noise2 * cone*0.7;
-            fog += noise1 * disk2 * 0.6;
-//            hit = true;
+            fog += noise1 * disk*2;
+            fog += noise2 * cone*2;
+            fog += noise1 * disk2*2;
         }
         float dist = length(cameraPos - rayPos);
 

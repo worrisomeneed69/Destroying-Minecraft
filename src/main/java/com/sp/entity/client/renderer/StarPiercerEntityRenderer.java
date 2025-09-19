@@ -60,7 +60,7 @@ public class StarPiercerEntityRenderer extends EntityRenderer<StarPiercerEntity>
 
         ShaderProgram shader = VeilRenderSystem.setShader(STAR_PIERCER_SHADER);
         if (shader == null) return;
-
+        float lastFrameDuration = MinecraftClient.getInstance().getRenderTickCounter().getLastFrameDuration();
         float bloomTime = 0;
         if (!MinecraftClient.getInstance().isPaused()) {
             bloomTimer.resume();
@@ -68,15 +68,14 @@ public class StarPiercerEntityRenderer extends EntityRenderer<StarPiercerEntity>
             if (entity.isStartingUp()) {
                 bloomTimer.start();
                 bloomTime = (float) (bloomTimer.getTime() - 34000L) / 10000;  // 34 second delay before glowing, 10 second duration
-
-                this.speed += 0.000072222f * MinecraftClient.getInstance().getRenderTickCounter().getLastFrameDuration();
-                this.speed = Math.min(this.speed, 0.15f);
-                this.model.barrel.roll += this.speed;
+                this.speed += 0.000202222f * lastFrameDuration;
+                this.speed = Math.min(this.speed, 2f);
+                this.model.barrel.roll += this.speed * lastFrameDuration;
             } else if (entity.isPoweringDown()) {
                 bloomTime = 1.0f - (float) (bloomTimer.getTime() - 60000L) / 20000;
-                this.speed -= 0.000052222f * MinecraftClient.getInstance().getRenderTickCounter().getLastFrameDuration();
+                this.speed -= 0.000052222f * lastFrameDuration;
                 this.speed = Math.max(this.speed, 0.00f);
-                this.model.barrel.roll += this.speed;
+                this.model.barrel.roll += this.speed * lastFrameDuration;
             } else {
                 this.speed = 0.0f;
                 bloomTimer.stop();

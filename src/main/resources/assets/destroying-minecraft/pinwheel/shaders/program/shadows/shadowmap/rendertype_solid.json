@@ -1,4 +1,0 @@
-{
-  "vertex": "destroying-minecraft:shadows/shadowmap/block",
-  "fragment": "destroying-minecraft:shadows/shadowmap/rendertype_solid"
-}
