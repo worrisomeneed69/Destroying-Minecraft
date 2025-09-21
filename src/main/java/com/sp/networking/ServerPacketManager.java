@@ -38,6 +38,7 @@ public class ServerPacketManager {
     public static void sendWaitingRoomPacket(PlayerEntity player, boolean setInWaitingRoom) {
         PlayerComponent component = InitializeComponents.PLAYERS.get(player);
         component.setHasDied(setInWaitingRoom);
+        component.setInWaitingRoom(setInWaitingRoom);
         component.sync();
         ServerPlayNetworking.send((ServerPlayerEntity) player, new CustomPayloads.WaitingRoomPacketPayload(setInWaitingRoom));
     }

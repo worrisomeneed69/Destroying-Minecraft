@@ -5,10 +5,7 @@ import com.sp.networking.CustomPayloads;
 import com.sp.render.camerashake.CameraShakeManager;
 import com.sp.render.camerashake.custom.PointCameraShake;
 import com.sp.util.MathUtil;
-import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.util.Easing;
-import foundry.veil.api.quasar.particle.ParticleEmitter;
-import foundry.veil.api.quasar.particle.ParticleSystemManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
@@ -23,16 +20,16 @@ public class PointSBEPacket {
             PointCameraShake cameraShake = new PointCameraShake(pos, (float) payload.radius(), 40, Easing.LINEAR);
             CameraShakeManager.addCameraShake(cameraShake);
 
-            try {
-                ParticleSystemManager manager = VeilRenderSystem.renderer().getParticleManager();
-                ParticleEmitter emitter = manager.createEmitter(SMOKE);
-                if (emitter != null) {
-                    emitter.setPosition(pos.x, pos.y + 1, pos.z);
-                    manager.addParticleSystem(emitter);
-                }
-            } catch (Exception e) {
-
-            }
+//            try {
+//                ParticleSystemManager manager = VeilRenderSystem.renderer().getParticleManager();
+//                ParticleEmitter emitter = manager.createEmitter(SMOKE);
+//                if (emitter != null) {
+//                    emitter.setPosition(pos.x, pos.y + 1, pos.z);
+//                    manager.addParticleSystem(emitter);
+//                }
+//            } catch (Exception e) {
+//
+//            }
         });
     }
 

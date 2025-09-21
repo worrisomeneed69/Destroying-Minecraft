@@ -55,6 +55,7 @@ public abstract class RenderLyingDownPlayerMixin<T extends LivingEntity, M exten
         if (entity instanceof LayingDownPlayerEntity layingDownPlayerEntity && layingDownPlayerEntity.isLayingDown()) {
             playerEntityModel.setVisible(true);
             playerEntityModel.head.visible = false;
+            playerEntityModel.hat.visible = false;
         }
     }
 }

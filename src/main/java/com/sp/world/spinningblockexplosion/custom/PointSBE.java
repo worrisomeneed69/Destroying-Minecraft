@@ -68,9 +68,9 @@ public class PointSBE extends SpinningBlockExplosion {
 
         for (LivingEntity entity : nearbyEntitiesList) {
 //            if (!entity.canTakeDamage()) continue;
-            if (entity instanceof PlayerEntity player) {
-                ServerPacketManager.sendPointSBEPacket(player, this.position, affectedRadius/2);
-            }
+//            if (entity instanceof PlayerEntity player) {
+//                ServerPacketManager.sendPointSBEPacket(player, this.position, affectedRadius/2);
+//            }
 
             double distanceFromCenter = Math.sqrt(entity.squaredDistanceTo(this.position)) / affectedRadius;
             if (distanceFromCenter > 1.3) continue;  //Also affect players a little bit outside the actual destruction

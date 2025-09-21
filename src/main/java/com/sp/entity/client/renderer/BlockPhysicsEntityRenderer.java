@@ -126,7 +126,6 @@ public class BlockPhysicsEntityRenderer extends EntityRenderer<BlockPhysicsEntit
             Vector3f rotatedPos = component.getRotation().transform(offsetPos.toVector3f());
 
 
-//            System.out.println(entity.getPos());
 
             blockModelRenderer.getModelRenderer().render(
                     world,

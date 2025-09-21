@@ -69,7 +69,7 @@ public class LaserDestructionServer extends ServerDestructionEvent {
                 }
 
                 if (playerCount <= 1) {
-//                    this.skipKeyframe();
+                    this.skipKeyframe();
                 }
             }),
 
