@@ -1,14 +1,18 @@
 package com.sp.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.world.WorldDestructionEventsComponent;
 import com.sp.destruction.DestructionEvent;
 import com.sp.destruction.DestructionType;
 import com.sp.destruction.server.ServerDestructionEvent;
+import com.sp.entity.custom.StarPiercerEntity;
 import com.sp.networking.CustomPayloads;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
 import com.sp.world.spinningblockexplosion.custom.DirectionalSBE;
@@ -23,6 +27,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector3f;
 
@@ -31,6 +36,8 @@ import java.util.List;
 import static net.minecraft.server.command.CommandManager.argument;
 
 public class DestructionCommand {
+    private static final SimpleCommandExceptionType NO_STAR_PIERCERS_EXCEPTION = new SimpleCommandExceptionType(new LiteralMessage("No Star Piercers exist nearby"));
+
     public static void register(CommandDispatcher<ServerCommandSource> serverCommandSourceCommandDispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
         serverCommandSourceCommandDispatcher.register(
                 CommandManager.literal("destruction")
@@ -90,9 +97,19 @@ public class DestructionCommand {
         );
     }
 
-    private static int execute(CommandContext<ServerCommandSource> context, DestructionType type, Vec3d position) {
+    private static int execute(CommandContext<ServerCommandSource> context, DestructionType type, Vec3d position) throws CommandSyntaxException {
         List<ServerPlayerEntity> playerList = context.getSource().getWorld().getPlayers();
         WorldDestructionEventsComponent worldComponent = InitializeComponents.EVENTS.get(context.getSource().getWorld());
+
+        if (type == DestructionType.SUPERNOVA) {
+            ServerWorld world = context.getSource().getWorld();
+            Box box = Box.of(context.getSource().getPosition(), 500, 300, 500);
+            List<StarPiercerEntity> starPiercerEntities = world.getEntitiesByClass(StarPiercerEntity.class, box, starPiercerEntity -> true);
+
+            if (starPiercerEntities.isEmpty()) {
+                throw NO_STAR_PIERCERS_EXCEPTION.create();
+            }
+        }
 
         long startTime = context.getSource().getWorld().getTime();
         for(ServerPlayerEntity player : playerList) {

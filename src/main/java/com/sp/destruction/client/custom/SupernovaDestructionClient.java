@@ -23,6 +23,7 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.sound.SoundManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -34,7 +35,8 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
     private static final ShaderTimer flashTimer = new ShaderTimer();
     private static final ShaderTimer explosionTimer = new ShaderTimer();
     private static float laserLength;
-    private static final List<StarPiercerEntity> starPiercers = new ArrayList<>();
+    private static List<StarPiercerEntity> starPiercers = new ArrayList<>();
+    private static Vec3d laserPos = Vec3d.ZERO;
     private static int flashFrame = -1;
 
     public SupernovaDestructionClient() {
@@ -54,6 +56,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
 
     @Override
     public void setUniforms(ShaderProgram shaderProgram, float tickDelta) {
+        BetterUniforms.setVector3f(shaderProgram, "laserPos", laserPos.toVector3f());
         BetterUniforms.setFloat(shaderProgram, "supernovaTimer", implodeTimer.getTimer(tickDelta));
         BetterUniforms.setFloat(shaderProgram, "flashTimer", flashTimer.getTimer(tickDelta));
         BetterUniforms.setFloat(shaderProgram, "explosionTimer", explosionTimer.getTimer(tickDelta));
@@ -74,16 +77,12 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                 new Keyframe(300.0/this.duration, () -> {
                     PlayerEntity player = MinecraftClient.getInstance().player;
                     if (player != null) {
-                        for (StarPiercerEntity entity : world.getEntitiesByClass(
+                        starPiercers = world.getEntitiesByClass(
                                 StarPiercerEntity.class,
                                 player.getBoundingBox().expand(1000),
-                                Entity::isAlive)
-                        ) {
-                            entity.startup();
-                            if(!starPiercers.contains(entity)) {
-                                starPiercers.add(entity);
-                            }
-                        }
+                                Entity::isAlive);
+
+                        starPiercers.getFirst().startup();
                     }
 
                     soundManager.play(
@@ -103,6 +102,9 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
                                     1.0f
                             )
                     );
+
+                    laserPos = starPiercers.getFirst().pos.add(15.4, 13, 0);
+
                 }, (globalTime, localTime) -> {
                     flashFrame = flashFrame == 0 ? 1 : 0;
                 }),
@@ -130,9 +132,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
 
                 //*Stop firing / Power down
                 new Keyframe(1500.0/this.duration, () -> {
-                    for (StarPiercerEntity entity : starPiercers) {
-                        entity.powerDown();
-                    }
+                    starPiercers.getFirst().powerDown();
                     laserLength = 0.0f;
                     soundManager.play(
                             PositionedSoundInstance.master(

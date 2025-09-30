@@ -44,6 +44,7 @@ uniform float explosionTimer;
 uniform float laserLength;
 uniform int flashFrame;
 
+uniform vec3 laserPos;
 uniform float FogStart;
 uniform float FogEnd;
 uniform vec4 FogColor;
@@ -53,7 +54,6 @@ out vec4 fragColor;
 
 const vec3 SkyColor = vec3(0.6,0.9,1.0);
 vec3 sunDir = normalize(mat3(IShadowViewMatrix) * vec3(0.0,0.0,1.0));
-const vec3 laserPos = vec3(-990, 80, 1305.5);
 
 vec3 projectAndDivide(mat4 projMat, vec3 pos){
     vec4 homogeneousPos = projMat * vec4(pos, 1.0);
