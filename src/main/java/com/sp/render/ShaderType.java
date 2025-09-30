@@ -21,6 +21,7 @@ public enum ShaderType implements StringIdentifiable {
     PLANET          ("planet", ClientDestructionEvents.PLANET_CLIENT.getPostShader()),
     SUPERNOVA       ("supernova", null),
     BLACK_HOLE      ("black_hole", true, false, true, true,  ClientDestructionEvents.BLACK_HOLE_CLIENT.getPostShader());
+
     public static final Codec<ShaderType> CODEC = StringIdentifiable.createCodec(ShaderType::values);
     final String id;
     final List<PostShader> enabledShaders;
