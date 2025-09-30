@@ -1,11 +1,14 @@
-package com.sp.destruction.client.custom.supernova;
+package com.sp.destruction.client.custom;
 
 import com.sp.DestroyingMinecraftClient;
+import com.sp.destruction.DestructionType;
 import com.sp.destruction.client.ClientDestructionEvent;
 import com.sp.entity.custom.StarPiercerEntity;
 import com.sp.render.camerashake.CameraShakeManager;
 import com.sp.render.camerashake.custom.CameraShakeInstance;
 import com.sp.render.camerashake.custom.SustainedCameraShakeInstance;
+import com.sp.render.postshaders.PostShaders;
+import com.sp.render.postshaders.custom.SupernovaPostShader;
 import com.sp.sounds.ModSounds;
 import com.sp.util.BetterUniforms;
 import com.sp.util.timer.ShaderTimer;
@@ -35,7 +38,7 @@ public class SupernovaDestructionClient extends ClientDestructionEvent {
     private static int flashFrame = -1;
 
     public SupernovaDestructionClient() {
-        super(2930);
+        super(DestructionType.SUPERNOVA, PostShaders.SUPERNOVA, 2930);
     }
 
     @Override

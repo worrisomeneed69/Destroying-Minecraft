@@ -3,6 +3,7 @@ package com.sp.util;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.client.render.shader.uniform.ShaderUniform;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public class BetterUniforms {
@@ -14,10 +15,17 @@ public class BetterUniforms {
         }
     }
 
-    public static void setVector(ShaderProgram shaderProgram, String charSequence, Vector3f vector3f) {
+    public static void setVector3f(ShaderProgram shaderProgram, String charSequence, Vector3f vector3f) {
         ShaderUniform uniform = shaderProgram.getUniform(charSequence);
         if(uniform != null) {
             uniform.setVector(vector3f);
+        }
+    }
+
+    public static void setVector2f(ShaderProgram shaderProgram, String charSequence, Vector2f vector2f) {
+        ShaderUniform uniform = shaderProgram.getUniform(charSequence);
+        if(uniform != null) {
+            uniform.setVector(vector2f);
         }
     }
 

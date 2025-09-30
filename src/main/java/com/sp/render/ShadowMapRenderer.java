@@ -103,7 +103,7 @@ public class ShadowMapRenderer {
             }
             default -> {
                 shadowModelView.rotate(RotationAxis.POSITIVE_X.rotationDegrees(20.0f));
-                shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-45.0f));
+                shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-100.0f));
             }
         }
 

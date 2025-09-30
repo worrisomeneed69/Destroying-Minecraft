@@ -18,6 +18,9 @@ public class WaitingRoomPacket {
                 context.client().getSoundManager().reloadSounds();
             }
 
+            PlayerComponent component = InitializeComponents.PLAYERS.get(context.player());
+            component.setInWaitingRoom(true);
+
             MinecraftClient.getInstance().options.hudHidden = payload.setInWaitingRoom();
 
             //Reset all events

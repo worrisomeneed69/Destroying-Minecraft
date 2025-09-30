@@ -1,5 +1,8 @@
 package com.sp.destruction.server.custom;
 
+import com.sp.cca.InitializeComponents;
+import com.sp.cca.custom.world.WorldDestructionEventsComponent;
+import com.sp.destruction.DestructionType;
 import com.sp.destruction.server.ServerDestructionEvent;
 import com.sp.entity.ModEntities;
 import com.sp.entity.custom.MeteorEntity;
@@ -19,14 +22,15 @@ public class PlanetDestructionServer extends ServerDestructionEvent {
     private int meteorCooldown;
     private int trackingMeteorCooldown = 300;
     private final Random random = Random.create();
-    private final Vec3d centerBlock = new Vec3d(-1503, 65, 1196);
 
     public PlanetDestructionServer() {
-        super(2400);
+        super(DestructionType.PLANET, 2400);
     }
 
     @Override
     protected KeyframeAnimation initAnimations(World world) {
+        WorldDestructionEventsComponent component = InitializeComponents.EVENTS.get(world);
+
         return new KeyframeAnimation.KeyframeAnimationBuilder(
             this.duration,
 
@@ -42,7 +46,8 @@ public class PlanetDestructionServer extends ServerDestructionEvent {
 
                 MeteorEntity meteor = ModEntities.METEOR_ENTITY.create(world);
                 if (meteor != null) {
-                    meteor.setPosition(centerBlock.add(randX + 120, 120, randZ));
+                    Vec3d center = component.getDestructionEventPosition();
+                    meteor.setPosition(center.add(randX + 120, 120, randZ));
                     world.spawnEntity(meteor);
                 }
 

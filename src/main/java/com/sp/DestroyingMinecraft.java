@@ -9,17 +9,15 @@ import com.sp.component.ModDataComponentTypes;
 import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.destruction.DestructionEvent;
 import com.sp.destruction.server.ServerDestructionEvent;
-import com.sp.destruction.server.custom.InitializeDestructionServer;
+import com.sp.destruction.server.ServerDestructionEvents;
 import com.sp.destruction.server.custom.LaserDestructionServer;
 import com.sp.destruction.server.custom.PlanetDestructionServer;
 import com.sp.destruction.server.custom.SupernovaDestructionServer;
-import com.sp.destruction.server.custom.blackhole.BlackHoleDestructionServerPart1;
-import com.sp.destruction.server.custom.blackhole.BlackHoleDestructionServerPart2;
+import com.sp.destruction.server.custom.BlackHoleDestructionServerPart2;
 import com.sp.entity.ModEntities;
 import com.sp.item.ModItemGroups;
 import com.sp.item.ModItems;
 import com.sp.networking.InitializePackets;
-import com.sp.networking.S2C.*;
 import com.sp.sounds.ModSounds;
 import com.sp.world.ModGameRules;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
@@ -41,11 +39,8 @@ public class DestroyingMinecraft implements ModInitializer {
 
 	public static final PlanetDestructionServer planetServerDestruction = new PlanetDestructionServer();
 	public static final SupernovaDestructionServer supernovaServerDestruction = new SupernovaDestructionServer();
-	public static final BlackHoleDestructionServerPart1 blackHoleDestructionPart1 = new BlackHoleDestructionServerPart1();
 	public static final BlackHoleDestructionServerPart2 blackHoleDestructionPart2 = new BlackHoleDestructionServerPart2();
 	public static final LaserDestructionServer laserDestruction = new LaserDestructionServer();
-    //TODO: REMOVE INIT DESTRUCTION
-    public static final InitializeDestructionServer initializeDestruction = new InitializeDestructionServer();
 
 	@Override
 	public void onInitialize() {
@@ -60,15 +55,14 @@ public class DestroyingMinecraft implements ModInitializer {
 		ModGameRules.registerGameRules();
 		ModDataComponentTypes.registerDataComponentTypes();
         ModArgumentTypes.registerModArgumentTypes();
+        ServerDestructionEvents.registerServerEvents();
 
 		MidnightConfig.init(MOD_ID, DestroyingMinecraftConfig.class);
 
 		CommandRegistrationCallback.EVENT.register(DestructionCommand::register);
 		CommandRegistrationCallback.EVENT.register(RipPlatformOutCommand::register);
-		CommandRegistrationCallback.EVENT.register(AddPlayZoneCommand::register);
-        CommandRegistrationCallback.EVENT.register(RevealBlackHoleCommand::register);
+//		CommandRegistrationCallback.EVENT.register(AddPlayZoneCommand::register);
         CommandRegistrationCallback.EVENT.register(PlayersCommand::register);
-        CommandRegistrationCallback.EVENT.register(LavaSpewCommand::register);
 
 		LOGGER.info("\"It's nukein' time\" -He said as he loaded the fork into the microwave");
 

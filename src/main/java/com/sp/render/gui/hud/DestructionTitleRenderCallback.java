@@ -2,7 +2,9 @@ package com.sp.render.gui.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.DestroyingMinecraft;
+import com.sp.destruction.DestructionType;
 import com.sp.sounds.ModSounds;
+import com.sp.sounds.instances.FadingSoundInstance;
 import com.sp.util.keyframes.Keyframe;
 import com.sp.util.keyframes.KeyframeAnimation;
 import com.sp.util.timer.MsTimer;
@@ -31,11 +33,21 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
     private static boolean renderTitle;
     private static boolean initAnimations;
 
-    public static void setDestructionTitle(DestructionTitleAnimation destructionTitle) {
+    public static void setDestructionTitle(DestructionType type) {
         if(renderTitle) return;
 
+        currentDestructionTitle = switch (type) {
+            case ORBITAL_LASER -> ORBITAL_LASER_ANIMATION;
+            case PLANET -> PLANET_ANIMATION;
+            case SUPERNOVA -> SUPERNOVA_ANIMATION;
+            case BLACK_HOLE -> BLACK_HOLE_ANIMATION;
+            default -> null;
+        };
 
-        currentDestructionTitle = destructionTitle;
+        if (currentDestructionTitle == null) {
+            return;
+        }
+
         timer.start();
         renderTitle = true;
     }
@@ -144,12 +156,18 @@ public class DestructionTitleRenderCallback implements HudRenderCallback {
         BLACK_HOLE_ANIMATION = new DestructionTitleAnimation(new KeyframeAnimation.KeyframeAnimationBuilder(
                 500,
                 new Keyframe(0.0f, () -> {
-                    client.getSoundManager().play(PositionedSoundInstance.master(ModSounds.BLACK_HOLE_INITIALIZE, 1.0f, 1.0f));
-                }),
-                new Keyframe(0.64f, (globalTime, localTime) -> {
+                    client.getSoundManager().play(FadingSoundInstance.ambient(
+                            ModSounds.BLACK_HOLE_INITIALIZE,
+                            20,
+                            false,
+                            0,
+                            1.0f,
+                            1.0f
+                    ));
+                }, (globalTime, localTime) -> {
                     this.renderText(drawContext, localTime);
                 })
-        ).build(), BLACK_HOLE, 25000L);
+        ).build(), BLACK_HOLE);
     }
 
     private void renderText(DrawContext drawContext, double localTime) {

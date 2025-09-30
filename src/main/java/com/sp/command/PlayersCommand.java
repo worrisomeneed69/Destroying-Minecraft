@@ -75,8 +75,6 @@ public class PlayersCommand {
         }
 
         for (ServerPlayerEntity player : targets) {
-            PlayerComponent component = InitializeComponents.PLAYERS.get(player);
-            component.setInWaitingRoom(setInWaitingRoom);
             ServerPacketManager.sendWaitingRoomPacket(player, setInWaitingRoom);
         }
 

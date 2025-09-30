@@ -107,8 +107,9 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
 
     public void tick(World world, BlockPos pos, BlockState state) {
         if (!world.isClient && doorMoving && this.currentDoor != null) {
-            Vec3d offset = new Vec3d(this.movementDirection.getOffsetX(), this.movementDirection.getOffsetY(), this.movementDirection.getOffsetZ());
-            if (this.currentDoor.getPos().add(offset.subtract(offset).subtract(offset).multiply(numOfBlocks)).distanceTo(this.startingPos) <= 0.02) {
+            Direction opposite = this.movementDirection.getOpposite();
+            Vec3d offset = new Vec3d(opposite.getOffsetX(), opposite.getOffsetY(), opposite.getOffsetZ());
+            if (this.currentDoor.getPos().add(offset.multiply(numOfBlocks)).distanceTo(this.startingPos) <= 0.05) {
                 this.currentDoor.setDown();
                 this.currentDoor.markForDiscard();
                 this.doorMoving = false;
@@ -119,7 +120,7 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
 
                 this.corner1 = corner1.offset(this.movementDirection, numOfBlocks);
                 this.corner2 = corner2.offset(this.movementDirection, numOfBlocks);
-                this.movementDirection = this.movementDirection.getOpposite();
+                this.movementDirection = opposite;
                 this.markDirty();
                 world.updateListeners(this.getPos(), world.getBlockState(this.getPos()), world.getBlockState(this.getPos()), Block.NOTIFY_ALL);
             }

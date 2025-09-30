@@ -1,4 +1,9 @@
 {
+  "destroying-minecraft.midnightconfig.shaderType": "Shader",
+  "destroying-minecraft.midnightconfig.enableDepthOfField": "Enable Depth of Field",
+  "destroying-minecraft.midnightconfig.blurStrength": "Depth of Field Blur Strength",
+  "destroying-minecraft.midnightconfig.autoFocusTime": "Auto Focus Time",
+
   "destroying-minecraft.midnightconfig.enum.ShaderType.NONE": "NONE",
   "destroying-minecraft.midnightconfig.enum.ShaderType.NUKE": "NUKE",
   "destroying-minecraft.midnightconfig.enum.ShaderType.CRACKS": "CRACKS",
@@ -6,7 +11,11 @@
   "destroying-minecraft.midnightconfig.enum.ShaderType.SUPERNOVA": "SUPERNOVA",
   "destroying-minecraft.midnightconfig.enum.ShaderType.BLACK_HOLE": "BLACK_HOLE",
 
+  "itemgroup.destroying-minecraft": "Destroying Minecraft",
   "item.destroying-minecraft.walkie_talkie": "Walkie Talkie",
+  "item.destroying-minecraft.camera_shake_stick": "Camera Shake Stick",
+  "block.destroying-minecraft.physics_door_block": "Physics Door Block",
+  "block.destroying-minecraft.chair_block": "Chair",
 
   "death.attack.play.zone1" : "%1$s tried to make a run for it!",
   "death.attack.play.zone2" : "%1$s thought they could get away!",

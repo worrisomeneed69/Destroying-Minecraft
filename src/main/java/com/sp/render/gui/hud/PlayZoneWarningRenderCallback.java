@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.DestroyingMinecraft;
 import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.entity.PlayerComponent;
-import com.sp.mixininterfaces.PlayZoneEntity;
 import com.sp.sounds.ModSounds;
 import com.sp.util.RenderUtil;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;

@@ -5,13 +5,15 @@ import com.sp.util.keyframes.KeyframeAnimation;
 import net.minecraft.world.World;
 
 public abstract class DestructionEvent {
+    private final DestructionType destructionType;
     private final boolean isClient;
     protected boolean active;
     protected boolean initAnimations;
     protected KeyframeAnimation animation;
     protected final int duration;
 
-    public DestructionEvent(int duration, boolean isClient) {
+    public DestructionEvent(DestructionType destructionType, int duration, boolean isClient) {
+        this.destructionType = destructionType;
         this.duration = duration;
         this.isClient = isClient;
     }
@@ -38,7 +40,9 @@ public abstract class DestructionEvent {
     }
 
     public void resetAnimationToCurrentTime(World world) {
-        this.animation.resetToCurrentTime(world);
+        if (this.animation != null) {
+            this.animation.resetToCurrentTime(world);
+        }
     }
 
     protected void skipKeyframe() {
@@ -77,6 +81,10 @@ public abstract class DestructionEvent {
 
     public boolean isActive() {
         return this.active;
+    }
+
+    public DestructionType getDestructionType(){
+        return this.destructionType;
     }
 
     public void setActive(boolean active, long startTime) {

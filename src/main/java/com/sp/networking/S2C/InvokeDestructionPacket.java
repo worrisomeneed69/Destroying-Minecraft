@@ -1,13 +1,20 @@
 package com.sp.networking.S2C;
 
+import com.sp.DestroyingMinecraft;
 import com.sp.DestroyingMinecraftClient;
 import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.world.WorldDestructionEventsComponent;
+import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.destruction.DestructionEvent;
+import com.sp.destruction.DestructionType;
 import com.sp.destruction.client.ClientDestructionEvent;
 import com.sp.networking.CustomPayloads;
+import com.sp.render.ShaderType;
 import com.sp.render.gui.hud.DestructionTitleRenderCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.util.math.Vec3d;
+
+import java.util.Optional;
 
 import static com.sp.command.DestructionCommand.*;
 
@@ -17,57 +24,30 @@ public class InvokeDestructionPacket {
         context.client().execute(() -> {
             WorldDestructionEventsComponent worldComponent = InitializeComponents.EVENTS.get(context.client().world);
 
-            switch (payload.type()) {
-                case reset: {
-                    for (DestructionEvent event : ClientDestructionEvent.getAllClientInstances()) {
-                        event.setActive(false, -1);
-                        event.resetEvent();
-                    }
-                    break;
+            if (payload.name().equals("reset")) {
+                for (DestructionEvent event : ClientDestructionEvent.getAllClientInstances()) {
+                    event.setActive(false, -1);
+                    event.resetEvent();
                 }
-
-                case nukeType: {
-                    worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraftClient.nukePostShader.getDestructionEvent(), payload.startTime());
-                    break;
-                }
-
-                case orbitalLaserType: {
-                    worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraftClient.cracksPostShader.getDestructionEvent(), payload.startTime());
-                    DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.ORBITAL_LASER_ANIMATION);
-                    break;
-                }
-
-                case planetType: {
-                    worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraftClient.planetPostShader.getDestructionEvent(), payload.startTime());
-                    DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.PLANET_ANIMATION);
-                    break;
-                }
-
-                case supernovaJazz: {
-                    worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraftClient.supernovaPostShader.supernovaJazz, payload.startTime());
-                    break;
-                }
-
-                case supernovaType: {
-                    worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraftClient.supernovaPostShader.getDestructionEvent(), payload.startTime());
-                    DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.SUPERNOVA_ANIMATION);
-                    break;
-                }
-
-                case blackHolePart1Type: {
-                    worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraftClient.blackHolePostShader.getDestructionEvent(), payload.startTime());
-                    DestructionTitleRenderCallback.setDestructionTitle(DestructionTitleRenderCallback.BLACK_HOLE_ANIMATION);
-                    break;
-                }
-
-                case blackHolePart2Type: {
-                    worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraftClient.blackHolePostShader.destruction2, payload.startTime());
-                    break;
-                }
-                case initializeType: {
-                    worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraftClient.initializePostShader.getDestructionEvent(), payload.startTime());
-                }
+                return;
             }
+
+            Optional<DestructionType> type = DestructionType.getFromName(payload.name());
+
+            type.ifPresent(destructionType -> {
+                for (DestructionEvent event : ClientDestructionEvent.getAllClientInstances()) {
+                    if (event.getDestructionType().equals(destructionType)) {
+                        worldComponent.setAndStartCurrentDestructionEvent(event, payload.startTime());
+                        worldComponent.setDestructionEventPosition(new Vec3d(payload.position()));
+                        ShaderType shaderType = ShaderType.getFromDestructionType(destructionType);
+                        if (shaderType != DestroyingMinecraftConfig.shaderType) {
+                            DestroyingMinecraftConfig.shaderType = shaderType;
+                            DestroyingMinecraftConfig.write(DestroyingMinecraft.MOD_ID);
+                        }
+                    }
+                }
+                DestructionTitleRenderCallback.setDestructionTitle(destructionType);
+            });
 
         });
     }

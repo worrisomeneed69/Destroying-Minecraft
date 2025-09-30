@@ -7,9 +7,10 @@ import net.minecraft.world.GameRules;
 public class ModGameRules {
 
     public static final GameRules.Key<GameRules.BooleanRule> ALLOW_EXPLOSIONS =
-            GameRuleRegistry.register("allowExplosions", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(false));
+            GameRuleRegistry.register("allowExplosions", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
 
     public static void registerGameRules() {
+
     }
 
 }

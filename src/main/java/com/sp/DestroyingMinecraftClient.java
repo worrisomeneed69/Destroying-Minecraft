@@ -4,14 +4,14 @@ import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sp.block.entity.ModBlockEntities;
 import com.sp.block.entity.client.PhysicsDoorBlockRenderer;
-import com.sp.block.entity.client.voidblock.GlitchedVoidBlockEntityRenderer;
-import com.sp.block.entity.client.voidblock.VoidBlockEntityRenderer;
 import com.sp.cca.InitializeComponents;
 import com.sp.cca.custom.entity.PlayerComponent;
 import com.sp.cca.custom.world.WorldDestructionEventsComponent;
 import com.sp.config.DestroyingMinecraftConfig;
 import com.sp.destruction.DestructionEvent;
 import com.sp.destruction.client.ClientDestructionEvent;
+import com.sp.destruction.client.ClientDestructionEvents;
+import com.sp.destruction.client.custom.NukeDestructionClient;
 import com.sp.entity.ModEntities;
 import com.sp.entity.client.model.StarPiercerModel;
 import com.sp.entity.client.renderer.BlockPhysicsEntityRenderer;
@@ -27,8 +27,8 @@ import com.sp.render.camerashake.CameraShakeManager;
 import com.sp.render.gui.HSVColorTextureManager;
 import com.sp.render.gui.hud.DestructionTitleRenderCallback;
 import com.sp.render.gui.hud.PlayZoneWarningRenderCallback;
-import com.sp.render.gui.hud.WaitingRoomRenderCallback;
 import com.sp.render.postshaders.PostShader;
+import com.sp.render.postshaders.PostShaders;
 import com.sp.render.postshaders.custom.*;
 import com.sp.util.RenderUtil;
 import com.sp.util.tickinstances.client.ClientTickInstances;
@@ -70,18 +70,6 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 	public static boolean shouldRenderDebug = false;
 	public BlockInstanceRenderer blockInstanceRenderer;
 
-	public static NukePostShader nukePostShader = new NukePostShader();
-	public static CracksPostShader cracksPostShader = new CracksPostShader();
-	public static PlanetPostShader planetPostShader = new PlanetPostShader();
-	public static SupernovaPostShader supernovaPostShader = new SupernovaPostShader();
-	public static BlackHolePostShader blackHolePostShader = new BlackHolePostShader();
-	public static ShadowPostShader shadowPostShader = new ShadowPostShader();
-	public static EarthPostShader earthPostShader = new EarthPostShader();
-	public static BloomPostShader bloomPostShader = new BloomPostShader();
-	public static PostProcessingPostShader postProcessingPostShader = new PostProcessingPostShader();
-
-    public static InitializePostShader initializePostShader = new InitializePostShader();
-
 	private static ShaderType prevShaderType;
 	private static final Set<Identifier> removedPipelines = new HashSet<>(1);
 	private static boolean enabledDynamicBuffers = false;
@@ -93,24 +81,21 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		HudRenderCallback.EVENT.register(new DestructionTitleRenderCallback());
 		HudRenderCallback.EVENT.register(new PlayZoneWarningRenderCallback());
-		HudRenderCallback.EVENT.register(new WaitingRoomRenderCallback());
 
 		InitializePackets.registerClientNetworking();
 		ClientTickInstances.registerAllClientTickInstances();
 		ModModelPredicates.registerModelPredicates();
+        ClientDestructionEvents.registerClientEvents();
+        PostShaders.registerPostShaders();
 
-
-		EntityRendererRegistry.register(ModEntities.SPINNING_BLOCK, SpinningBlockEntityRenderer::new);
+        EntityRendererRegistry.register(ModEntities.SPINNING_BLOCK, SpinningBlockEntityRenderer::new);
 		EntityRendererRegistry.register(ModEntities.BLOCK_PHYSICS_ENTITY, BlockPhysicsEntityRenderer::new);
 		EntityRendererRegistry.register(ModEntities.METEOR_ENTITY, MeteorEntityRenderer::new);
 
 		EntityModelLayerRegistry.registerModelLayer(StarPiercerModel.STAR_PIERCER_MODEL_LAYER, StarPiercerModel::getTexturedModelData);
 		EntityRendererRegistry.register(ModEntities.STAR_PIERCER_ENTITY, StarPiercerEntityRenderer::new);
 
-		BlockEntityRendererFactories.register(ModBlockEntities.VOID_BE, VoidBlockEntityRenderer::new);
-        BlockEntityRendererFactories.register(ModBlockEntities.GLITCHED_VOID_BE, GlitchedVoidBlockEntityRenderer::new);
 		BlockEntityRendererFactories.register(ModBlockEntities.PHYSICS_DOOR_BE, PhysicsDoorBlockRenderer::new);
-//		BlockEntityRendererFactories.register(ModBlockEntities.LIMBO_SQUARE_BE, LimboSquareBlockEntityRenderer::new);
 
         RenderTypeShardRegistry.addGenericShard(renderType -> "translucent_target".equals(getOutputName(renderType)), new DynamicBufferShard("translucent", DestroyingMinecraftClient::getTranslucentBuffer));
 
@@ -165,8 +150,12 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
                     if (client.player == null) return;
 
                     PlayerComponent component = InitializeComponents.PLAYERS.get(client.player);
-                    if(shouldRenderDebug || !component.isInsideAPlayZone()) {
+                    if (shouldRenderDebug) {
                         BlackHoleDestruction.renderSelectionDebug(matrixStack.toPoseStack(), bufferSource, camera, frustum);
+                    }
+
+                    if(shouldRenderDebug || !component.isInsideAPlayZone()) {
+
 
                         for (PlayZone playZone : PlayZoneManager.getActivePlayZones()) {
                             boolean inside = playZone.isPositionInsideZone(client.player.pos);
@@ -208,12 +197,12 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 			float tickDelta = client.getRenderTickCounter().getTickDelta(true);
 
 			if(clientWorld != null) {
-				for(PostShader postShader : PostShader.getAllInstances()) {
+                ShaderType type = DestroyingMinecraftConfig.shaderType;
 
+				for(PostShader postShader : type.getEnabledShaders()) {
 					if(postShader.getPost().equals(name)) {
 						postShader.setUniforms(context, tickDelta, client, clientWorld);
 					}
-
 				}
 			}
 		});
@@ -280,9 +269,9 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 
 		//Enable all shaders in their specific order
-		for (Identifier enabledPosts : DestroyingMinecraftConfig.shaderType.getEnabledShaders()) {
-			if (!postProcessingManager.isActive(enabledPosts)) {
-				postProcessingManager.add(enabledPosts);
+		for (PostShader enabledPosts : DestroyingMinecraftConfig.shaderType.getEnabledShaders()) {
+			if (!postProcessingManager.isActive(enabledPosts.getPost())) {
+				postProcessingManager.add(enabledPosts.getPost());
 			}
 		}
 	}
@@ -291,15 +280,6 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
         AdvancedFbo translucentBuffer = VeilRenderSystem.renderer().getFramebufferManager().getFramebuffer(TRANSLUCENT_FRAMEBUFFER);
         if (translucentBuffer != null && !VeilLevelPerspectiveRenderer.isRenderingPerspective()) {
             return translucentBuffer.toRenderTarget();
-        }
-
-        return MinecraftClient.getInstance().getFramebuffer();
-    }
-
-    public static Framebuffer getBloomBuffer() {
-        AdvancedFbo bloomBuffer = VeilRenderSystem.renderer().getFramebufferManager().getFramebuffer(BLOOM_FRAMEBUFFER);
-        if (bloomBuffer != null && !VeilLevelPerspectiveRenderer.isRenderingPerspective()) {
-            return bloomBuffer.toRenderTarget();
         }
 
         return MinecraftClient.getInstance().getFramebuffer();

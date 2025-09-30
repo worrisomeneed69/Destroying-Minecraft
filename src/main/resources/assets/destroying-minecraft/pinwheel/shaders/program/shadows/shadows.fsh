@@ -51,7 +51,6 @@ uniform vec4 FogColor;
 in vec2 texCoord;
 out vec4 fragColor;
 
-//const vec3 SkyColor = vec3(0.596078431372549, 0.8, 0.9);
 const vec3 SkyColor = vec3(0.6,0.9,1.0);
 vec3 sunDir = normalize(mat3(IShadowViewMatrix) * vec3(0.0,0.0,1.0));
 const vec3 laserPos = vec3(-990, 80, 1305.5);
@@ -203,6 +202,8 @@ void main() {
 
     vec3 outputColor = albedoColor.rgb;
 
+    vec3 opaqueNormal = viewToWorldSpaceDir(texture(NormalSampler, texCoord).rgb);
+
 
 
     ///EARLY EXITS///
@@ -213,7 +214,7 @@ void main() {
     }
     //BlackHole Terrain
     else if (material == 9) {
-        outputColor = albedoColor * (dot(sunDir, viewToWorldSpaceDir(texture(NormalSampler, texCoord).rgb)) * 0.5 + 0.7);
+        outputColor = albedoColor * (dot(sunDir, opaqueNormal) * 0.5 + 0.7);
         gl_FragDepth = translucentDepth;
     }
     //Only sky
@@ -226,7 +227,7 @@ void main() {
 
         ///OPAQUE///
         vec3 opaqueColor = outputColor;
-        opaqueColor = getShadow(opaqueColor, depth, viewToWorldSpaceDir(texture(NormalSampler, texCoord).rgb), false);
+        opaqueColor = getShadow(opaqueColor, depth, opaqueNormal, false);
         //Opaque fog
         opaqueColor = linear_fog(vec4(opaqueColor, 1.0), length(screenToViewSpace(texCoord, depth).rgb), FogEnd - 30, FogEnd, vec4(vec3(SkyColor - height * 0.7), 1.0)).rgb;
         opaqueColor += texture(BloomSampler, texCoord).rgb;

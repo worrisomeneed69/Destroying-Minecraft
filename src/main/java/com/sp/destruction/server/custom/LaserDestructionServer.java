@@ -1,6 +1,8 @@
 package com.sp.destruction.server.custom;
 
-import com.sp.DestroyingMinecraft;
+import com.sp.cca.InitializeComponents;
+import com.sp.cca.custom.world.WorldDestructionEventsComponent;
+import com.sp.destruction.DestructionType;
 import com.sp.destruction.server.ServerDestructionEvent;
 import com.sp.networking.ServerPacketManager;
 import com.sp.sounds.ModSounds;
@@ -15,7 +17,6 @@ import net.minecraft.world.World;
 
 public class LaserDestructionServer extends ServerDestructionEvent {
     private static final Random random = Random.create();
-    private static final Vec3d centerPos = new Vec3d(-1716.5, 66, 1563.5);
     private static final float radius = 23;
     private static int lavaSpewDelay = 200;
 
@@ -23,7 +24,7 @@ public class LaserDestructionServer extends ServerDestructionEvent {
     public static float crackingTime;
 
     public LaserDestructionServer() {
-        super(2500);
+        super(DestructionType.ORBITAL_LASER, 2500);
     }
 
     @Override
@@ -35,6 +36,8 @@ public class LaserDestructionServer extends ServerDestructionEvent {
 
     @Override
     protected KeyframeAnimation initAnimations(World world) {
+        WorldDestructionEventsComponent component = InitializeComponents.EVENTS.get(world);
+
         return new KeyframeAnimation.KeyframeAnimationBuilder(
             this.duration,
             new Keyframe(0.0),
@@ -49,7 +52,7 @@ public class LaserDestructionServer extends ServerDestructionEvent {
                 if (lavaSpewDelay <= 0) {
                     float maxRadius = crackingTime * radius;
                     Vec3d offset = new Vec3d(MathUtil.nextBetween(-maxRadius, maxRadius), 0, MathUtil.nextBetween(-maxRadius, maxRadius));
-                    offset = offset.add(centerPos);
+                    offset = offset.add(component.getDestructionEventPosition());
 
                     for (PlayerEntity player : world.getPlayers()) {
                         ServerPacketManager.sendLavaSpewPacket(player, offset);

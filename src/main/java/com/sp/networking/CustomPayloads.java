@@ -13,26 +13,6 @@ import org.joml.Vector3f;
 public class CustomPayloads {
 
     ///////////////////////////// C2S /////////////////////////////
-    public record UpdateLimboSquareBlockPayload(BlockPos blockEntityPos, Vector3f color, float size, float height) implements CustomPayload {
-        public static final Id<UpdateLimboSquareBlockPayload> ID = new Id<>(DestroyingMinecraft.idOf("updatelimboblk"));
-
-        public static final PacketCodec<RegistryByteBuf, UpdateLimboSquareBlockPayload> CODEC = PacketCodec.tuple(
-                BlockPos.PACKET_CODEC, UpdateLimboSquareBlockPayload::blockEntityPos,
-                PacketCodecs.VECTOR3F, UpdateLimboSquareBlockPayload::color,
-                PacketCodecs.FLOAT, UpdateLimboSquareBlockPayload::size,
-                PacketCodecs.FLOAT, UpdateLimboSquareBlockPayload::height,
-                UpdateLimboSquareBlockPayload::new);
-
-
-        @Override
-        public Id<? extends CustomPayload> getId() {
-            return ID;
-        }
-    }
-
-    /////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////
-
     public record UpdatePhysicsDoorBlock(
             BlockPos blockEntityPos,
             BlockPos corner1,
@@ -99,11 +79,12 @@ public class CustomPayloads {
     /////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////
 
-    public record DestructionPayload(int type, long startTime) implements CustomPayload {
+    public record DestructionPayload(String name, Vector3f position, long startTime) implements CustomPayload {
         public static final CustomPayload.Id<DestructionPayload> ID = new CustomPayload.Id<>(DestroyingMinecraft.idOf("dest"));
 
         public static final PacketCodec<RegistryByteBuf, DestructionPayload> CODEC = PacketCodec.tuple(
-                PacketCodecs.INTEGER, DestructionPayload::type,
+                PacketCodecs.STRING, DestructionPayload::name,
+                PacketCodecs.VECTOR3F, DestructionPayload::position,
                 PacketCodecs.VAR_LONG, DestructionPayload::startTime,
                 DestructionPayload::new);
 

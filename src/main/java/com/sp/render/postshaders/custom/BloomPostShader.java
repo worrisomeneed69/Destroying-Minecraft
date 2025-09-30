@@ -22,7 +22,7 @@ public class BloomPostShader extends PostShader {
 
 
     public BloomPostShader() {
-        super(BLOOM_POST, BLOOM_POST, null);
+        super(BLOOM_POST, BLOOM_POST);
     }
 
     @Override

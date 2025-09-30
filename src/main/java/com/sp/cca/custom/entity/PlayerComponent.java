@@ -34,7 +34,7 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
     private boolean spawnedEvaporateParticles;
 
     private boolean isInWaitingRoom;
-    private boolean initWaitingRoom;
+    private int timeInWaitingRoom;
 
     private boolean shouldGlitch;
     private int glitchTime;
@@ -65,21 +65,12 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
         this.isInWaitingRoom = inWaitingRoom;
     }
 
-    public boolean hasDied() {
-        return this.hasDied;
-    }
-    public void setHasDied(boolean hasDied) {
-        this.hasDied = hasDied;
-    }
-
     public int getGlitchTime() {
         return glitchTime;
     }
 
     @Override
     public void readFromNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
-        this.isInWaitingRoom = nbtCompound.getBoolean("isInWaitingRoom");
-        this.initWaitingRoom = nbtCompound.getBoolean("initWaitingRoom");
         this.isInHole = nbtCompound.getBoolean("isInHole");
         this.hasDied = nbtCompound.getBoolean("hasDied");
         this.shouldGlitch = nbtCompound.getBoolean("shouldGlitch");
@@ -87,8 +78,6 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
 
     @Override
     public void writeToNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
-        nbtCompound.putBoolean("isInWaitingRoom", this.isInWaitingRoom);
-        nbtCompound.putBoolean("initWaitingRoom", this.initWaitingRoom);
         nbtCompound.putBoolean("isInHole", this.isInHole);
         nbtCompound.putBoolean("hasDied", this.hasDied);
         nbtCompound.putBoolean("shouldGlitch", this.shouldGlitch);
@@ -111,6 +100,14 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
 
     @Override
     public void clientTick() {
+        if (this.isInWaitingRoom) {
+            this.timeInWaitingRoom++;
+            if (this.timeInWaitingRoom >= 60) {
+                this.setInWaitingRoom(false);
+                MinecraftClient.getInstance().options.hudHidden = false;
+            }
+        }
+
         if (this.isInHole && !spawnedEvaporateParticles) {
             this.player.playSound(ModSounds.LAVA_DEATH, 1.0f, 1.0f);
             for (int i = 0; i < 100; i++) {
@@ -150,7 +147,9 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
             } else {
                 if (glitchSoundInstance != null) {
                     glitchSoundInstance.fadeOut();
-//                    glitchSoundInstance = null;
+                    if (glitchSoundInstance.isDone()) {
+                        glitchSoundInstance = null;
+                    }
                 }
                 this.glitchTime = Math.max(this.glitchTime - 1, 0);
             }
@@ -160,14 +159,6 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
 
     @Override
     public void serverTick() {
-        if (!initWaitingRoom) {
-            if (!this.player.getDisplayName().getString().equals("SppacePotato")) {
-                this.isInWaitingRoom = true;
-                this.sync();
-            }
-            initWaitingRoom = true;
-        }
-
         if (this.hasDied && !this.player.isSpectator()) {
             if (prevGameMode == null) {
                 prevGameMode = ((ServerPlayerEntity) this.player).interactionManager.getGameMode();
@@ -192,10 +183,11 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
 
     private void updateGlitchTimer() {
         WorldDestructionEventsComponent component = InitializeComponents.EVENTS.get(this.player.getWorld());
+        Vec3d destructionPos = component.getDestructionEventPosition();
 
         if (component.getCurrentDestructionEvent() == null ||
             !component.getCurrentDestructionEvent().equals(DestroyingMinecraft.blackHoleDestructionPart2) ||
-            this.player.getPos().z > 46.0f || this.player.getPos().y < 250.0f
+                destructionPos.z - this.player.getPos().z > 290.0f || this.player.getPos().y - destructionPos.y > 180
         ) {
             if (this.shouldGlitch) {
                 this.shouldGlitch = false;
@@ -233,7 +225,6 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
 
         if (!insidePlayZone && (this.deathTime - System.currentTimeMillis()) <= 0) {
             this.player.damage(ModDamageSources.of(this.player.getWorld(), ModDamageSources.PLAY_ZONE_DAMAGE_TYPE), Float.MAX_VALUE);
-//            this.player.kill();
         }
 
         this.insideAPlayZone = insidePlayZone;
@@ -251,8 +242,8 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
         }
 
         Vec3d playerPos = this.player.getPos();
-
-        float holeSize = (float) (1.0 - Vector2d.distance(-1716, 1563, playerPos.x, playerPos.z)/time);
+        Vec3d position = InitializeComponents.EVENTS.get(this.player.getWorld()).getDestructionEventPosition();
+        float holeSize = (float) (1.0 - Vector2d.distance(position.x, position.y, playerPos.x, playerPos.z)/time);
 
         float noise = Noise.getCrackNoise(new Vec3d(playerPos.x, 4, playerPos.z));
         this.isInHole = noise < holeSize;

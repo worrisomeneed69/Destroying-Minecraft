@@ -2,10 +2,7 @@ package com.sp.block;
 
 import com.sp.DestroyingMinecraft;
 import com.sp.block.custom.ChairBlock;
-import com.sp.block.custom.LimboSquareBlock;
 import com.sp.block.custom.PhysicsDoorBlock;
-import com.sp.block.custom.voidblock.GlitchedVoidBlock;
-import com.sp.block.custom.voidblock.VoidBlock;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -15,24 +12,11 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 
 public class ModBlocks {
-
-    public static final Block WHITE_VOID_BLOCK = registerBlock("white_void_block",
-            new VoidBlock(AbstractBlock.Settings.copy(Blocks.STONE).hardness(-1f).solid().noBlockBreakParticles().luminance(value -> 15)));
-
-    public static final Block DARK_VOID_BLOCK = registerBlock("dark_void_block",
-            new Block(AbstractBlock.Settings.copy(Blocks.STONE).hardness(-1f).solid().noBlockBreakParticles().luminance(value -> 15)));
-
-    public static final Block GLITCHED_VOID_BLOCK = registerBlock("glitched_void_block",
-            new GlitchedVoidBlock(AbstractBlock.Settings.copy(Blocks.STONE).hardness(-1f).solid().noBlockBreakParticles().luminance(value -> 15)));
-
     public static final Block PHYSICS_DOOR_BLOCK = registerBlock("physics_door_block",
             new PhysicsDoorBlock(AbstractBlock.Settings.copy(Blocks.STONE).hardness(-1f).solid().noBlockBreakParticles()));
 
     public static final Block CHAIR_BLOCK = registerBlock("chair_block",
             new ChairBlock(AbstractBlock.Settings.copy(Blocks.SPRUCE_STAIRS).solid()));
-
-    public static final Block LIMBO_SQUARE_BLOCK = registerBlock("limbo_square_block",
-            new LimboSquareBlock(AbstractBlock.Settings.copy(Blocks.GLASS).solid().noBlockBreakParticles()));
 
 
 

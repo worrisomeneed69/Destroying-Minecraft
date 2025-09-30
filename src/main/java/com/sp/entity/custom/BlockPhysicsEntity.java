@@ -78,10 +78,20 @@ public class BlockPhysicsEntity extends Entity {
     }
 
     public void setDown() {
-//        PhysicsBlockComponent component = InitializeComponents.PHYSICS_BLOCK.get(this);
+        BlockPos blockPos = this.getBlockPos();
+
+        // Doors may not be all the way out of a block pos. This checks for that so the blocks aren't put in the wrong place
+        Vec3d directionOffset = new Vec3d(this.getMovementDirection().getOffsetX(), this.getMovementDirection().getOffsetY(), this.getMovementDirection().getOffsetZ());
+        Vec3d fracBlockPos = this.getPos().subtract(Vec3d.of(blockPos)).multiply(directionOffset);
+
+        int xOffset = fracBlockPos.x >= 0.85f ? 1 : 0;
+        int yOffset = fracBlockPos.y >= 0.85f ? 1 : 0;
+        int zOffset = fracBlockPos.z >= 0.85f ? 1 : 0;
+
+        blockPos = blockPos.add(xOffset,yOffset,zOffset);
 
         for (BlockPhysicsEntity.BlockData blockData : this.getBlocks()) {
-            this.getWorld().setBlockState(this.getBlockPos().add(BlockPos.ofFloored(blockData.offset)), blockData.blockState);
+            this.getWorld().setBlockState(blockPos.add(BlockPos.ofFloored(blockData.offset)), blockData.blockState);
         }
     }
 

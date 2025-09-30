@@ -1,9 +1,12 @@
 package com.sp.destruction.client.custom;
 
 import com.sp.DestroyingMinecraftClient;
+import com.sp.destruction.DestructionType;
 import com.sp.destruction.client.ClientDestructionEvent;
 import com.sp.render.camerashake.CameraShakeManager;
 import com.sp.render.camerashake.custom.CameraShakeInstance;
+import com.sp.render.postshaders.PostShaders;
+import com.sp.render.postshaders.custom.PlanetPostShader;
 import com.sp.sounds.ModSounds;
 import com.sp.sounds.instances.FadingSoundInstance;
 import com.sp.util.BetterUniforms;
@@ -26,7 +29,7 @@ public class PlanetDestructionClient extends ClientDestructionEvent {
     private static FadingSoundInstance ambientSound;
 
     public PlanetDestructionClient() {
-        super(2400);
+        super(DestructionType.PLANET, PostShaders.PLANET, 2400);
     }
 
     @Override

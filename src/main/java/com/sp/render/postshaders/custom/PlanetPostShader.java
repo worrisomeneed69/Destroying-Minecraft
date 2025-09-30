@@ -1,7 +1,6 @@
 package com.sp.render.postshaders.custom;
 
 import com.sp.DestroyingMinecraft;
-import com.sp.destruction.client.custom.PlanetDestructionClient;
 import com.sp.render.postshaders.PostShader;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -13,6 +12,6 @@ public class PlanetPostShader extends PostShader {
     public static final Identifier PLANET_SHADER = DestroyingMinecraft.idOf("planet/planet");
 
     public PlanetPostShader() {
-        super(PLANET_POST, PLANET_SHADER, new PlanetDestructionClient());
+        super(PLANET_POST, PLANET_SHADER);
     }
 }

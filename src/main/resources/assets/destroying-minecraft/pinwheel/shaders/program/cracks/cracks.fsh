@@ -13,6 +13,7 @@ uniform sampler2D TranslucentAlbedoSampler;
 
 uniform sampler2D DirtTexture;
 
+uniform vec2 CENTER_POS;
 uniform float GameTime;
 uniform float laserLength;
 uniform float cracksTime;
@@ -21,7 +22,6 @@ uniform float flashTimer;
 in vec2 texCoord;
 out vec4 fragColor;
 
-const vec2 centerPos = vec2(-1716, 1563);
 const float TEXTURE_SIZE = 0.5;
 
 float getNoise(vec3 pos, float HOLE_SIZE) {
@@ -36,7 +36,7 @@ float map(vec3 p) {
     float length = laserLength * 520;
 
     if (length <= 0.0) return 5000.0;
-    float d = sdCylinder(rayPos - vec3(centerPos.x, 500, centerPos.y), length, 0.5 * (1.0 + flashTimer*10.0));
+    float d = sdCylinder(rayPos - vec3(CENTER_POS.x, 500, CENTER_POS.y), length, 0.5 * (1.0 + flashTimer*10.0));
     d -= (sin(p.y*1 + rand(vec2(GameTime*1000, 745))*100)*0.5 + 0.5)*0.1;
     return d;
 }
@@ -82,7 +82,7 @@ void main() {
         if (cracksTime > 0.0) {
             time = (cracksTime*50) + 5.0;
         }
-        float holeSize = pow(1 - distance(centerPos, worldPos.xz)/time, 1);
+        float holeSize = pow(1 - distance(CENTER_POS, worldPos.xz)/time, 1);
         float noise = getNoise(worldPos, holeSize);
 
 
@@ -90,7 +90,6 @@ void main() {
 
         if (noise < holeSize) {
             cracks = true;
-            //rayMarch
             vec3 rayPos = worldPos + rand(texCoord + GameTime) * 0.01;
             vec3 rayDir = viewDirFromUv(texCoord);
             vec3 step = rayDir * length(viewPos)*2;
@@ -99,7 +98,7 @@ void main() {
             vec3 magmaColor = vec3(0.0);
             for(int i = 0; i < 50; i++) {
                 rayPos += step;
-                holeSize = pow(1 - distance(centerPos, rayPos.xz)/time, 1);
+                holeSize = pow(1 - distance(CENTER_POS, rayPos.xz)/time, 1);
                 noise = getNoise(vec3(rayPos.x, worldPos.y, rayPos.z), holeSize);
 
 

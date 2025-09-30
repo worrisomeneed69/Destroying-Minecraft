@@ -4,20 +4,18 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import com.sp.DestroyingMinecraft;
 import com.sp.cca.InitializeComponents;
-import com.sp.cca.custom.entity.PlayerComponent;
 import com.sp.cca.custom.world.WorldDestructionEventsComponent;
 import com.sp.destruction.DestructionEvent;
+import com.sp.destruction.DestructionType;
 import com.sp.destruction.server.ServerDestructionEvent;
 import com.sp.networking.CustomPayloads;
-import com.sp.networking.ServerPacketManager;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
 import com.sp.world.spinningblockexplosion.custom.DirectionalSBE;
 import com.sp.world.spinningblockexplosion.custom.PointSBE;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.command.argument.BlockPosArgumentType;
+import net.minecraft.command.argument.EnumArgumentType;
 import net.minecraft.command.argument.Vec3ArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -26,60 +24,27 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import org.joml.Vector3f;
 
 import java.util.List;
 
 import static net.minecraft.server.command.CommandManager.argument;
 
 public class DestructionCommand {
-    //Correlates to the switch statement in the InvokeDestructionPacket
-    public final static int reset = 0;
-    public final static int nukeType = 1;
-    public final static int orbitalLaserType = 2;
-    public final static int planetType = 3;
-    public final static int supernovaJazz = 4;
-    public final static int supernovaType = 5;
-    public final static int blackHolePart1Type = 6;
-    public final static int blackHolePart2Type = 7;
-    public final static int initializeType = 8;
-
     public static void register(CommandDispatcher<ServerCommandSource> serverCommandSourceCommandDispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
         serverCommandSourceCommandDispatcher.register(
                 CommandManager.literal("destruction")
                         .requires(source -> source.hasPermissionLevel(2))
-                        .then(CommandManager.literal("supernova")
-                                .then(CommandManager.literal("jazz")
-                                        .executes(commandContext -> execute(commandContext, supernovaJazz))
-                                )
-                                .executes(commandContext -> execute(commandContext, supernovaType))
-                        )
-
-
-                        .then(CommandManager.literal("nuke")
-                                .executes(commandContext -> execute(commandContext, nukeType))
-                        )
-
-
-                        .then(CommandManager.literal("planet")
-                                .executes(commandContext -> execute(commandContext, planetType))
-                        )
-
-                        .then(CommandManager.literal("black_hole")
-                                .then(CommandManager.literal("select")
-                                        .then(argument("position", BlockPosArgumentType.blockPos())
-                                                .executes(commandContext -> blackHoleSelect(commandContext, BlockPosArgumentType.getBlockPos(commandContext, "position")))
+                        .then(argument("type", DestructionArgumentTypes.destructionType())
+                                .then(argument("position", Vec3ArgumentType.vec3())
+                                        .executes(context ->
+                                                execute(
+                                                        context,
+                                                        DestructionArgumentTypes.getDestructionType(context, "type"),
+                                                        Vec3ArgumentType.getVec3(context, "position")
+                                                )
                                         )
                                 )
-                                .then(CommandManager.literal("part1")
-                                        .executes(commandContext -> blackHoleExecute(commandContext, blackHolePart1Type))
-                                )
-                                .then(CommandManager.literal("part2")
-                                        .executes(commandContext -> blackHoleExecute(commandContext, blackHolePart2Type))
-                                )
-                        )
-
-                        .then(CommandManager.literal("orbital_laser")
-                                    .executes(commandContext -> execute(commandContext, orbitalLaserType))
                         )
 
                         .then(CommandManager.literal("explosion")
@@ -119,77 +84,33 @@ public class DestructionCommand {
                                 )
 
                         )
-                        .then(CommandManager.literal("initialize")
-                                .executes(commandContext -> execute(commandContext, initializeType))
-                        )
                         .then(CommandManager.literal("reset")
                                 .executes(DestructionCommand::reset)
                         )
         );
     }
 
-    private static int execute(CommandContext<ServerCommandSource> context, int type) {
+    private static int execute(CommandContext<ServerCommandSource> context, DestructionType type, Vec3d position) {
         List<ServerPlayerEntity> playerList = context.getSource().getWorld().getPlayers();
         WorldDestructionEventsComponent worldComponent = InitializeComponents.EVENTS.get(context.getSource().getWorld());
-        BlockPos spawnPointPos = BlockPos.ORIGIN;
 
         long startTime = context.getSource().getWorld().getTime();
         for(ServerPlayerEntity player : playerList) {
-            ServerPlayNetworking.send(player, new CustomPayloads.DestructionPayload(type, startTime));
-
-            switch (type) {
-                case planetType -> {
-                    spawnPointPos = new BlockPos(-1496, 66, 1205);
-                }
-                case supernovaType -> {
-                    spawnPointPos = new BlockPos(-1048, 76, 1328);
-                }
-                case supernovaJazz -> {
-                    PlayerComponent component = InitializeComponents.PLAYERS.get(player);
-                    component.resetPlayer();
-                    ServerPacketManager.sendWaitingRoomPacket(player, false);
-                }
-                case orbitalLaserType -> {
-                    spawnPointPos = new BlockPos(-1705, 67, 1560);
-                }
-            }
-            player.setSpawnPoint(context.getSource().getWorld().getRegistryKey(), spawnPointPos, 0, true, false);
+            ServerPlayNetworking.send(player, new CustomPayloads.DestructionPayload(type.getName(), position.toVector3f(), startTime));
+            player.setSpawnPoint(context.getSource().getWorld().getRegistryKey(), BlockPos.ofFloored(position), 0, true, false);
         }
 
-        switch (type) {
-            case planetType -> {
-                worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraft.planetServerDestruction, startTime);
-            }
-            case supernovaType -> {
-                worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraft.supernovaServerDestruction, startTime);
-            }
-            case orbitalLaserType -> {
-                worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraft.laserDestruction, startTime);
-            }
-            case initializeType -> {
-                worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraft.initializeDestruction, startTime);
-            }
-        }
-        return 1;
-    }
-
-    private static int blackHoleSelect(CommandContext<ServerCommandSource> context, BlockPos centerPos) {
-        int i = BlackHoleDestruction.selectSurfaceBlocks(centerPos, context.getSource().getWorld());
-        context.getSource().sendFeedback(() -> Text.literal("Successfully selected " + i + " blocks for destruction"), true);
-        return 1;
-    }
-
-    private static int blackHoleExecute(CommandContext<ServerCommandSource> context, int part) {
-        WorldDestructionEventsComponent worldComponent = InitializeComponents.EVENTS.get(context.getSource().getWorld());
-        long startTime = context.getSource().getWorld().getTime();
-        switch (part) {
-            case blackHolePart1Type -> worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraft.blackHoleDestructionPart1, startTime);
-            case blackHolePart2Type -> worldComponent.setAndStartCurrentDestructionEvent(DestroyingMinecraft.blackHoleDestructionPart2, startTime);
+        //Select Blocks for Black Hole Destruction
+        if (type.equals(DestructionType.BLACK_HOLE)) {
+            int i = BlackHoleDestruction.selectSurfaceBlocks(BlockPos.ofFloored(position), context.getSource().getWorld());
+            context.getSource().sendFeedback(() -> Text.literal("Successfully selected " + i + " blocks for destruction"), true);
         }
 
-        for(ServerPlayerEntity player : context.getSource().getWorld().getPlayers()) {
-            player.setSpawnPoint(context.getSource().getWorld().getRegistryKey(), new BlockPos(-1150, 71, 363), 0, true, false);
-            ServerPlayNetworking.send(player, new CustomPayloads.DestructionPayload(part, startTime));
+        for (DestructionEvent event : ServerDestructionEvent.getAllServerInstances()) {
+            if (event.getDestructionType().equals(type)) {
+                worldComponent.setAndStartCurrentDestructionEvent(event, startTime);
+                worldComponent.setDestructionEventPosition(position);
+            }
         }
 
         return 1;
@@ -209,7 +130,7 @@ public class DestructionCommand {
         worldComponent.syncLight();
 
         for (ServerPlayerEntity player : context.getSource().getWorld().getPlayers()) {
-            ServerPlayNetworking.send(player, new CustomPayloads.DestructionPayload(reset, -1));
+            ServerPlayNetworking.send(player, new CustomPayloads.DestructionPayload("reset", new Vector3f(), -1));
         }
 
         return 1;
@@ -227,5 +148,19 @@ public class DestructionCommand {
         explosion.beginExplosion(world);
 
         return 1;
+    }
+
+    public static class DestructionArgumentTypes extends EnumArgumentType<DestructionType> {
+        protected DestructionArgumentTypes() {
+            super(DestructionType.CODEC, DestructionType::values);
+        }
+
+        public static EnumArgumentType<DestructionType> destructionType() {
+            return new DestructionCommand.DestructionArgumentTypes();
+        }
+
+        public static DestructionType getDestructionType(CommandContext<ServerCommandSource> context, String id) {
+            return context.getArgument(id, DestructionType.class);
+        }
     }
 }

@@ -1,8 +1,6 @@
 package com.sp.render.postshaders.custom;
 
 import com.sp.DestroyingMinecraft;
-import com.sp.destruction.client.custom.supernova.SupernovaDestructionClient;
-import com.sp.destruction.client.custom.supernova.SupernovaJazz;
 import com.sp.render.ShadowMapRenderer;
 import com.sp.render.postshaders.PostShader;
 import com.sp.util.BetterUniforms;
@@ -20,10 +18,9 @@ import java.util.Optional;
 public class SupernovaPostShader extends PostShader {
     public static final Identifier SUPERNOVA_POST = DestroyingMinecraft.idOf("sky");
     public static final Identifier SUPERNOVA_SHADER = DestroyingMinecraft.idOf("sky/sky");
-    public final SupernovaJazz supernovaJazz = new SupernovaJazz();
 
     public SupernovaPostShader() {
-        super(SUPERNOVA_POST, SUPERNOVA_SHADER, new SupernovaDestructionClient());
+        super(SUPERNOVA_POST, SUPERNOVA_SHADER);
     }
 
     @Override

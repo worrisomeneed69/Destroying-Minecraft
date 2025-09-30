@@ -2,6 +2,10 @@ package com.sp.render;
 
 import com.mojang.serialization.Codec;
 import com.sp.DestroyingMinecraftClient;
+import com.sp.destruction.DestructionType;
+import com.sp.destruction.client.ClientDestructionEvents;
+import com.sp.render.postshaders.PostShader;
+import com.sp.render.postshaders.PostShaders;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
 import org.jetbrains.annotations.Nullable;
@@ -10,45 +14,41 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-//@SuppressWarnings("unused")
 public enum ShaderType implements StringIdentifiable {
     NONE            ("none", false, false, false, false, null),
-    NUKE            ("nuke", DestroyingMinecraftClient.nukePostShader.getPost()),
-    CRACKS          ("orbital_laser", DestroyingMinecraftClient.cracksPostShader.getPost()),
-    PLANET          ("planet", DestroyingMinecraftClient.planetPostShader.getPost()),
+    NUKE            ("nuke", ClientDestructionEvents.NUKE_CLIENT.getPostShader()),
+    CRACKS          ("orbital_laser", ClientDestructionEvents.CRACKS_CLIENT.getPostShader()),
+    PLANET          ("planet", ClientDestructionEvents.PLANET_CLIENT.getPostShader()),
     SUPERNOVA       ("supernova", null),
-    BLACK_HOLE      ("black_hole", true, false, true, true,  DestroyingMinecraftClient.blackHolePostShader.getPost());
-//    MINI_BLACK_HOLE ("mini_black_hole", DestroyingMinecraft.idOf("mini_black_hole"))
-//    INITIALIZE      ("init", DestroyingMinecraftClient.initializePostShader.getPost());
-
+    BLACK_HOLE      ("black_hole", true, false, true, true,  ClientDestructionEvents.BLACK_HOLE_CLIENT.getPostShader());
     public static final Codec<ShaderType> CODEC = StringIdentifiable.createCodec(ShaderType::values);
     final String id;
-    final List<Identifier> enabledShaders;
+    final List<PostShader> enabledShaders;
 
-    ShaderType(String id, @Nullable Identifier ... identifiers) {
-        this(id, true, true, true, true, identifiers);
+    ShaderType(String id, @Nullable PostShader ... postShaders) {
+        this(id, true, true, true, true, postShaders);
     }
 
-    ShaderType(String id, boolean enableShadows, boolean enableSky, boolean enableBloom, boolean enablePost, @Nullable Identifier ... identifiers) {
+    ShaderType(String id, boolean enableShadows, boolean enableSky, boolean enableBloom, boolean enablePost, @Nullable PostShader ... postShaders) {
         this.id = id;
 
         this.enabledShaders = new ArrayList<>();
 
-        if(enableSky) this.enabledShaders.add(DestroyingMinecraftClient.supernovaPostShader.getPost());
-        if(enableShadows) this.enabledShaders.add(DestroyingMinecraftClient.shadowPostShader.getPost());
+        if(enableSky) this.enabledShaders.add(ClientDestructionEvents.SUPERNOVA_CLIENT.getPostShader());
+        if(enableShadows) this.enabledShaders.add(PostShaders.SHADOW);
 
 
         //then add whatever shader after
-        if(identifiers != null) {
-            this.enabledShaders.addAll(Arrays.stream(identifiers).toList());
+        if(postShaders != null) {
+            this.enabledShaders.addAll(Arrays.stream(postShaders).toList());
         }
 
         //finally add bloom and post to all of it if any shader is enabled
-        if(enableBloom) this.enabledShaders.add(DestroyingMinecraftClient.bloomPostShader.getPost());
-        if(enablePost) this.enabledShaders.add(DestroyingMinecraftClient.postProcessingPostShader.getPost());
+        if(enableBloom) this.enabledShaders.add(PostShaders.BLOOM);
+        if(enablePost) this.enabledShaders.add(PostShaders.POST);
     }
 
-    public List<Identifier> getEnabledShaders() {
+    public List<PostShader > getEnabledShaders() {
         return this.enabledShaders;
     }
 
@@ -65,5 +65,15 @@ public enum ShaderType implements StringIdentifiable {
         }
 
         return ShaderType.NONE;
+    }
+
+    public static ShaderType getFromDestructionType(DestructionType type) {
+        return switch (type) {
+            case NUKE -> ShaderType.NUKE;
+            case ORBITAL_LASER -> ShaderType.CRACKS;
+            case PLANET -> ShaderType.PLANET;
+            case SUPERNOVA -> ShaderType.SUPERNOVA;
+            case BLACK_HOLE -> ShaderType.BLACK_HOLE;
+        };
     }
 }

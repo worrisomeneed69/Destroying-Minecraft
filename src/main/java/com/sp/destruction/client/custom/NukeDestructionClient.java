@@ -1,12 +1,17 @@
 package com.sp.destruction.client.custom;
 
+import com.sp.cca.InitializeComponents;
+import com.sp.cca.custom.world.WorldDestructionEventsComponent;
+import com.sp.destruction.DestructionType;
 import com.sp.destruction.client.ClientDestructionEvent;
+import com.sp.render.postshaders.PostShaders;
 import com.sp.util.BetterUniforms;
 import com.sp.util.timer.ShaderTimer;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.client.util.Easing;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.world.World;
 
 @Environment(EnvType.CLIENT)
@@ -17,7 +22,7 @@ public class NukeDestructionClient extends ClientDestructionEvent {
     private float floatProgress;
 
     public NukeDestructionClient() {
-        super(100);
+        super(DestructionType.NUKE, PostShaders.NUKE, 100);
     }
 
     @Override
@@ -50,8 +55,12 @@ public class NukeDestructionClient extends ClientDestructionEvent {
 
     @Override
     public void setUniforms(ShaderProgram shaderProgram, float tickDelta) {
+        World world = MinecraftClient.getInstance().world;
+        if (world != null) {
+            WorldDestructionEventsComponent component = InitializeComponents.EVENTS.get(world);
+            BetterUniforms.setVector3f(shaderProgram, "NUKE_POS", component.getDestructionEventPosition().toVector3f());
+        }
         BetterUniforms.setFloat(shaderProgram, "smokeRiseTimer", smokeRiseTimer.getTimer(tickDelta));
-//        System.out.println(smokeRiseTimer.getTimer(tickDelta));
         BetterUniforms.setFloat(shaderProgram, "flashTimer", flashTimer.getTimer(tickDelta));
     }
 }

@@ -1,7 +1,6 @@
 package com.sp.mixin.compat.sodium;
 
 import com.sp.DestroyingMinecraftClient;
-import com.sp.destruction.client.custom.supernova.SupernovaDestructionClient;
 import net.caffeinemc.mods.sodium.client.render.chunk.RenderSection;
 import net.caffeinemc.mods.sodium.client.render.chunk.occlusion.OcclusionCuller;
 import net.caffeinemc.mods.sodium.client.render.viewport.Viewport;

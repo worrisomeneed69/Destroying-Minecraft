@@ -58,7 +58,7 @@ public class BlockInstanceRenderer {
         shader.setSampler("Sampler2", RenderSystem.getShaderTexture(2));
         shader.setSampler("Sampler3", RenderSystem.getShaderTexture(3));
 
-        BetterUniforms.setVector(shader, "offset", position);
+        BetterUniforms.setVector3f(shader, "offset", position);
 
         shader.bindSamplers(0);
         shader.setDefaultUniforms(VertexFormat.DrawMode.QUADS);
@@ -78,42 +78,43 @@ public class BlockInstanceRenderer {
 
 
     private void createCube(BufferBuilder bufferBuilder, float pMinX, float pMinY, float pMinZ, float pMaxX, float pMaxY, float pMaxZ) {
+        float scale = 3.0f;
 
         //NORTH
-        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMinZ).mul(2)).texture(1.0f, 1.0f).normal(0,0,-1);
-        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMinZ).mul(2)).texture(0.0f, 1.0f).normal(0,0,-1);
-        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMinZ).mul(2)).texture(0.0f, 0.0f).normal(0,0,-1);
-        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMinZ).mul(2)).texture(1.0f, 0.0f).normal(0,0,-1);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMinZ).mul(scale)).texture(1.0f, 1.0f).normal(0,0,-1);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMinZ).mul(scale)).texture(0.0f, 1.0f).normal(0,0,-1);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMinZ).mul(scale)).texture(0.0f, 0.0f).normal(0,0,-1);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMinZ).mul(scale)).texture(1.0f, 0.0f).normal(0,0,-1);
 
         //DOWN
-        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMinZ).mul(2)).texture(0.0f, 1.0f).normal(0,-1,0);
-        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMaxZ).mul(2)).texture(0.0f, 0.0f).normal(0,-1,0);
-        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMaxZ).mul(2)).texture(1.0f, 0.0f).normal(0,-1,0);
-        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMinZ).mul(2)).texture(1.0f, 1.0f).normal(0,-1,0);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMinZ).mul(scale)).texture(0.0f, 1.0f).normal(0,-1,0);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMaxZ).mul(scale)).texture(0.0f, 0.0f).normal(0,-1,0);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMaxZ).mul(scale)).texture(1.0f, 0.0f).normal(0,-1,0);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMinZ).mul(scale)).texture(1.0f, 1.0f).normal(0,-1,0);
 
         //UP
-        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMaxZ).mul(2)).texture(0.0f, 1.0f).normal(0,1,0);
-        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMaxZ).mul(2)).texture(0.0f, 0.0f).normal(0,1,0);
-        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMinZ).mul(2)).texture(1.0f, 0.0f).normal(0,1,0);
-        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMinZ).mul(2)).texture(1.0f, 1.0f).normal(0,1,0);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMaxZ).mul(scale)).texture(0.0f, 1.0f).normal(0,1,0);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMaxZ).mul(scale)).texture(0.0f, 0.0f).normal(0,1,0);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMinZ).mul(scale)).texture(1.0f, 0.0f).normal(0,1,0);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMinZ).mul(scale)).texture(1.0f, 1.0f).normal(0,1,0);
 
         //SOUTH
-        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMaxZ).mul(2)).texture(0.0f, 1.0f).normal(0,0,1);
-        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMaxZ).mul(2)).texture(0.0f, 0.0f).normal(0,0,1);
-        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMaxZ).mul(2)).texture(1.0f, 0.0f).normal(0,0,1);
-        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMaxZ).mul(2)).texture(1.0f, 1.0f).normal(0,0,1);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMaxZ).mul(scale)).texture(0.0f, 1.0f).normal(0,0,1);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMaxZ).mul(scale)).texture(0.0f, 0.0f).normal(0,0,1);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMaxZ).mul(scale)).texture(1.0f, 0.0f).normal(0,0,1);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMaxZ).mul(scale)).texture(1.0f, 1.0f).normal(0,0,1);
 
         //EAST
-        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMaxZ).mul(2)).texture(0.0f, 1.0f).normal(1,0,0);
-        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMaxZ).mul(2)).texture(0.0f, 0.0f).normal(1,0,0);
-        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMinZ).mul(2)).texture(1.0f, 0.0f).normal(1,0,0);
-        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMinZ).mul(2)).texture(1.0f, 1.0f).normal(1,0,0);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMaxZ).mul(scale)).texture(0.0f, 1.0f).normal(1,0,0);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMaxZ).mul(scale)).texture(0.0f, 0.0f).normal(1,0,0);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMinY, pMinZ).mul(scale)).texture(1.0f, 0.0f).normal(1,0,0);
+        bufferBuilder.vertex(new Vector3f(pMaxX, pMaxY, pMinZ).mul(scale)).texture(1.0f, 1.0f).normal(1,0,0);
 
         //WEST
-        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMinZ).mul(2)).texture(0.0f, 1.0f).normal(-1,0,0);
-        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMinZ).mul(2)).texture(0.0f, 0.0f).normal(-1,0,0);
-        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMaxZ).mul(2)).texture(1.0f, 0.0f).normal(-1,0,0);
-        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMaxZ).mul(2)).texture(1.0f, 1.0f).normal(-1,0,0);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMinZ).mul(scale)).texture(0.0f, 1.0f).normal(-1,0,0);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMinZ).mul(scale)).texture(0.0f, 0.0f).normal(-1,0,0);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMinY, pMaxZ).mul(scale)).texture(1.0f, 0.0f).normal(-1,0,0);
+        bufferBuilder.vertex(new Vector3f(pMinX, pMaxY, pMaxZ).mul(scale)).texture(1.0f, 1.0f).normal(-1,0,0);
     }
 
     public void free(){

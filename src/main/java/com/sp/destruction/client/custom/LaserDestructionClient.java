@@ -1,8 +1,12 @@
 package com.sp.destruction.client.custom;
 
+import com.sp.cca.InitializeComponents;
+import com.sp.cca.custom.world.WorldDestructionEventsComponent;
+import com.sp.destruction.DestructionType;
 import com.sp.destruction.client.ClientDestructionEvent;
 import com.sp.render.camerashake.CameraShakeManager;
 import com.sp.render.camerashake.custom.CameraShakeInstance;
+import com.sp.render.postshaders.PostShaders;
 import com.sp.sounds.ModSounds;
 import com.sp.util.BetterUniforms;
 import com.sp.util.timer.ShaderTimer;
@@ -18,6 +22,7 @@ import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.client.sound.SoundManager;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.world.World;
+import org.joml.Vector2f;
 
 @Environment(EnvType.CLIENT)
 public class LaserDestructionClient extends ClientDestructionEvent {
@@ -29,7 +34,7 @@ public class LaserDestructionClient extends ClientDestructionEvent {
     private static PositionedSoundInstance laserEnding;
 
     public LaserDestructionClient() {
-        super(2500);
+        super(DestructionType.ORBITAL_LASER, PostShaders.CRACKS, 2500);
     }
 
     @Override
@@ -52,6 +57,12 @@ public class LaserDestructionClient extends ClientDestructionEvent {
 
     @Override
     public void setUniforms(ShaderProgram shaderProgram, float tickDelta) {
+        World world = MinecraftClient.getInstance().world;
+        if (world != null) {
+            WorldDestructionEventsComponent component = InitializeComponents.EVENTS.get(world);
+            Vector2f pos = new Vector2f((float) component.getDestructionEventPosition().x, (float) component.getDestructionEventPosition().z);
+            BetterUniforms.setVector2f(shaderProgram, "CENTER_POS", pos);
+        }
         BetterUniforms.setFloat(shaderProgram, "laserLength", laserLength.getTimer(tickDelta));
         BetterUniforms.setFloat(shaderProgram, "cracksTime", cracksTime.getTimer(tickDelta));
         BetterUniforms.setFloat(shaderProgram, "flashTimer", flashTimer.getTimer(tickDelta));

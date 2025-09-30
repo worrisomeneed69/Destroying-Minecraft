@@ -16,7 +16,6 @@ uniform sampler2D StarsTexture;
 uniform vec4 ColorModulator;
 uniform vec3 redMultiplier;
 uniform float GameTime;
-uniform float flashTimer;
 
 uniform mat4 prevProjMat;
 uniform mat4 prevViewMat;
@@ -160,16 +159,13 @@ void main() {
 
         }
 
-        //SkyFlash
-        fragColor = mix(vec4(vec3(5.0), 1.0), color, flashTimer);
-//        fragColor = color;
+        fragColor = color;
 
 
 
         if(prevTexcoord.x >= 0.0 && prevTexcoord.x <= 1.0 && prevTexcoord.y >= 0.0 && prevTexcoord.y <= 1.0) {
             if(prevDepth >= 1.0) {
-                fragColor = mix(fragColor, texture(PrevSampler, prevTexcoord), min(flashTimer, 0.5));
-//                fragColor = mix(fragColor, texture(PrevSampler, prevTexcoord), 0.9);
+                fragColor = mix(fragColor, texture(PrevSampler, prevTexcoord), 0.7);
             }
         }
 

@@ -21,6 +21,12 @@
                 "blur": true
             }
         }
+    },
+    "textures": {
+      "HandDepthSampler": {
+        "type": "framebuffer",
+        "name": "veil:first_person:depth"
+      }
     }
 }
 

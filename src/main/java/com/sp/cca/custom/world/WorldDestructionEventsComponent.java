@@ -20,13 +20,15 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Com
     private final World world;
     private boolean syncLight;
     private DestructionEvent currentDestructionEvent;
+    private Vec3d destructionEventPosition;
     private double gravityLerp;
     public static final Vec3d gravityDir = new Vec3d(0.0, 0.07, -0.03);
-    private NbtCompound worldPlayZones;
+//    private NbtCompound worldPlayZones;
 
     public WorldDestructionEventsComponent(World world) {
         this.world = world;
         this.gravityLerp = 0.0;
+        this.destructionEventPosition = Vec3d.ZERO;
     }
 
     public double getGravityLerp() {
@@ -42,7 +44,7 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Com
     public void setAndStartCurrentDestructionEvent(DestructionEvent currentDestructionEvent, long startTime) {
         if (this.currentDestructionEvent != null) {
             this.currentDestructionEvent.setActive(false, -1);
-//            this.currentDestructionEvent.resetEvent();
+            this.currentDestructionEvent.resetEvent();
         }
 
         if (currentDestructionEvent == null) {
@@ -56,6 +58,14 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Com
 
         this.currentDestructionEvent = currentDestructionEvent;
         this.currentDestructionEvent.setActive(true, startTime);
+    }
+
+    public Vec3d getDestructionEventPosition() {
+        return this.destructionEventPosition;
+    }
+
+    public void setDestructionEventPosition(Vec3d position) {
+        this.destructionEventPosition = position;
     }
 
 
@@ -79,26 +89,26 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Com
             this.currentDestructionEvent.setProgress(nbtCompound.getInt("currentDestructionEventProgress"));
         }
 
-        if (nbtCompound.contains("playZones")) {
-            this.worldPlayZones = nbtCompound.getCompound("playZones");
-            NbtCompound playZoneCompound = this.worldPlayZones;
-            PlayZoneManager.clearAllPlayZones();
-
-            for (int i = 0; i < playZoneCompound.getInt("numOfPlayZones"); i++) {
-                Box playZoneBoundingBox = new Box(
-                        playZoneCompound.getDouble("minX" + i),
-                        playZoneCompound.getDouble("minY" + i),
-                        playZoneCompound.getDouble("minZ" + i),
-
-                        playZoneCompound.getDouble("maxX" + i),
-                        playZoneCompound.getDouble("maxY" + i),
-                        playZoneCompound.getDouble("maxZ" + i)
-                );
-
-                PlayZone playZone = new PlayZone(playZoneBoundingBox, playZoneCompound.getInt("id" + i));
-                PlayZoneManager.addPlayZone(this.world, playZone);
-            }
-        }
+//        if (nbtCompound.contains("playZones")) {
+//            this.worldPlayZones = nbtCompound.getCompound("playZones");
+//            NbtCompound playZoneCompound = this.worldPlayZones;
+//            PlayZoneManager.clearAllPlayZones();
+//
+//            for (int i = 0; i < playZoneCompound.getInt("numOfPlayZones"); i++) {
+//                Box playZoneBoundingBox = new Box(
+//                        playZoneCompound.getDouble("minX" + i),
+//                        playZoneCompound.getDouble("minY" + i),
+//                        playZoneCompound.getDouble("minZ" + i),
+//
+//                        playZoneCompound.getDouble("maxX" + i),
+//                        playZoneCompound.getDouble("maxY" + i),
+//                        playZoneCompound.getDouble("maxZ" + i)
+//                );
+//
+//                PlayZone playZone = new PlayZone(playZoneBoundingBox, playZoneCompound.getInt("id" + i));
+//                PlayZoneManager.addPlayZone(this.world, playZone);
+//            }
+//        }
     }
 
     @Override
@@ -106,26 +116,26 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Com
         nbtCompound.putDouble("gravityLerp", this.gravityLerp);
         nbtCompound.putDouble("currentDestructionEventProgress", this.currentDestructionEvent != null ? this.currentDestructionEvent.getProgress() : -1);
 
-        NbtCompound playZoneNbt = new NbtCompound();
-        Vector<PlayZone> activePlayZones = PlayZoneManager.getActivePlayZones();
-        playZoneNbt.putInt("numOfPlayZones", activePlayZones.size());
-        for (int i = 0; i < activePlayZones.size(); i++) {
-            PlayZone playZone = activePlayZones.get(i);
-            Box playZoneBounds = playZone.getBoundingBox();
-
-            playZoneNbt.putDouble("minX" + i, playZoneBounds.minX);
-            playZoneNbt.putDouble("minY" + i, playZoneBounds.minY);
-            playZoneNbt.putDouble("minZ" + i, playZoneBounds.minZ);
-
-            playZoneNbt.putDouble("maxX" + i, playZoneBounds.maxX);
-            playZoneNbt.putDouble("maxY" + i, playZoneBounds.maxY);
-            playZoneNbt.putDouble("maxZ" + i, playZoneBounds.maxZ);
-            playZoneNbt.putInt("id" + i, playZone.getId());
-        }
-        nbtCompound.put("playZones", playZoneNbt);
-
-        this.worldPlayZones = playZoneNbt;
-        nbtCompound.put("playZones", this.worldPlayZones);
+//        NbtCompound playZoneNbt = new NbtCompound();
+//        Vector<PlayZone> activePlayZones = PlayZoneManager.getActivePlayZones();
+//        playZoneNbt.putInt("numOfPlayZones", activePlayZones.size());
+//        for (int i = 0; i < activePlayZones.size(); i++) {
+//            PlayZone playZone = activePlayZones.get(i);
+//            Box playZoneBounds = playZone.getBoundingBox();
+//
+//            playZoneNbt.putDouble("minX" + i, playZoneBounds.minX);
+//            playZoneNbt.putDouble("minY" + i, playZoneBounds.minY);
+//            playZoneNbt.putDouble("minZ" + i, playZoneBounds.minZ);
+//
+//            playZoneNbt.putDouble("maxX" + i, playZoneBounds.maxX);
+//            playZoneNbt.putDouble("maxY" + i, playZoneBounds.maxY);
+//            playZoneNbt.putDouble("maxZ" + i, playZoneBounds.maxZ);
+//            playZoneNbt.putInt("id" + i, playZone.getId());
+//        }
+//        nbtCompound.put("playZones", playZoneNbt);
+//
+//        this.worldPlayZones = playZoneNbt;
+//        nbtCompound.put("playZones", this.worldPlayZones);
 
     }
 

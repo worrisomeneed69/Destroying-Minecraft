@@ -10,7 +10,6 @@ import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 
 public class PhysicsBlockComponent implements AutoSyncedComponent {
     private final BlockPhysicsEntity blockPhysicsEntity;
-//    private List<BlockPhysicsEntity.BlockData> blocks = new ArrayList<>();
     private Quaternionf rotation = new Quaternionf();
     private float xRotationSpeed;
     private float yRotationSpeed;
@@ -21,20 +20,6 @@ public class PhysicsBlockComponent implements AutoSyncedComponent {
     public PhysicsBlockComponent(BlockPhysicsEntity spinningBlock) {
         this.blockPhysicsEntity = spinningBlock;
     }
-
-//    public void setBlocks(List<BlockPhysicsEntity.BlockData> blocks) {
-//        sync();
-//        this.blocks = blocks;
-//    }
-//
-//    public void addBlock(BlockPhysicsEntity.BlockData blockData) {
-//        this.blocks.add(blockData);
-//        sync();
-//    }
-//
-//    public List<BlockPhysicsEntity.BlockData> getBlocks() {
-//        return blocks;
-//    }
 
     public void setRotation(Quaternionf rotation) {
         this.rotation = new Quaternionf(rotation);
@@ -95,19 +80,6 @@ public class PhysicsBlockComponent implements AutoSyncedComponent {
             shouldSync = true;
         }
 
-//        if (nbtCompound.contains("blocks")) {
-//            NbtList blockList = nbtCompound.getList("blocks", NbtList.COMPOUND_TYPE);
-//
-//            this.setBlocks(
-//                    blockList.stream().map((nbtElement) -> {
-//                        NbtCompound blockNbt = (NbtCompound) nbtElement;
-//                        return BlockPhysicsEntity.BlockData.fromNBT(blockNbt, wrapperLookup);
-//                    }).toList()
-//            );
-//
-//            shouldSync = true;
-//        }
-
         if (shouldSync) {
             this.sync();
         }
@@ -128,12 +100,11 @@ public class PhysicsBlockComponent implements AutoSyncedComponent {
         rotationSpeedNbt.putFloat("y", yRotationSpeed);
         rotationSpeedNbt.putFloat("z", zRotationSpeed);
         nbtCompound.put("rotationSpeed", rotationSpeedNbt);
+    }
 
-//        NbtList blockList = new NbtList();
-//        for (BlockPhysicsEntity.BlockData blockData : blocks) {
-//            blockList.add(blockData.asNBT());
-//        }
-//
-//        nbtCompound.put("blocks", blockList);
+    public enum Type {
+        DOOR,
+        METEOR,
+        DESTRUCTION;
     }
 }

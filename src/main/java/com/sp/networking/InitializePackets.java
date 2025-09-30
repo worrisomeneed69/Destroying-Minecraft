@@ -1,6 +1,5 @@
 package com.sp.networking;
 
-import com.sp.networking.C2S.UpdateLimboSquareBlockPacket;
 import com.sp.networking.C2S.UpdatePhysicsDoorPacket;
 import com.sp.networking.S2C.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -13,11 +12,9 @@ public class InitializePackets {
     public static void registerServerNetworking() {
         //Send to server
         PayloadTypeRegistry.playC2S().register(CustomPayloads.UpdatePhysicsDoorBlock.ID, CustomPayloads.UpdatePhysicsDoorBlock.CODEC);
-        PayloadTypeRegistry.playC2S().register(CustomPayloads.UpdateLimboSquareBlockPayload.ID, CustomPayloads.UpdateLimboSquareBlockPayload.CODEC);
 
         //Receive from client
         ServerPlayNetworking.registerGlobalReceiver(CustomPayloads.UpdatePhysicsDoorBlock.ID, UpdatePhysicsDoorPacket::recieve);
-        ServerPlayNetworking.registerGlobalReceiver(CustomPayloads.UpdateLimboSquareBlockPayload.ID, UpdateLimboSquareBlockPacket::receive);
 
 
         //Send to client
