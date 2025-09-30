@@ -243,7 +243,7 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
 
         Vec3d playerPos = this.player.getPos();
         Vec3d position = InitializeComponents.EVENTS.get(this.player.getWorld()).getDestructionEventPosition();
-        float holeSize = (float) (1.0 - Vector2d.distance(position.x, position.y, playerPos.x, playerPos.z)/time);
+        float holeSize = (float) (1.0 - Vector2d.distance(position.x, position.z, playerPos.x, playerPos.z)/time);
 
         float noise = Noise.getCrackNoise(new Vec3d(playerPos.x, 4, playerPos.z));
         this.isInHole = noise < holeSize;

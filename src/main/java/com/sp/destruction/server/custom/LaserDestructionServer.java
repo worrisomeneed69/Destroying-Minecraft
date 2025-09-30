@@ -15,6 +15,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
+import java.util.List;
+
 public class LaserDestructionServer extends ServerDestructionEvent {
     private static final Random random = Random.create();
     private static final float radius = 23;
@@ -66,14 +68,18 @@ public class LaserDestructionServer extends ServerDestructionEvent {
 
                 int playerCount = 0;
 
-                for (PlayerEntity player : world.getPlayers()) {
-                    if (player.isCreative() || player.isSpectator()) continue;
-                    playerCount++;
+                List<? extends PlayerEntity> playerList = world.getPlayers();
+                if (!playerList.isEmpty()) {
+                    for (PlayerEntity player : world.getPlayers()) {
+                        if (player.isCreative() || player.isSpectator()) continue;
+                        playerCount++;
+                    }
+
+                    if (playerCount <= 1) {
+                        this.skipKeyframe();
+                    }
                 }
 
-                if (playerCount <= 1) {
-                    this.skipKeyframe();
-                }
             }),
 
             new Keyframe(2100.0 / this.duration)

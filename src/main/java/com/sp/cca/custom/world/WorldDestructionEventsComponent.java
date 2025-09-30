@@ -2,6 +2,7 @@ package com.sp.cca.custom.world;
 
 import com.sp.cca.InitializeComponents;
 import com.sp.destruction.DestructionEvent;
+import com.sp.world.destructionevent.custom.BlackHoleDestruction;
 import com.sp.world.playzone.PlayZone;
 import com.sp.world.playzone.PlayZoneManager;
 import net.minecraft.nbt.NbtCompound;
@@ -45,6 +46,11 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Com
         if (this.currentDestructionEvent != null) {
             this.currentDestructionEvent.setActive(false, -1);
             this.currentDestructionEvent.resetEvent();
+            BlackHoleDestruction.setStartDestruction(false);
+            BlackHoleDestruction.reset();
+
+            this.setGravityLerp(0.0);
+            this.syncLight();
         }
 
         if (currentDestructionEvent == null) {
