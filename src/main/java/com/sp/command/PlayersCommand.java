@@ -36,17 +36,6 @@ public class PlayersCommand {
                                         )
                                 )
                         )
-                        .then(CommandManager.literal("setinwaitingroom")
-                                .then(CommandManager.argument("targets", EntityArgumentType.players())
-                                        .then(CommandManager.argument("setinwaitingroom", BoolArgumentType.bool())
-                                                .executes(context -> executeSetInWaitingRoom(
-                                                                EntityArgumentType.getPlayers(context, "targets"),
-                                                                BoolArgumentType.getBool(context, "setinwaitingroom")
-                                                        )
-                                                )
-                                        )
-                                )
-                        )
                         .then(CommandManager.literal("reset")
                                 .then(CommandManager.argument("targets", EntityArgumentType.players())
                                         .executes(context -> executeReset(
