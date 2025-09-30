@@ -293,11 +293,15 @@ public class BlackHoleDestruction {
     }
 
     public static void reset() {
-        resetEntityMap.forEach(blockPhysicsEntity -> {
-            if(blockPhysicsEntity != null && !blockPhysicsEntity.isRemoved()){
-                blockPhysicsEntity.discard();
-            }
-        });
+        if (!resetEntityMap.isEmpty()) {
+            resetEntityMap.forEach(blockPhysicsEntity -> {
+                if(blockPhysicsEntity != null && !blockPhysicsEntity.isRemoved()){
+                    blockPhysicsEntity.discard();
+                }
+            });
+
+            resetEntityMap.clear();
+        }
     }
 
     private static void breakOff(World world, List<BlockPos> blocks) {

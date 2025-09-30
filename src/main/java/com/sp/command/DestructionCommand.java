@@ -12,6 +12,7 @@ import com.sp.cca.custom.world.WorldDestructionEventsComponent;
 import com.sp.destruction.DestructionEvent;
 import com.sp.destruction.DestructionType;
 import com.sp.destruction.server.ServerDestructionEvent;
+import com.sp.entity.custom.BlockPhysicsEntity;
 import com.sp.entity.custom.StarPiercerEntity;
 import com.sp.networking.CustomPayloads;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
@@ -21,6 +22,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EnumArgumentType;
 import net.minecraft.command.argument.Vec3ArgumentType;
+import net.minecraft.entity.Entity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -127,6 +129,7 @@ public class DestructionCommand {
             if (event.getDestructionType().equals(type)) {
                 worldComponent.setAndStartCurrentDestructionEvent(event, startTime);
                 worldComponent.setDestructionEventPosition(position);
+                break;
             }
         }
 
@@ -141,7 +144,10 @@ public class DestructionCommand {
         }
 
         BlackHoleDestruction.setStartDestruction(false);
-        BlackHoleDestruction.reset();
+        context.getSource().getWorld().getEntitiesByClass(
+                BlockPhysicsEntity.class,
+                Box.of(worldComponent.getDestructionEventPosition(), 1000, 1000, 1000),
+                blockPhysicsEntity -> true).forEach(Entity::discard);
 
         worldComponent.setGravityLerp(0.0);
         worldComponent.syncLight();

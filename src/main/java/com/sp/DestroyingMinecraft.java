@@ -37,11 +37,6 @@ public class DestroyingMinecraft implements ModInitializer {
 	public static final String MOD_ID = "destroying-minecraft";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	public static final PlanetDestructionServer planetServerDestruction = new PlanetDestructionServer();
-	public static final SupernovaDestructionServer supernovaServerDestruction = new SupernovaDestructionServer();
-	public static final BlackHoleDestructionServerPart2 blackHoleDestructionPart2 = new BlackHoleDestructionServerPart2();
-	public static final LaserDestructionServer laserDestruction = new LaserDestructionServer();
-
 	@Override
 	public void onInitialize() {
 

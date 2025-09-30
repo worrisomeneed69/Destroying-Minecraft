@@ -69,7 +69,7 @@ public class LaserDestructionServer extends ServerDestructionEvent {
                 int playerCount = 0;
 
                 List<? extends PlayerEntity> playerList = world.getPlayers();
-                if (!playerList.isEmpty()) {
+                if (playerList.size() > 1) {
                     for (PlayerEntity player : world.getPlayers()) {
                         if (player.isCreative() || player.isSpectator()) continue;
                         playerCount++;

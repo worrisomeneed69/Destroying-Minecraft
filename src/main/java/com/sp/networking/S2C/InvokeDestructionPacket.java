@@ -16,8 +16,6 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.Optional;
 
-import static com.sp.command.DestructionCommand.*;
-
 public class InvokeDestructionPacket {
 
     public static void receive(CustomPayloads.DestructionPayload payload, ClientPlayNetworking.Context context) {
@@ -44,6 +42,7 @@ public class InvokeDestructionPacket {
                             DestroyingMinecraftConfig.shaderType = shaderType;
                             DestroyingMinecraftConfig.write(DestroyingMinecraft.MOD_ID);
                         }
+                        break;
                     }
                 }
                 DestructionTitleRenderCallback.setDestructionTitle(destructionType);

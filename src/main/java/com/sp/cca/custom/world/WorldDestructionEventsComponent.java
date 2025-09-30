@@ -2,9 +2,10 @@ package com.sp.cca.custom.world;
 
 import com.sp.cca.InitializeComponents;
 import com.sp.destruction.DestructionEvent;
+import com.sp.destruction.DestructionType;
+import com.sp.entity.custom.BlockPhysicsEntity;
 import com.sp.world.destructionevent.custom.BlackHoleDestruction;
-import com.sp.world.playzone.PlayZone;
-import com.sp.world.playzone.PlayZoneManager;
+import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.registry.RegistryWrapper;
@@ -14,8 +15,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.tick.CommonTickingComponent;
-
-import java.util.Vector;
 
 public class WorldDestructionEventsComponent implements AutoSyncedComponent, CommonTickingComponent {
     private final World world;
@@ -46,11 +45,17 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Com
         if (this.currentDestructionEvent != null) {
             this.currentDestructionEvent.setActive(false, -1);
             this.currentDestructionEvent.resetEvent();
-            BlackHoleDestruction.setStartDestruction(false);
-            BlackHoleDestruction.reset();
 
-            this.setGravityLerp(0.0);
-            this.syncLight();
+            if (this.currentDestructionEvent.getDestructionType().equals(DestructionType.BLACK_HOLE)) {
+                BlackHoleDestruction.setStartDestruction(false);
+                this.world.getEntitiesByClass(
+                        BlockPhysicsEntity.class,
+                        Box.of(this.destructionEventPosition, 1000, 1000, 1000),
+                        blockPhysicsEntity -> true).forEach(Entity::discard);
+                this.setGravityLerp(0.0);
+                this.syncLight();
+            }
+
         }
 
         if (currentDestructionEvent == null) {
@@ -84,8 +89,9 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Com
 
             buf.writeNbt(nbtCompound);
             this.syncLight = false;
+        }else {
+            AutoSyncedComponent.super.writeSyncPacket(buf, recipient);
         }
-        AutoSyncedComponent.super.writeSyncPacket(buf, recipient);
     }
 
     @Override
@@ -94,54 +100,12 @@ public class WorldDestructionEventsComponent implements AutoSyncedComponent, Com
         if (this.currentDestructionEvent != null) {
             this.currentDestructionEvent.setProgress(nbtCompound.getInt("currentDestructionEventProgress"));
         }
-
-//        if (nbtCompound.contains("playZones")) {
-//            this.worldPlayZones = nbtCompound.getCompound("playZones");
-//            NbtCompound playZoneCompound = this.worldPlayZones;
-//            PlayZoneManager.clearAllPlayZones();
-//
-//            for (int i = 0; i < playZoneCompound.getInt("numOfPlayZones"); i++) {
-//                Box playZoneBoundingBox = new Box(
-//                        playZoneCompound.getDouble("minX" + i),
-//                        playZoneCompound.getDouble("minY" + i),
-//                        playZoneCompound.getDouble("minZ" + i),
-//
-//                        playZoneCompound.getDouble("maxX" + i),
-//                        playZoneCompound.getDouble("maxY" + i),
-//                        playZoneCompound.getDouble("maxZ" + i)
-//                );
-//
-//                PlayZone playZone = new PlayZone(playZoneBoundingBox, playZoneCompound.getInt("id" + i));
-//                PlayZoneManager.addPlayZone(this.world, playZone);
-//            }
-//        }
     }
 
     @Override
     public void writeToNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {
         nbtCompound.putDouble("gravityLerp", this.gravityLerp);
         nbtCompound.putDouble("currentDestructionEventProgress", this.currentDestructionEvent != null ? this.currentDestructionEvent.getProgress() : -1);
-
-//        NbtCompound playZoneNbt = new NbtCompound();
-//        Vector<PlayZone> activePlayZones = PlayZoneManager.getActivePlayZones();
-//        playZoneNbt.putInt("numOfPlayZones", activePlayZones.size());
-//        for (int i = 0; i < activePlayZones.size(); i++) {
-//            PlayZone playZone = activePlayZones.get(i);
-//            Box playZoneBounds = playZone.getBoundingBox();
-//
-//            playZoneNbt.putDouble("minX" + i, playZoneBounds.minX);
-//            playZoneNbt.putDouble("minY" + i, playZoneBounds.minY);
-//            playZoneNbt.putDouble("minZ" + i, playZoneBounds.minZ);
-//
-//            playZoneNbt.putDouble("maxX" + i, playZoneBounds.maxX);
-//            playZoneNbt.putDouble("maxY" + i, playZoneBounds.maxY);
-//            playZoneNbt.putDouble("maxZ" + i, playZoneBounds.maxZ);
-//            playZoneNbt.putInt("id" + i, playZone.getId());
-//        }
-//        nbtCompound.put("playZones", playZoneNbt);
-//
-//        this.worldPlayZones = playZoneNbt;
-//        nbtCompound.put("playZones", this.worldPlayZones);
 
     }
 
