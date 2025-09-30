@@ -129,6 +129,7 @@ void main() {
     vec3 normal = vec3(0.0);
 
     Ray ray;
+    ray.hit = false;
     if (smokeRiseTimer > 0.0) {
         rayMarchNuke(color, viewPos, normal, ray);
     }
