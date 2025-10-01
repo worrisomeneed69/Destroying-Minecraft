@@ -141,10 +141,4 @@ void main() {
     }
     float flash = flashTimer > 0 ? 0.6 * (1.0-min(flashTimer, 1.0)) : 0.0;
     fragColor += flash;
-
-//    if (depth < 1.0) {
-//        fragColor = vec4(1.0);
-//    } else {
-//        fragColor = vec4(0.0);
-//    }
 }

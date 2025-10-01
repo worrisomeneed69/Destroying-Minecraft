@@ -273,7 +273,4 @@ void main() {
 
     fragColor = vec4(outputColor, 1.0);
     gl_FragDepth = translucentDepth;
-
-
-
 }

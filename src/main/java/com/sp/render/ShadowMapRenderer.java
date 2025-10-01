@@ -92,10 +92,9 @@ public class ShadowMapRenderer {
                 shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
             }
             case SUPERNOVA -> {
-                if(client.world != null) {
-                    shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0F));
-                    shadowModelView.rotate(RotationAxis.POSITIVE_Z.rotationDegrees(-(client.world.getSkyAngle(client.getRenderTickCounter().getTickDelta(true)) * 360.0F) - 90.0f));
-                }
+                //Same position as /time set day
+                shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0f));
+                shadowModelView.rotate(RotationAxis.POSITIVE_Z.rotationDegrees(-387.6012f));
             }
             case PLANET -> {
                 shadowModelView.rotate(RotationAxis.POSITIVE_X.rotationDegrees(25.0f));
@@ -103,7 +102,7 @@ public class ShadowMapRenderer {
             }
             default -> {
                 shadowModelView.rotate(RotationAxis.POSITIVE_X.rotationDegrees(20.0f));
-                shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-100.0f));
+                shadowModelView.rotate(RotationAxis.POSITIVE_Y.rotationDegrees(-75.0f));
             }
         }
 
