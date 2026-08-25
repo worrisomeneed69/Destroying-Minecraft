@@ -43,6 +43,15 @@ jobs:
           path: build/libs/*.jar
           if-no-files-found: warn
 
+
+      - name: Publish to release
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete server-build --repo ${{ github.repository }} --yes --cleanup-tag || true
+          gh release create server-build --repo ${{ github.repository }} --prerelease --title "latest patched server build" build/libs/*.jar
+
       - name: Upload logs
         uses: actions/upload-artifact@v4
         if: always()
