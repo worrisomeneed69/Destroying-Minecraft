@@ -61,7 +61,9 @@ import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class DestroyingMinecraftClient implements ClientModInitializer {
@@ -199,7 +201,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 			if(clientWorld != null) {
                 ShaderType type = DestroyingMinecraftConfig.shaderType;
 
-				for(PostShader postShader : type.getEnabledShaders()) {
+				for(PostShader postShader : enabledShadersFor(type)) {
 					if(postShader.getPost().equals(name)) {
 						postShader.setUniforms(context, tickDelta, client, clientWorld);
 					}
@@ -269,7 +271,7 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 
 
 		//Enable all shaders in their specific order
-		for (PostShader enabledPosts : DestroyingMinecraftConfig.shaderType.getEnabledShaders()) {
+		for (PostShader enabledPosts : enabledShadersFor(DestroyingMinecraftConfig.shaderType)) {
 			if (!postProcessingManager.isActive(enabledPosts.getPost())) {
 				postProcessingManager.add(enabledPosts.getPost());
 			}
@@ -293,4 +295,19 @@ public class DestroyingMinecraftClient implements ClientModInitializer {
 		Identifier bufferId = Veil.veilPath("forced");
 		VeilRenderSystem.renderer().enableBuffers(bufferId, DynamicBufferType.values());
 	}
+
+    private static List<PostShader> enabledShadersFor(ShaderType type) {
+        List<PostShader> list = new ArrayList<>();
+        if (type.enableSky) list.add(ClientDestructionEvents.SUPERNOVA_CLIENT.getPostShader());
+        if (type.enableShadows) list.add(PostShaders.SHADOW);
+        switch (type) {
+            case NUKE -> list.add(ClientDestructionEvents.NUKE_CLIENT.getPostShader());
+            case CRACKS -> list.add(ClientDestructionEvents.CRACKS_CLIENT.getPostShader());
+            case BLACK_HOLE -> list.add(ClientDestructionEvents.BLACK_HOLE_CLIENT.getPostShader());
+            default -> {}
+        }
+        if (type.enableBloom) list.add(PostShaders.BLOOM);
+        if (type.enablePost) list.add(PostShaders.POST);
+        return list;
+    }
 }
