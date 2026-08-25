@@ -8,10 +8,8 @@ import com.sp.destruction.server.custom.LaserDestructionServer;
 import com.sp.entity.ModDamageSources;
 import com.sp.networking.ServerPacketManager;
 import com.sp.sounds.ModSounds;
-import com.sp.sounds.instances.FadingSoundInstance;
 import com.sp.util.Noise;
 import com.sp.world.playzone.PlayZoneManager;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
@@ -38,7 +36,6 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
 
     private boolean shouldGlitch;
     private int glitchTime;
-    private FadingSoundInstance glitchSoundInstance;
 
     public PlayerComponent(PlayerEntity player) {
         this.player = player;
@@ -103,34 +100,21 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
             this.timeInWaitingRoom++;
             if (this.timeInWaitingRoom >= 60) {
                 this.setInWaitingRoom(false);
-                MinecraftClient.getInstance().options.hudHidden = false;
+                ClientHandlers.unhideHud();
                 this.timeInWaitingRoom = 0;
             }
         }
 
-        if (this.player == MinecraftClient.getInstance().player) {
+        if (ClientHandlers.isLocalPlayer(this.player)) {
             this.updateInAPlayZone();
 
             if (this.shouldGlitch) {
-                if (glitchSoundInstance == null || glitchSoundInstance.isDone()) {
-                    glitchSoundInstance = FadingSoundInstance.ambient(
-                            ModSounds.GLITCH,
-                            50,
-                            true,
-                            0,
-                            1.0f,
-                            1.0f
-                    );
-                    MinecraftClient.getInstance().getSoundManager().play(glitchSoundInstance);
+                if (!ClientHandlers.isGlitchPlaying(this.player.getUuid())) {
+                    ClientHandlers.playGlitch(this.player.getUuid());
                 }
-                this.glitchTime = Math.min(this.glitchTime + 1, 100);;
+                this.glitchTime = Math.min(this.glitchTime + 1, 100);
             } else {
-                if (glitchSoundInstance != null) {
-                    glitchSoundInstance.fadeOut();
-                    if (glitchSoundInstance.isDone()) {
-                        glitchSoundInstance = null;
-                    }
-                }
+                ClientHandlers.stopGlitch(this.player.getUuid());
                 this.glitchTime = Math.max(this.glitchTime - 1, 0);
             }
         }
@@ -242,5 +226,37 @@ public class PlayerComponent implements AutoSyncedComponent, ClientTickingCompon
 
         float noise = Noise.getCrackNoise(new Vec3d(playerPos.x, 4, playerPos.z));
         this.isInHole = noise < holeSize;
+    }
+
+    private static class ClientHandlers {
+        private static final java.util.Map<java.util.UUID, com.sp.sounds.instances.FadingSoundInstance> GLITCH_SOUNDS =
+                new java.util.HashMap<>();
+
+        static void unhideHud() {
+            net.minecraft.client.MinecraftClient.getInstance().options.hudHidden = false;
+        }
+
+        static boolean isLocalPlayer(PlayerEntity p) {
+            return p == net.minecraft.client.MinecraftClient.getInstance().player;
+        }
+
+        static boolean isGlitchPlaying(java.util.UUID id) {
+            com.sp.sounds.instances.FadingSoundInstance inst = GLITCH_SOUNDS.get(id);
+            return inst != null && !inst.isDone();
+        }
+
+        static void playGlitch(java.util.UUID id) {
+            com.sp.sounds.instances.FadingSoundInstance inst = com.sp.sounds.instances.FadingSoundInstance.ambient(
+                    ModSounds.GLITCH, 50, true, 0, 1.0f, 1.0f);
+            GLITCH_SOUNDS.put(id, inst);
+            net.minecraft.client.MinecraftClient.getInstance().getSoundManager().play(inst);
+        }
+
+        static void stopGlitch(java.util.UUID id) {
+            com.sp.sounds.instances.FadingSoundInstance inst = GLITCH_SOUNDS.remove(id);
+            if (inst != null) {
+                inst.fadeOut();
+            }
+        }
     }
 }
