@@ -2,13 +2,10 @@ package com.sp.block.entity.custom;
 
 import com.sp.block.entity.ModBlockEntities;
 import com.sp.entity.custom.BlockPhysicsEntity;
-import com.sp.render.gui.screen.PhysicsDoorBlockScreen;
 import com.sp.sounds.ModSounds;
-import com.sp.sounds.instances.DoorOpeningLoopSoundInstance;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
@@ -36,7 +33,6 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
     private boolean doorMoving;
     private Vec3d startingPos;
     private BlockPhysicsEntity currentDoor;
-    private DoorOpeningLoopSoundInstance doorOpeningSoundInstance;
 
     public PhysicsDoorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.PHYSICS_DOOR_BE, pos, state);
@@ -81,7 +77,7 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
             return false;
         } else {
             if (player.getEntityWorld().isClient) {
-                MinecraftClient.getInstance().setScreen(new PhysicsDoorBlockScreen(this));
+                ClientHandlers.openScreen(this);
             }
 
             return true;
@@ -127,15 +123,7 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
         }
 
         if (world.isClient && this.shouldPlaySound()) {
-            if (doorMoving && doorOpeningSoundInstance == null) {
-                doorOpeningSoundInstance = new DoorOpeningLoopSoundInstance(this.getPos().toCenterPos());
-                MinecraftClient.getInstance().getSoundManager().play(doorOpeningSoundInstance);
-            } else if(!doorMoving) {
-                if (doorOpeningSoundInstance != null) {
-                    doorOpeningSoundInstance.startFadeOut();
-                    doorOpeningSoundInstance = null;
-                }
-            }
+            ClientHandlers.tickDoorSound(this, doorMoving);
         }
     }
 
@@ -197,5 +185,26 @@ public class PhysicsDoorBlockEntity extends BlockEntity {
 
     public boolean isDoorMoving() {
         return this.doorMoving;
+    }
+
+    private static class ClientHandlers {
+        private static final java.util.Map<BlockPos, com.sp.sounds.instances.DoorOpeningLoopSoundInstance> SOUNDS = new java.util.HashMap<>();
+
+        static void openScreen(PhysicsDoorBlockEntity be) {
+            net.minecraft.client.MinecraftClient.getInstance()
+                    .setScreen(new com.sp.render.gui.screen.PhysicsDoorBlockScreen(be));
+        }
+
+        static void tickDoorSound(PhysicsDoorBlockEntity be, boolean doorMoving) {
+            com.sp.sounds.instances.DoorOpeningLoopSoundInstance inst = SOUNDS.get(be.getPos());
+            if (doorMoving && inst == null) {
+                inst = new com.sp.sounds.instances.DoorOpeningLoopSoundInstance(be.getPos().toCenterPos());
+                SOUNDS.put(be.getPos(), inst);
+                net.minecraft.client.MinecraftClient.getInstance().getSoundManager().play(inst);
+            } else if (!doorMoving && inst != null) {
+                inst.startFadeOut();
+                SOUNDS.remove(be.getPos());
+            }
+        }
     }
 }
